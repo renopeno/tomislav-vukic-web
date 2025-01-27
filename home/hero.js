@@ -92,28 +92,26 @@ function initHomeHero() {
   }
 
   // Parallax stack photos
-  window.addEventListener("mousemove", (event) => {
-    const parallaxFactor = 32;
+    window.addEventListener("mousemove", (event) => {
+        const parallaxFactor = 32;
 
-    const { clientX, clientY } = event;
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+        const { clientX, clientY } = event;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
 
-    const offsetX = (clientX - centerX) / centerX;
-    const offsetY = (clientY - centerY) / centerY;
+        const offsetX = (clientX - centerX) / centerX;
+        const offsetY = (clientY - centerY) / centerY;
 
-    heroImage.forEach((image, index) => {
-        // Povećava fleksibilnost za 30% sa svakom fotografijom
-        const baseDepth = 1; // Najdonja fotografija
-        const depthMultiplier = 1 + index * 0.6; // Svaka sljedeća fotografija povećava fleksibilnost za 30%
-        const depth = baseDepth + index * depthMultiplier;
+        heroImage.forEach((image, index) => {
+            // Generiraj slučajni koeficijent između 1.3 (30%) i 2.0 (100%)
+            const depthMultiplier = 1 + Math.random() * 0.7; // Random između 1.3 i 2.0
 
-        const moveX = offsetX * parallaxFactor * depth;
-        const moveY = offsetY * parallaxFactor * depth;
+            const moveX = offsetX * parallaxFactor * depthMultiplier;
+            const moveY = offsetY * parallaxFactor * depthMultiplier;
 
-        gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
-    });
-});
+            gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
+         });
+    });     
   
 }
 
