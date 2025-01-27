@@ -91,7 +91,7 @@ function initHomeHero() {
           );
   }
 
-  // Parallax stack photos
+    // Parallax stack photos
     window.addEventListener("mousemove", (event) => {
         const parallaxFactor = 32;
 
@@ -103,15 +103,17 @@ function initHomeHero() {
         const offsetY = (clientY - centerY) / centerY;
 
         heroImage.forEach((image, index) => {
-            // Generiraj slučajni koeficijent između 1.3 (30%) i 2.0 (100%)
-            const depthMultiplier = 1 + Math.random() * 0.7; // Random između 1.3 i 2.0
+            // Povećava fleksibilnost za 40% sa svakom fotografijom
+            const baseDepth = 1; // Najdonja fotografija
+            const depthMultiplier = 1 + index * 0.4; // Svaka sljedeća fotografija povećava fleksibilnost za 30%
+            const depth = baseDepth + index * depthMultiplier;
 
-            const moveX = offsetX * parallaxFactor * depthMultiplier;
-            const moveY = offsetY * parallaxFactor * depthMultiplier;
+            const moveX = offsetX * parallaxFactor * depth;
+            const moveY = offsetY * parallaxFactor * depth;
 
             gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
-         });
-    });     
+        });
+    });
   
 }
 
