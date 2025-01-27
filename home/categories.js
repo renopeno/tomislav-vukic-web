@@ -1,9 +1,22 @@
 function initHomeCategories() {
   const categories = document.querySelectorAll('.categories-row');
 
+  if (!categories.length) {
+    console.warn('Categories elements not found.');
+    return;
+  }
+
+  // Prvo ukloni sve event listenere ako postoje
   categories.forEach((category) => {
+    const newCategory = category.cloneNode(true);
+    category.replaceWith(newCategory);
+  });
+
+  const updatedCategories = document.querySelectorAll('.categories-row');
+
+  updatedCategories.forEach((category) => {
     category.addEventListener('mouseenter', () => {
-      gsap.to(categories, {
+      gsap.to(updatedCategories, {
         opacity: 0.1,
         duration: 0.3,
         ease: 'power2.out',
@@ -15,7 +28,7 @@ function initHomeCategories() {
         ease: 'power1.out',
       });
 
-      categories.forEach((cat) => {
+      updatedCategories.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         if (cat !== category) {
           gsap.to(image, {
@@ -43,13 +56,13 @@ function initHomeCategories() {
     });
 
     category.addEventListener('mouseleave', () => {
-      gsap.to(categories, {
+      gsap.to(updatedCategories, {
         opacity: 1,
         duration: 0.3,
         ease: 'power1.out',
       });
 
-      categories.forEach((cat) => {
+      updatedCategories.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         gsap.to(image, {
           opacity: 0,

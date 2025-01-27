@@ -13,8 +13,6 @@ function updateNavigationWithHref() {
       link.classList.remove('current', 'w--current');
     }
   });
-
-  console.log(`Navigacija ažurirana za href: ${currentHref}`);
 }
 
 function initGlobalFunctions() {
@@ -29,11 +27,8 @@ function initPageSpecificFunctions(namespace) {
     case 'home':
       console.log('Initializing home page functions');
       initHomeHero?.();
-      console.log('initHomeHero called');
       initHomeHighlights?.();
-      console.log('initHomeHighlights called');
       initHomeCategories?.();
-      console.log('initHomeCategories called');
       break;
     case 'work':
       console.log('Initializing work page functions');
@@ -45,6 +40,15 @@ function initPageSpecificFunctions(namespace) {
       break;
     default:
       console.log(`No specific functions for namespace: ${namespace}`);
+  }
+}
+
+function destroyPageSpecificFunctions(namespace) {
+  // Dodajte ovdje logiku za resetiranje funkcionalnosti ako je potrebno
+  if (namespace === 'home') {
+    // Očisti sve scroll-triggere iz GSAP-a
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    console.log('ScrollTrigger killed for home namespace.');
   }
 }
 
@@ -71,6 +75,9 @@ function initBarba() {
     views: [
       {
         namespace: 'home',
+        beforeLeave(data) {
+          destroyPageSpecificFunctions('home');
+        },
         afterEnter(data) {
           initGlobalFunctions();
           initPageSpecificFunctions('home');
@@ -79,6 +86,9 @@ function initBarba() {
       },
       {
         namespace: 'work',
+        beforeLeave(data) {
+          destroyPageSpecificFunctions('work');
+        },
         afterEnter(data) {
           initGlobalFunctions();
           initPageSpecificFunctions('work');
