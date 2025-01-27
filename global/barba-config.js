@@ -1,12 +1,3 @@
-// Importi potrebni za ovaj modul
-import barba from "@barba/core";
-import { initFooter } from "./footer-gsap.js";
-import { initLinksHover } from "./links-hover-effect.js";
-import { initDarkMode } from "./dark-mode.js";
-import initLenis from './lenis-config.js';
-import { initHomeHero, initHomeHighlights, initHomeCategories } from "../home/index.js";
-import { initPhotoGrid } from "../work/grid.js";
-
 function updateNavigationWithHref() {
   const navLinks = document.querySelectorAll('.nav-link');
   const currentHref = window.location.pathname;
@@ -93,4 +84,4 @@ function initBarba() {
   });
 }
 
-export { initBarba };
+initBarba();

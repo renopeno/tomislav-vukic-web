@@ -33,4 +33,4 @@ function initPhotoGrid() {
   );
 }
 
-export { initPhotoGrid };
+initPhotoGrid();

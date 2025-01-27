@@ -69,4 +69,4 @@ function initHomeCategories() {
   });
 }
 
-export { initHomeCategories };
+initHomeCategories();

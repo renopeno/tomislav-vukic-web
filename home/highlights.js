@@ -17,4 +17,4 @@ function initHomeHighlights() {
   });
 }
 
-export { initHomeHighlights };
+initHomeHighlights();

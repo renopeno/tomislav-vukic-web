@@ -1,8 +1,3 @@
-import Lenis from '@studio-freight/lenis';
-import { initGsapPlugins } from './gsap-plugins.js';
-
-initGsapPlugins();
-
 function initLenis() {
   const lenis = new Lenis({
     duration: 0.65,
@@ -21,4 +16,4 @@ function initLenis() {
   lenis.on('scroll', ScrollTrigger.update);
 }
 
-export default initLenis;
+initLenis();

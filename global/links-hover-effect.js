@@ -29,4 +29,4 @@ function initLinksHover() {
   });
 }
 
-export { initLinksHover };
+initLinksHover();

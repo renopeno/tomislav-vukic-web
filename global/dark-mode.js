@@ -21,4 +21,4 @@ function initDarkMode() {
   });
 }
 
-export { initDarkMode };
+initDarkMode();

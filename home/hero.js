@@ -111,4 +111,4 @@ function initHomeHero() {
   });
 }
 
-export { initHomeHero };
+initHomeHero();
