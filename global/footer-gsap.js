@@ -1,5 +1,4 @@
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
 
 function initFooter() {
   const footer = document.querySelector('.section.footer');
