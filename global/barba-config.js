@@ -18,8 +18,7 @@ function updateNavigationWithHref() {
 function initGlobalFunctions() {
   initFooter?.();
   initLinksHover?.();
-  initDarkMode?.();
-  initLenis?.();
+  initLenis?.(); // Pokreni Lenis samo jednom na početku
 }
 
 function initPageSpecificFunctions(namespace) {
@@ -44,12 +43,9 @@ function initPageSpecificFunctions(namespace) {
 }
 
 function destroyPageSpecificFunctions(namespace) {
-  // Dodajte ovdje logiku za resetiranje funkcionalnosti ako je potrebno
-  if (namespace === 'home') {
-    // Očisti sve scroll-triggere iz GSAP-a
-    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    console.log('ScrollTrigger killed for home namespace.');
-  }
+  // Resetiraj sve ScrollTrigger instance
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+  console.log(`ScrollTrigger killed for ${namespace} namespace.`);
 }
 
 function initBarba() {
@@ -76,23 +72,23 @@ function initBarba() {
       {
         namespace: 'home',
         beforeLeave(data) {
-          destroyPageSpecificFunctions('home');
+          destroyPageSpecificFunctions('home'); // Očisti funkcionalnosti za home
         },
         afterEnter(data) {
-          initGlobalFunctions();
-          initPageSpecificFunctions('home');
-          updateNavigationWithHref();
+          initGlobalFunctions(); // Inicijaliziraj globalne funkcije
+          initPageSpecificFunctions('home'); // Pokreni funkcije specifične za home
+          updateNavigationWithHref(); // Ažuriraj navigaciju
         },
       },
       {
         namespace: 'work',
         beforeLeave(data) {
-          destroyPageSpecificFunctions('work');
+          destroyPageSpecificFunctions('work'); // Očisti funkcionalnosti za work
         },
         afterEnter(data) {
-          initGlobalFunctions();
-          initPageSpecificFunctions('work');
-          updateNavigationWithHref();
+          initGlobalFunctions(); // Inicijaliziraj globalne funkcije
+          initPageSpecificFunctions('work'); // Pokreni funkcije specifične za work
+          updateNavigationWithHref(); // Ažuriraj navigaciju
         },
       },
     ],
