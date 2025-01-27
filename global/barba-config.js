@@ -27,19 +27,24 @@ function initGlobalFunctions() {
 function initPageSpecificFunctions(namespace) {
   switch (namespace) {
     case 'home':
+      console.log('Initializing home page functions');
       initHomeHero?.();
+      console.log('initHomeHero called');
       initHomeHighlights?.();
+      console.log('initHomeHighlights called');
       initHomeCategories?.();
+      console.log('initHomeCategories called');
       break;
     case 'work':
+      console.log('Initializing work page functions');
       initPhotoGrid?.();
       break;
     case 'about':
+      console.log('Initializing about page functions');
       // Dodaj init funkcije specifične za About page
       break;
     default:
-      console.log(`No specific init functions for namespace: ${namespace}`);
-      break;
+      console.log(`No specific functions for namespace: ${namespace}`);
   }
 }
 
