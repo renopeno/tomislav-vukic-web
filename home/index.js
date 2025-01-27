@@ -1,4 +1,7 @@
-import '../global/index.js'; // Uključujemo globalne funkcije
-import './hero.js';
-import './categories.js';
-import './highlights.js';
+import '../global/index.js';
+
+import { initHomeHero } from './hero.js';
+import { initHomeCategories } from './categories.js';
+import { initHomeHighlights } from './highlights.js';
+
+export { initHomeHero, initHomeCategories, initHomeHighlights };

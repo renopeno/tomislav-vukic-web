@@ -1,2 +1,4 @@
-import '../global/index.js'; // Uključujemo globalne funkcije
-import './grid.js';
+import '../global/index.js';
+import { initPhotoGrid } from './grid.js';
+
+export { initPhotoGrid };

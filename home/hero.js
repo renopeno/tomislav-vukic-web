@@ -1,3 +1,5 @@
+import gsap from "gsap";
+
 function initHomeHero() {
   let imagesLoaded = 0;
 
@@ -9,22 +11,17 @@ function initHomeHero() {
   const heroImageContainer = document.querySelector(".hero-images-container");
   let heroImages = Array.from(document.querySelectorAll(".hero-image"));
 
-  // Provjera sessionStorage samo za navigaciju
   if (!sessionStorage.getItem("navAnimationShown")) {
       sessionStorage.setItem("navAnimationShown", "true");
-      // Sakrij navigaciju na početku
       gsap.set(navbarItems, { y: -20, opacity: 0 });
   }
 
-  // Ponovno dodaj slike u container u nasumičnom redoslijedu
   heroImages.forEach((img) => {
       heroImageContainer.appendChild(img);
   });
 
-  // Ažuriraj niz heroImages nakon promjene u DOM-u
   heroImages = Array.from(document.querySelectorAll(".hero-image"));
 
-  // Randomiziraj fotke u hero stacku
   function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -33,7 +30,6 @@ function initHomeHero() {
   }
   shuffleArray(heroImages);
 
-  // Čekaj dok se sve slike ne učitaju
   heroImage.forEach((img) => {
       const imgElement = new Image();
       imgElement.src = img.src;
@@ -45,7 +41,6 @@ function initHomeHero() {
       };
   });
 
-  // Ručno razdvoji tekst hero-title na pojedinačna slova
   function splitTextToSpans(element) {
       if (element) {
           const text = element.textContent.trim();
@@ -57,23 +52,12 @@ function initHomeHero() {
   }
   splitTextToSpans(heroTitle);
 
-  // Selektiraj razdvojena slova
   const characters = heroTitle ? heroTitle.querySelectorAll("span") : [];
 
-  // Postavi slike na random pozicije izvan viewporta
-  gsap.set(heroImage, {
-      y: window.innerHeight,
-      scale: 0,
-      rotation: 0,
-  });
-
-  // Sakrij footer elemente (početna pozicija)
+  gsap.set(heroImage, { y: window.innerHeight, scale: 0, rotation: 0 });
   gsap.set(heroFooters, { y: 20, opacity: 0 });
-
-  // Sakrij hero-title na početku
   gsap.set(characters, { y: 500 });
 
-  // Funkcija za pokretanje animacije
   function startAnimation() {
       const timeline = gsap.timeline();
 
@@ -86,24 +70,12 @@ function initHomeHero() {
           })
           .to(
               navbarItems,
-              {
-                  y: 0,
-                  opacity: 1,
-                  duration: 0.4,
-                  stagger: 0.25,
-                  ease: "power1.out",
-              },
+              { y: 0, opacity: 1, duration: 0.4, stagger: 0.25, ease: "power1.out" },
               "-=1"
           )
           .to(
               heroFooters,
-              {
-                  y: 0,
-                  opacity: 1,
-                  duration: 0.4,
-                  stagger: 0.2,
-                  ease: "power1.out",
-              },
+              { y: 0, opacity: 1, duration: 0.4, stagger: 0.2, ease: "power1.out" },
               "-=1"
           )
           .to(
@@ -121,36 +93,24 @@ function initHomeHero() {
           );
   }
 
-  // Parallax efekt za slike
   window.addEventListener("mousemove", (event) => {
-      const parallaxFactor = 32; // Maksimalni pomak u pikselima
+      const parallaxFactor = 32;
 
       const { clientX, clientY } = event;
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
 
-      // Izračunaj offset u odnosu na centar ekrana
       const offsetX = (clientX - centerX) / centerX;
       const offsetY = (clientY - centerY) / centerY;
 
-      // Pomakni slike prema offsetu
       heroImage.forEach((image, index) => {
-          const depth = (index + 5) / heroImage.length; // Različita dubina za svaki sloj
+          const depth = (index + 5) / heroImage.length;
           const moveX = offsetX * parallaxFactor * depth;
           const moveY = offsetY * parallaxFactor * depth;
 
-          // GSAP animacija za glatki efekt
-          gsap.to(image, {
-              x: moveX,
-              y: moveY,
-              duration: 0.4, // Tromost animacije
-              ease: "power1.out",
-          });
+          gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
       });
   });
 }
 
-// Poziv funkcije inicijalizacije prilikom učitavanja stranice
-document.addEventListener("DOMContentLoaded", () => {
-  initHomeHero();
-});
+export { initHomeHero };
