@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@barba/core": "^2.10.3",
-    "@studio-freight/lenis": "^1.0.42",
-    "gsap": "^3.12.7"
+    "@studio-freight/lenis": "^1.0.42"
   }
 }

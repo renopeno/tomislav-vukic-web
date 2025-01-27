@@ -1,5 +1,3 @@
-import gsap from "gsap";
-
 function initHomeHero() {
   let imagesLoaded = 0;
 

@@ -1,12 +1,9 @@
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import Flip from "gsap/Flip";
-import CustomEase from "gsap/CustomEase";
 import './dark-mode.js';
 import './footer-gsap.js';
 import './links-hover-effect.js';
 import initLenis from './lenis-config.js';
 
+// Registracija GSAP pluginova
 function initGsapPlugins() {
   gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 }

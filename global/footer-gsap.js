@@ -1,5 +1,3 @@
-import gsap from "gsap";
-
 function initFooter() {
   const footer = document.querySelector('.section.footer');
   const previousSection = footer?.previousElementSibling;

@@ -1,5 +1,3 @@
-import gsap from "gsap";
-
 function initHomeCategories() {
   const categories = document.querySelectorAll('.categories-row');
 

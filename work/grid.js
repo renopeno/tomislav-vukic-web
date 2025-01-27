@@ -1,5 +1,3 @@
-import gsap from "gsap";
-
 function initPhotoGrid() {
   const photoContainers = Array.from(document.querySelectorAll(".photo-container"));
 

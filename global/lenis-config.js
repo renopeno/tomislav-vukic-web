@@ -1,8 +1,5 @@
 import Lenis from '@studio-freight/lenis';
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+initGsapPlugins();
 
 function initLenis() {
   const lenis = new Lenis({

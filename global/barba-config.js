@@ -1,6 +1,5 @@
 // Importi potrebni za ovaj modul
 import barba from "@barba/core";
-import gsap from "gsap";
 import { initFooter } from "./footer-gsap.js";
 import { initLinksHover } from "./links-hover-effect.js";
 import { initDarkMode } from "./dark-mode.js";
