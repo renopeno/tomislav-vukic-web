@@ -2,14 +2,10 @@ import './dark-mode.js';
 import './footer-gsap.js';
 import './links-hover-effect.js';
 import initLenis from './lenis-config.js';
-
-// Registracija GSAP pluginova
-function initGsapPlugins() {
-  gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
-}
-initGsapPlugins();
+import { initGsapPlugins } from './gsap-plugins.js';
 
 initLenis();
+initGsapPlugins();
 
 function loadBarbaConfig() {
   import('./barba-config.js')

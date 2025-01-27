@@ -1,4 +1,6 @@
 import Lenis from '@studio-freight/lenis';
+import { initGsapPlugins } from './gsap-plugins.js';
+
 initGsapPlugins();
 
 function initLenis() {
