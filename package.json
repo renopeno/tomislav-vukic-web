@@ -23,5 +23,10 @@
     "babel-loader": "^9.2.1",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@barba/core": "^2.10.3",
+    "@studio-freight/lenis": "^1.0.42",
+    "gsap": "^3.12.7"
   }
 }

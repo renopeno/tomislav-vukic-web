@@ -1,3 +1,5 @@
+import Lenis from '@studio-freight/lenis';
+
 function initLenis () {
   const lenis = new Lenis({
     duration: 0.65, // Tromost scrolla
@@ -19,3 +21,5 @@ gsap.ticker.add((time) => lenis.raf(time));
 // Ažuriranje ScrollTrigger-a za Lenis
 lenis.on('scroll', ScrollTrigger.update);
 }
+
+export default initLenis;

@@ -1,30 +1,35 @@
-import './barba.js';
+// Importaj sve potrebne module
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import Flip from "gsap/Flip";
+import CustomEase from "gsap/CustomEase";
+
 import './dark-mode.js';
 import './footer-gsap.js';
-import './gsap-plugins.js';
-import './lenis.js';
 import './links-hover-effect.js';
+import initLenis from './lenis-config.js'; // Ažurirano ime
 
-function loadBarba() {
-    if (document.querySelector('script[src="https://tomislav-vukic-web-team-renopeno.vercel.app/barba.bundle.js"]')) {
-        console.log('Barba.js već učitan');
-        return;
-    }
-    const script = document.createElement('script');
-    script.src = "https://tomislav-vukic-web-team-renopeno.vercel.app/barba.bundle.js"; // URL Barba.js bundle-a
-    script.defer = true;
-    document.body.appendChild(script);
-  
-    script.onload = () => {
-      console.log('Barba.js loaded successfully!');
-    };
-  
-    script.onerror = () => {
-      console.error('Failed to load Barba.js');
-    };
+// Registracija GSAP pluginova
+function initGsapPlugins() {
+    gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 }
-  
-  // Pozovi loadBarba nakon što se sve ostale funkcije inicijaliziraju
-  window.addEventListener('load', () => {
-    loadBarba(); // Dinamički učitaj Barba.js
-  });
+initGsapPlugins();
+
+// POZIV FUNKCIJE ZA INICIJALIZACIJU LENIS
+initLenis(); // <--- Ovdje se sad inicijalizira
+
+// Dinamičko učitavanje Barba.js
+function loadBarbaConfig() {
+    import('./barba-config.js')
+        .then(() => {
+            console.log('Barba.js konfiguracija učitana.');
+        })
+        .catch((error) => {
+            console.error('Greška pri učitavanju Barba konfiguracije:', error);
+        });
+}
+
+// Pokreni sve na load
+window.addEventListener('load', () => {
+    loadBarbaConfig();
+});
