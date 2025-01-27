@@ -1,6 +1,9 @@
 function initFooter() {
   const footer = document.querySelector('.section.footer');
   const previousSection = footer?.previousElementSibling;
+  
+  gsap.registerPlugin(ScrollTrigger);
+
 
   if (previousSection) {
     gsap.to(previousSection, {

@@ -1,8 +1,9 @@
 function initHomeHighlights() {
   const highlightsSection = document.querySelector('.section.highlights');
   const highlightsWrapper = document.querySelector('.highlights-wrapper');
-
   const totalWidth = highlightsWrapper.scrollWidth - highlightsSection.offsetWidth;
+
+  gsap.registerPlugin(ScrollTrigger);
 
   gsap.to(highlightsWrapper, {
     x: -totalWidth,

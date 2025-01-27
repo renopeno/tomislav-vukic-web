@@ -1,4 +1,6 @@
 function initLenis() {
+  gsap.registerPlugin(ScrollTrigger);
+
   const lenis = new Lenis({
     duration: 0.65,
     easing: (t) => 1 - Math.pow(1 - t, 3),

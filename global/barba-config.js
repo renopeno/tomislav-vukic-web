@@ -18,7 +18,6 @@ function updateNavigationWithHref() {
 }
 
 function initGlobalFunctions() {
-  initGsapPlugins();
   initFooter?.();
   initLinksHover?.();
   initDarkMode?.();

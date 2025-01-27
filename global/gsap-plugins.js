@@ -1,1 +1,0 @@
-gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
