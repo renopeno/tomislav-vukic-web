@@ -105,7 +105,7 @@ function initHomeHero() {
     heroImage.forEach((image, index) => {
         // Povećava fleksibilnost za 30% sa svakom fotografijom
         const baseDepth = 1; // Najdonja fotografija
-        const depthMultiplier = 1 + index * 0.3; // Svaka sljedeća fotografija povećava fleksibilnost za 30%
+        const depthMultiplier = 1 + index * 0.6; // Svaka sljedeća fotografija povećava fleksibilnost za 30%
         const depth = baseDepth + index * depthMultiplier;
 
         const moveX = offsetX * parallaxFactor * depth;
