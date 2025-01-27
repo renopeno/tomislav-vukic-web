@@ -91,24 +91,45 @@ function initHomeHero() {
           );
   }
 
+
   window.addEventListener("mousemove", (event) => {
-      const parallaxFactor = 32;
+    const parallaxFactor = 32;
 
-      const { clientX, clientY } = event;
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
+    const { clientX, clientY } = event;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
-      const offsetX = (clientX - centerX) / centerX;
-      const offsetY = (clientY - centerY) / centerY;
+    const offsetX = (clientX - centerX) / centerX;
+    const offsetY = (clientY - centerY) / centerY;
 
-      heroImage.forEach((image, index) => {
-          const depth = (index + 5) / heroImage.length;
-          const moveX = offsetX * parallaxFactor * depth;
-          const moveY = offsetY * parallaxFactor * depth;
+    heroImage.forEach((image, index) => {
+        // Obrnuti redoslijed kako bi zadnja fotografija imala veći efekt
+        const depth = (heroImage.length - index) / heroImage.length; 
+        const moveX = offsetX * parallaxFactor * depth;
+        const moveY = offsetY * parallaxFactor * depth;
 
-          gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
-      });
-  });
+        gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
+    });
+});
+
+//   window.addEventListener("mousemove", (event) => {
+//       const parallaxFactor = 32;
+
+//       const { clientX, clientY } = event;
+//       const centerX = window.innerWidth / 2;
+//       const centerY = window.innerHeight / 2;
+
+//       const offsetX = (clientX - centerX) / centerX;
+//       const offsetY = (clientY - centerY) / centerY;
+
+//       heroImage.forEach((image, index) => {
+//           const depth = (index + 5) / heroImage.length;
+//           const moveX = offsetX * parallaxFactor * depth;
+//           const moveY = offsetY * parallaxFactor * depth;
+
+//           gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
+//       });
+//   });
 }
 
 initHomeHero();
