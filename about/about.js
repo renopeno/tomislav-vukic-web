@@ -6,6 +6,16 @@ function initAbout() {
   
     gsap.registerPlugin(ScrollTrigger);
   
+    // Dohvati elemente
+    const aboutTitle = document.querySelector('.about-title');
+    const aboutBody = document.querySelector('.body.about');
+  
+    // Postavi početno stanje
+    gsap.set([aboutTitle, aboutBody], { 
+        autoAlpha: 0, 
+        y: window.innerHeight / 2 
+    });
+  
     // Title animation
     const title = document.querySelector('.reveal-type');
     const titleText = new SplitType(title, { 
@@ -55,57 +65,109 @@ function initAbout() {
       opacity: 0
     });
   
-    // Title animation
-    gsap.fromTo(titleText.chars, 
-      { opacity: 0.15 },
-      {
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.02,
-        scrollTrigger: {
-          trigger: ".about-reveal-start",
-          endTrigger: ".about-reveal-end",
-          start: "top center",
-          end: "top center",
-          scrub: true,
-          markers: true
+    // Sequence reveal animations
+    gsap.fromTo(
+      aboutTitle,
+      { 
+        autoAlpha: 0, 
+        scale: 0.8, 
+        y: window.innerHeight / 2 
+      },
+      { 
+        autoAlpha: 1, 
+        scale: 1, 
+        y: 0, 
+        duration: 0.8, 
+        ease: "power3.out"
+      }
+    );
+  
+    gsap.fromTo(
+      aboutBody,
+      { 
+        autoAlpha: 0, 
+        y: 0,
+        scale: 1,
+      },
+      { 
+        autoAlpha: 1,  
+        y: 0, 
+        // duration: 0.3, 
+        ease: "power3.out",
+        delay: 0.35, // Mali delay nakon title-a
+        onComplete: () => {
+          ScrollTrigger.refresh();
         }
       }
     );
   
-    // Left paragraph animation
-    gsap.fromTo(leftText.chars,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.02,
-        scrollTrigger: {
-          trigger: leftParagraph,
-          start: "top 60%",
-          end: "top 40%",
-          scrub: true,
-          markers: true,
+    // Scroll animations
+    const scrollAnimations = () => {
+      // Title animation
+      gsap.fromTo(titleText.chars, 
+        { opacity: 0.15 },
+        {
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.02,
+          scrollTrigger: {
+            trigger: ".about-reveal-start",
+            endTrigger: ".about-reveal-end",
+            start: "top 40%",
+            end: "top center",
+            scrub: true,
+            markers: false,
+          }
         }
-      }
-    );
+      );
   
-    // Right paragraph animation
-    gsap.fromTo(rightText.chars,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.02,
-        scrollTrigger: {
-          trigger: rightParagraph,
-          start: "top 50%",
-          end: "top 30%",
-          scrub: true,
-          markers: true,
+      // Left paragraph animation
+      gsap.fromTo(leftText.chars,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.02,
+          scrollTrigger: {
+            trigger: leftParagraph,
+            start: "top 60%",
+            end: "top 40%",
+            scrub: true,
+            markers: false,
+          }
         }
-      }
-    );
+      );
+  
+      // Right paragraph animation
+      gsap.fromTo(rightText.chars,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.02,
+          scrollTrigger: {
+            trigger: rightParagraph,
+            start: "top 50%",
+            end: "top 40%",
+            scrub: true,
+            markers: false,
+          }
+        }
+      );
+    };
+  
+    // Inicijaliziraj scroll animacije
+    scrollAnimations();
+  
+    // Cleanup funkcija
+    return () => {
+      // Kill sve ScrollTrigger instance
+      ScrollTrigger.getAll().forEach(t => t.kill());
+      // Kill sve split instance
+      titleText.revert();
+      leftText.revert();
+      rightText.revert();
+    };
   }
   
   initAbout();

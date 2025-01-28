@@ -50,6 +50,8 @@ function destroyPageSpecificFunctions(namespace) {
 
 function initBarba() {
   barba.init({
+    debug: true,
+    sync: true,
     transitions: [
       {
         name: 'fade',
@@ -72,23 +74,34 @@ function initBarba() {
       {
         namespace: 'home',
         beforeLeave(data) {
-          destroyPageSpecificFunctions('home'); // Očisti funkcionalnosti za home
+          destroyPageSpecificFunctions('home');
         },
         afterEnter(data) {
-          initGlobalFunctions(); // Inicijaliziraj globalne funkcije
-          initPageSpecificFunctions('home'); // Pokreni funkcije specifične za home
-          updateNavigationWithHref(); // Ažuriraj navigaciju
+          initGlobalFunctions();
+          initPageSpecificFunctions('home');
+          updateNavigationWithHref();
         },
       },
       {
         namespace: 'work',
         beforeLeave(data) {
-          destroyPageSpecificFunctions('work'); // Očisti funkcionalnosti za work
+          destroyPageSpecificFunctions('work');
         },
         afterEnter(data) {
-          initGlobalFunctions(); // Inicijaliziraj globalne funkcije
-          initPageSpecificFunctions('work'); // Pokreni funkcije specifične za work
-          updateNavigationWithHref(); // Ažuriraj navigaciju
+          initGlobalFunctions();
+          initPageSpecificFunctions('work');
+          updateNavigationWithHref();
+        },
+      },
+      {
+        namespace: 'about',
+        beforeLeave(data) {
+          destroyPageSpecificFunctions('about');
+        },
+        afterEnter(data) {
+          initGlobalFunctions();
+          initPageSpecificFunctions('about');
+          updateNavigationWithHref();
         },
       },
     ],
