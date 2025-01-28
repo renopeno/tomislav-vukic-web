@@ -1,7 +1,7 @@
 function initFooter() {
   const footer = document.querySelector('.section.footer');
   const previousSection = footer?.previousElementSibling;
-  
+
   gsap.registerPlugin(ScrollTrigger);
 
 
@@ -26,9 +26,7 @@ function initFooter() {
     });
   }
 
-  document.querySelectorAll('.section.categories').forEach((section) => {
-    gsap.set(section, { zIndex: 1 });
-  });
+    gsap.set(previousSection, { zIndex: 1 });
 }
 
 initFooter();

@@ -16,9 +16,9 @@ function updateNavigationWithHref() {
 }
 
 function initGlobalFunctions() {
-  initFooter?.();
+  initLenis?.();
   initLinksHover?.();
-  initLenis?.(); // Pokreni Lenis samo jednom na početku
+  initFooter?.();
 }
 
 function initPageSpecificFunctions(namespace) {
@@ -35,7 +35,7 @@ function initPageSpecificFunctions(namespace) {
       break;
     case 'about':
       console.log('Initializing about page functions');
-      // Dodaj init funkcije specifične za About page
+      initAbout?.();
       break;
     default:
       console.log(`No specific functions for namespace: ${namespace}`);
