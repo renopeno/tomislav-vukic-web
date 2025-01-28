@@ -1,42 +1,111 @@
 function initAbout() {
-  // Provjeri je li GSAP dostupan
-  if (typeof gsap === 'undefined') {
-    console.warn('GSAP nije učitan');
-    return;
-  }
-
-  const aboutSection = document.querySelector('.section.about-me');
-  if (!aboutSection) {
-    console.warn('About sekcija nije pronađena');
-    return;
-  }
-
-  // Očisti postojeće animacije
-  gsap.killTweensOf(".about *");
-  if (ScrollTrigger) {
-    ScrollTrigger.getAll().forEach(t => t.kill());
-  }
-
-  // Jednostavna timeline animacija
-  const tl = gsap.timeline({
-    defaults: {
-      ease: "power3.out",
-      duration: 0.8
+    if (typeof gsap === 'undefined' || typeof SplitType === 'undefined') {
+      console.error('GSAP ili SplitType nisu učitani');
+      return;
     }
-  });
-
-  // Animiraj elemente jedan po jedan
-  tl.from('.about .body:first-child', {
-    opacity: 0,
-    y: 50
-  })
-  .from('.about-title', {
-    opacity: 0,
-    y: 30
-  }, "-=0.4")
-  .from('.about .body:not(:first-child)', {
-    opacity: 0,
-    y: 50,
-    stagger: 0.2
-  }, "-=0.4");
-}
+  
+    gsap.registerPlugin(ScrollTrigger);
+  
+    // Title animation
+    const title = document.querySelector('.reveal-type');
+    const titleText = new SplitType(title, { 
+      types: ['words', 'chars'],
+      tagName: 'span'
+    });
+  
+    if (titleText.chars && titleText.chars[0]) {
+      titleText.chars[0].style.marginLeft = '16vw';
+    }
+  
+    titleText.words.forEach(word => {
+      word.style.display = 'inline-block';
+      word.style.whiteSpace = 'nowrap';
+    });
+  
+    // Left paragraph
+    const leftParagraph = document.querySelector('[data-about-paragraph="left"]');
+    const leftText = new SplitType(leftParagraph, { 
+      types: ['words', 'chars'],
+      tagName: 'span'
+    });
+  
+    leftText.words.forEach(word => {
+      word.style.display = 'inline-block';
+      word.style.whiteSpace = 'nowrap';
+    });
+  
+    // Right paragraph
+    const rightParagraph = document.querySelector('[data-about-paragraph="right"]');
+    const rightText = new SplitType(rightParagraph, { 
+      types: ['words', 'chars'],
+      tagName: 'span'
+    });
+  
+    rightText.words.forEach(word => {
+      word.style.display = 'inline-block';
+      word.style.whiteSpace = 'nowrap';
+    });
+  
+    // Set initial states
+    gsap.set(titleText.chars, {
+      opacity: 0.15
+    });
+    
+    gsap.set([leftText.chars, rightText.chars], {
+      opacity: 0
+    });
+  
+    // Title animation
+    gsap.fromTo(titleText.chars, 
+      { opacity: 0.15 },
+      {
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.02,
+        scrollTrigger: {
+          trigger: ".about-reveal-start",
+          endTrigger: ".about-reveal-end",
+          start: "top center",
+          end: "top center",
+          scrub: true,
+          markers: true
+        }
+      }
+    );
+  
+    // Left paragraph animation
+    gsap.fromTo(leftText.chars,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.02,
+        scrollTrigger: {
+          trigger: leftParagraph,
+          start: "top 60%",
+          end: "top 40%",
+          scrub: true,
+          markers: true,
+        }
+      }
+    );
+  
+    // Right paragraph animation
+    gsap.fromTo(rightText.chars,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.02,
+        scrollTrigger: {
+          trigger: rightParagraph,
+          start: "top 50%",
+          end: "top 30%",
+          scrub: true,
+          markers: true,
+        }
+      }
+    );
+  }
+  
+  initAbout();
