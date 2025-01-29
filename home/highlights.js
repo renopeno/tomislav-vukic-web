@@ -1,4 +1,4 @@
-function initHomeHighlights() {
+function initHighlights() {
   const highlightsSection = document.querySelector('.section.highlights');
   const highlightsWrapper = document.querySelector('.highlights-wrapper');
 
@@ -27,4 +27,4 @@ function initHomeHighlights() {
   });
 }
 
-initHomeHighlights();
+initHighlights();

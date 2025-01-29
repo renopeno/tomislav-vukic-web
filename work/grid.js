@@ -1,4 +1,4 @@
-function initPhotoGrid() {
+function initGrid() {
   const photoContainers = Array.from(document.querySelectorAll(".photo-container"));
 
   // Funkcija za miješanje redoslijeda
@@ -55,4 +55,4 @@ function initPhotoGrid() {
   );
 }
 
-initPhotoGrid();
+initGrid();

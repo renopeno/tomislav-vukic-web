@@ -1,4 +1,4 @@
-function initHomeCategories() {
+function initCategories() {
   const categories = document.querySelectorAll('.categories-row');
 
   if (!categories.length) {
@@ -82,4 +82,4 @@ function initHomeCategories() {
   });
 }
 
-initHomeCategories();
+initCategories();

@@ -1,4 +1,4 @@
-function initHomeHero() {
+function initHero() {
   let imagesLoaded = 0;
 
   const heroImage = document.querySelectorAll(".hero-images-container > *");
@@ -117,4 +117,4 @@ function initHomeHero() {
   
 }
 
-initHomeHero();
+initHero();
