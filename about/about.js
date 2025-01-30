@@ -3,7 +3,7 @@ function initAbout() {
   gsap.registerPlugin(ScrollTrigger);
 
   const aboutTitle = document.querySelector('.about-title');
-  const aboutBody = document.querySelector('.body.about');
+  const aboutBody = document.querySelector('.about-small-title');
 
   const title = document.querySelector('.reveal-type');
   const titleText = new SplitType(title, { 
@@ -12,7 +12,7 @@ function initAbout() {
   });
 
   if (titleText.chars && titleText.chars[0]) {
-      titleText.chars[0].style.marginLeft = '16vw';
+      titleText.chars[0].style.marginLeft = '12vw';
   }
 
   titleText.words.forEach(word => {
@@ -81,7 +81,7 @@ function initAbout() {
               scrollTrigger: {
                   trigger: ".about-reveal-start",
                   endTrigger: ".about-reveal-end",
-                  start: "top 40%",
+                  start: "top 50%",
                   end: "top center",
                   scrub: true,
                   markers: false,
