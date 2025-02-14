@@ -1,10 +1,10 @@
 function initGrid() {
-  const max_photos = 30; // Upravljamo brojem fotografija ovdje
+  const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
-  const photoContainers = allPhotoContainers.slice(0, max_photos);
+  const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
   
   // Sakrij ostale fotke iz CMS koje nisu u našem odabranom setu
-  allPhotoContainers.slice(max_photos).forEach(container => {
+  allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
     container.style.display = 'none';
   });
 
@@ -12,39 +12,90 @@ function initGrid() {
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
   const shuffledPhotos = shuffleArray([...photoContainers]);
 
-  const leftColumns = [2, 3];
-  const rightColumns = [8, 9];
-
-  let isLeft = true;
-  let currentRow = 1;
-  let lastLeftCol = null;
-  let lastRightCol = null;
-
-  shuffledPhotos.forEach((container) => {
-    const photo = container.querySelector(".photo");
-    const isHorizontal = photo.naturalWidth > photo.naturalHeight;
-    const colSpan = isHorizontal ? 3 : 2;
-
-    let startCol;
-    if (isLeft) {
-      do {
-        startCol = leftColumns[Math.floor(Math.random() * leftColumns.length)];
-      } while (startCol === lastLeftCol);
-      lastLeftCol = startCol;
-    } else {
-      do {
-        startCol = rightColumns[Math.floor(Math.random() * rightColumns.length)];
-      } while (startCol === lastRightCol);
-      lastRightCol = startCol;
+  // Responsive grid konfiguracija
+  const gridConfig = {
+    desktop: {
+      columns: 12,
+      left: [2, 3],
+      right: [8, 9],
+      horizontalSpan: 3,
+      verticalSpan: 2
+    },
+    tablet: {
+      columns: 8,
+      left: [2, 3],
+      right: [5, 6],
+      horizontalSpan: 3,
+      verticalSpan: 2
+    },
+    mobile: {
+      columns: 1,
+      left: [1],
+      right: [1],
+      horizontalSpan: 1,
+      verticalSpan: 1
     }
+  };
 
-    const endCol = startCol + colSpan;
-    container.style.gridColumnStart = startCol;
-    container.style.gridColumnEnd = endCol;
-    container.style.gridRowStart = currentRow;
+  // Funkcija koja vraća trenutnu konfiguraciju baziranu na širini ekrana
+  function getCurrentConfig() {
+    const width = window.innerWidth;
+    if (width < 768) return gridConfig.mobile;
+    if (width < 992) return gridConfig.tablet;
+    return gridConfig.desktop;
+  }
 
-    isLeft = !isLeft;
-    currentRow++;
+  // Funkcija za postavljanje grida
+  function setupGrid() {
+    const config = getCurrentConfig();
+    let isLeft = true;
+    let currentRow = 1;
+    let lastLeftCol = null;
+    let lastRightCol = null;
+
+    shuffledPhotos.forEach((container) => {
+      const photo = container.querySelector(".photo");
+      const isHorizontal = photo.naturalWidth > photo.naturalHeight;
+      const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
+
+      let startCol;
+      if (config.columns === 1) {
+        // Mobile layout - jedna kolumna
+        startCol = 1;
+      } else {
+        // Tablet/Desktop layout
+        if (isLeft) {
+          do {
+            startCol = config.left[Math.floor(Math.random() * config.left.length)];
+          } while (startCol === lastLeftCol);
+          lastLeftCol = startCol;
+        } else {
+          do {
+            startCol = config.right[Math.floor(Math.random() * config.right.length)];
+          } while (startCol === lastRightCol);
+          lastRightCol = startCol;
+        }
+      }
+
+      const endCol = startCol + colSpan;
+      container.style.gridColumnStart = startCol;
+      container.style.gridColumnEnd = endCol;
+      container.style.gridRowStart = currentRow;
+
+      isLeft = !isLeft;
+      currentRow++;
+    });
+  }
+
+  // Inicijalno postavi grid
+  setupGrid();
+
+  // Slušaj resize event
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    // Debounce resize event
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(setupGrid, 250);
   });
 
   // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
