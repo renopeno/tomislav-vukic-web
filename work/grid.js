@@ -3,7 +3,22 @@ function initGrid() {
 
   // Funkcija za miješanje redoslijeda
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
-  const shuffledPhotos = shuffleArray(photoContainers);
+
+  // Provjera postoji li već spremljeni redoslijed u sessionStorage
+  let storedOrder = sessionStorage.getItem("photoOrder");
+  let shuffledPhotos;
+
+  if (storedOrder) {
+    console.log("📌 Koristim spremljeni redoslijed iz sessionStorage.");
+    const orderIndexes = JSON.parse(storedOrder);
+    shuffledPhotos = orderIndexes.map(index => photoContainers[index]);
+  } else {
+    console.log("🎲 Generiram novi randomizirani redoslijed.");
+    shuffledPhotos = shuffleArray([...photoContainers]);
+    // Spremaj indeks svakog elementa u sessionStorage
+    const orderIndexes = shuffledPhotos.map(photo => photoContainers.indexOf(photo));
+    sessionStorage.setItem("photoOrder", JSON.stringify(orderIndexes));
+  }
 
   const leftColumns = [2, 3]; // Moguće početne kolumne za lijevu stranu
   const rightColumns = [7, 8]; // Moguće početne kolumne za desnu stranu
@@ -22,16 +37,14 @@ function initGrid() {
 
     let startCol;
     if (isLeft) {
-      // Nasumično odaberi kolonu za lijevu stranu
       do {
         startCol = leftColumns[Math.floor(Math.random() * leftColumns.length)];
-      } while (startCol === lastLeftCol); // Izbjegavaj ponavljanje iste kolone zaredom
+      } while (startCol === lastLeftCol);
       lastLeftCol = startCol;
     } else {
-      // Nasumično odaberi kolonu za desnu stranu
       do {
         startCol = rightColumns[Math.floor(Math.random() * rightColumns.length)];
-      } while (startCol === lastRightCol); // Izbjegavaj ponavljanje iste kolone zaredom
+      } while (startCol === lastRightCol);
       lastRightCol = startCol;
     }
 
@@ -39,10 +52,9 @@ function initGrid() {
 
     // Postavi pozicije u gridu
     container.style.gridColumnStart = startCol;
-    container.style.gridColumnEnd = endCol + 1; // Jedan više zbog grid pravila
+    container.style.gridColumnEnd = endCol + 1;
     container.style.gridRowStart = currentRow;
 
-    // Prebacivanje na suprotnu stranu (lijevo/desno)
     isLeft = !isLeft;
     currentRow++;
   });
