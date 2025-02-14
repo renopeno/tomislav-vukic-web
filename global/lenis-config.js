@@ -10,13 +10,13 @@ function initLenis() {
   window.lenis = new Lenis({
     smoothWheel: true,
     wheelMultiplier: 1,
-    lerp: 0.1,
+    lerp: 0.5,
   });
 
-  // Sinkroniziraj Lenis s GSAP-om
-  window.lenis.on('scroll', () => {
-    ScrollTrigger.update();
-  });
+  // // Sinkroniziraj Lenis s GSAP-om
+  // window.lenis.on('scroll', () => {
+  //   ScrollTrigger.update();
+  // });
 
   gsap.ticker.add((time) => {
     window.lenis.raf(time * 1000);
