@@ -48,6 +48,11 @@ function initPhotoModal() {
     });
 
     function openModal(photo) {
+        // Zaustavi Lenis scroll
+        if (window.lenis) {
+            window.lenis.stop();
+        }
+        
         // Spriječi scroll na body
         document.body.style.overflow = 'hidden';
         
@@ -110,6 +115,11 @@ function initPhotoModal() {
 
     function closeModal() {
         if (activePhoto) {
+            // Ponovno pokreni Lenis scroll
+            if (window.lenis) {
+                window.lenis.start();
+            }
+            
             // Vrati scroll na body
             document.body.style.overflow = '';
             
