@@ -118,5 +118,6 @@ function initAbout() {
 
   scrollAnimations();
 
+  console.log(`ℹ️ About initialized, scroll position: ${window.scrollY}px`);
 }
 initAbout();

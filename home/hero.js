@@ -115,6 +115,7 @@ function initHero() {
         });
     });
   
+  console.log(`🦸‍♂️ Hero initialized, scroll position: ${window.scrollY}px`);
 }
 
 initHero();

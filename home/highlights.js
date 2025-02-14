@@ -25,6 +25,8 @@ function initHighlights() {
       pin: true,
     },
   });
+
+  console.log(`✨ Highlights initialized, scroll position: ${window.scrollY}px`);
 }
 
 initHighlights();
