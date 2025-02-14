@@ -1,4 +1,5 @@
 function initLenis() {
+  history.scrollRestoration = "manual"
   gsap.registerPlugin(ScrollTrigger);
 
   // Uništi postojeću instancu ako postoji
