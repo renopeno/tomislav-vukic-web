@@ -6,7 +6,9 @@ function initPhotoModal() {
     const closeButton = modal.querySelector(".modal-close");
     const prevButton = modal.querySelector('[data-photo-nav="previous"]');
     const nextButton = modal.querySelector('[data-photo-nav="next"]');
-    const gridPhotos = document.querySelectorAll(".photo");
+    
+    // Koristi shuffledPhotos iz window objekta
+    const gridPhotos = window.shuffledPhotos.map(container => container.querySelector(".photo"));
 
     gsap.registerPlugin(Flip);
 
