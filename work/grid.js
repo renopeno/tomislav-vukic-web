@@ -1,12 +1,19 @@
 function initGrid() {
-  const photoContainers = Array.from(document.querySelectorAll(".photo-container"));
+  const max_photos = 30; // Upravljamo brojem fotografija ovdje
+  const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
+  const photoContainers = allPhotoContainers.slice(0, max_photos);
+  
+  // Sakrij ostale fotke iz CMS koje nisu u našem odabranom setu
+  allPhotoContainers.slice(max_photos).forEach(container => {
+    container.style.display = 'none';
+  });
 
   // Funkcija za miješanje redoslijeda
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
   const shuffledPhotos = shuffleArray([...photoContainers]);
 
   const leftColumns = [2, 3];
-  const rightColumns = [7, 8];
+  const rightColumns = [8, 9];
 
   let isLeft = true;
   let currentRow = 1;
@@ -31,9 +38,9 @@ function initGrid() {
       lastRightCol = startCol;
     }
 
-    const endCol = startCol + colSpan - 1;
+    const endCol = startCol + colSpan;
     container.style.gridColumnStart = startCol;
-    container.style.gridColumnEnd = endCol + 1;
+    container.style.gridColumnEnd = endCol;
     container.style.gridRowStart = currentRow;
 
     isLeft = !isLeft;
@@ -46,9 +53,26 @@ function initGrid() {
   // GSAP animacija za ulazak fotografija
   gsap.fromTo(
     shuffledPhotos,
-    { autoAlpha: 0, scale: 0.8, y: window.innerHeight / 2 },
-    { autoAlpha: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.1 }
+    { opacity: 0, scale: 0.8, y: window.innerHeight / 2 },
+    { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      duration: 0.8,
+      ease: "power3.out",
+      stagger: 0.1,
+    }
   );
+
+  // Inicijaliziraj modal nakon što su shuffledPhotos postavljeni
+  if (typeof initPhotoModal === "function") {
+    initPhotoModal();
+  }
 }
 
-initGrid();
+// Inicijalizacija
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGrid);
+} else {
+  initGrid();
+}

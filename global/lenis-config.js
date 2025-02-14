@@ -28,6 +28,7 @@ function initLenis() {
   window.lenis.scrollTo(0, { immediate: true });
 }
 
+
 // Čekaj da se DOM učita
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initLenis);
