@@ -9,8 +9,9 @@ function initLenis() {
   // Inicijaliziraj novu Lenis instancu
   window.lenis = new Lenis({
     smoothWheel: true,
-    wheelMultiplier: 1,
-    lerp: 0.3,
+    smoothTouch: true,
+    wheelMultiplier: 1.2,
+    lerp: 0.15,
   });
 
   // Sinkroniziraj Lenis s GSAP-om
