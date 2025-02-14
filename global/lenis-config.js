@@ -1,4 +1,5 @@
 function initLenis() {
+  //Fix za random start scroll position na Work stranici <3
   history.scrollRestoration = "manual"
   gsap.registerPlugin(ScrollTrigger);
 
