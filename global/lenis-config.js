@@ -10,7 +10,7 @@ function initLenis() {
   window.lenis = new Lenis({
     smoothWheel: true,
     wheelMultiplier: 1,
-    lerp: 0.05,
+    lerp: 0.3,
   });
 
   // Sinkroniziraj Lenis s GSAP-om
