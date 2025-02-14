@@ -11,7 +11,7 @@ function initLenis() {
     smoothWheel: true,
     smoothTouch: true,
     wheelMultiplier: 1.2,
-    lerp: 0.15,
+    lerp: 0.25,
   });
 
   // Sinkroniziraj Lenis s GSAP-om
