@@ -172,23 +172,66 @@ function initPhotoModal() {
         const currentPhoto = photoData[currentPhotoIndex];
         const nextPhoto = photoData[newIndex];
 
-        // Reset trenutne fotke prije vraćanja u grid
-        if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
-            gsap.set(currentPhoto.element, {
-                x: 0,
-                opacity: 1,
+        // Kreiramo container za obje fotke
+        modalImageContainer.innerHTML = "";
+        const currentPhotoWrapper = document.createElement("div");
+        const nextPhotoWrapper = document.createElement("div");
+        currentPhotoWrapper.appendChild(currentPhoto.element);
+        nextPhotoWrapper.appendChild(nextPhoto.element);
+        modalImageContainer.appendChild(currentPhotoWrapper);
+        modalImageContainer.appendChild(nextPhotoWrapper);
+
+        // Postavimo stil za wrappere
+        gsap.set([currentPhotoWrapper, nextPhotoWrapper], {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0
+        });
+
+        // Animacija za trenutnu fotku - leti van
+        gsap.to(currentPhotoWrapper, {
+            x: '-100%',
+            scale: 0.95,
+            rotation: -3,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.inOut",
+            onComplete: () => {
+                if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
+                    gsap.set(currentPhoto.element, {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        rotation: 0
+                    });
+                    currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
+                    currentPhoto.placeholder.remove();
+                    currentPhoto.placeholder = null;
+                }
+            }
+        });
+
+        // Animacija za novu fotku - doleti unutra
+        gsap.fromTo(nextPhotoWrapper, 
+            {
+                x: '100%',
+                scale: 0.95,
+                rotation: 3,
+                opacity: 0
+            },
+            {
+                x: '0%',
                 scale: 1,
-                rotation: 0
-            });
-            currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
-            currentPhoto.placeholder.remove();
-            currentPhoto.placeholder = null;
-        }
+                rotation: 0,
+                opacity: 1,
+                duration: 0.5,
+                ease: "power2.inOut"
+            }
+        );
 
-        const gridPhotos = Array.from(document.querySelectorAll('.photo'))
-            .filter(el => el !== nextPhoto.element);
-        gsap.set(gridPhotos, { opacity: 0 });
-
+        // Ostali setup za novu fotku
         const origParent = nextPhoto.element.originalParent;
         const placeholder = document.createElement("div");
         placeholder.classList.add("photo-placeholder");
@@ -196,27 +239,6 @@ function initPhotoModal() {
         placeholder.style.height = nextPhoto.element.offsetHeight + "px";
         origParent.insertBefore(placeholder, nextPhoto.element);
         nextPhoto.placeholder = placeholder;
-
-        ensurePhotoInViewport(nextPhoto.element);
-
-        modalImageContainer.innerHTML = "";
-        modalImageContainer.appendChild(nextPhoto.element);
-        
-        // Nova tranzicija koja prati swipe pokret
-        gsap.set(nextPhoto.element, {
-            opacity: 1,
-            x: '100%',
-            scale: 0.95,
-            rotation: 3
-        });
-
-        gsap.to(nextPhoto.element, {
-            x: 0,
-            scale: 1,
-            rotation: 0,
-            duration: 0.5,
-            ease: "power2.out"
-        });
 
         modalTitle.textContent = nextPhoto.title;
         modalExif.textContent = nextPhoto.exif;
@@ -232,23 +254,66 @@ function initPhotoModal() {
         const currentPhoto = photoData[currentPhotoIndex];
         const prevPhoto = photoData[newIndex];
 
-        // Reset trenutne fotke prije vraćanja u grid
-        if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
-            gsap.set(currentPhoto.element, {
-                x: 0,
-                opacity: 1,
+        // Kreiramo container za obje fotke
+        modalImageContainer.innerHTML = "";
+        const currentPhotoWrapper = document.createElement("div");
+        const prevPhotoWrapper = document.createElement("div");
+        currentPhotoWrapper.appendChild(currentPhoto.element);
+        prevPhotoWrapper.appendChild(prevPhoto.element);
+        modalImageContainer.appendChild(currentPhotoWrapper);
+        modalImageContainer.appendChild(prevPhotoWrapper);
+
+        // Postavimo stil za wrappere
+        gsap.set([currentPhotoWrapper, prevPhotoWrapper], {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0
+        });
+
+        // Animacija za trenutnu fotku - leti van
+        gsap.to(currentPhotoWrapper, {
+            x: '100%',
+            scale: 0.95,
+            rotation: 3,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.inOut",
+            onComplete: () => {
+                if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
+                    gsap.set(currentPhoto.element, {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        rotation: 0
+                    });
+                    currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
+                    currentPhoto.placeholder.remove();
+                    currentPhoto.placeholder = null;
+                }
+            }
+        });
+
+        // Animacija za novu fotku - doleti unutra
+        gsap.fromTo(prevPhotoWrapper, 
+            {
+                x: '-100%',
+                scale: 0.95,
+                rotation: -3,
+                opacity: 0
+            },
+            {
+                x: '0%',
                 scale: 1,
-                rotation: 0
-            });
-            currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
-            currentPhoto.placeholder.remove();
-            currentPhoto.placeholder = null;
-        }
+                rotation: 0,
+                opacity: 1,
+                duration: 0.5,
+                ease: "power2.inOut"
+            }
+        );
 
-        const gridPhotos = Array.from(document.querySelectorAll('.photo'))
-            .filter(el => el !== prevPhoto.element);
-        gsap.set(gridPhotos, { opacity: 0 });
-
+        // Ostali setup za novu fotku
         const origParent = prevPhoto.element.originalParent;
         const placeholder = document.createElement("div");
         placeholder.classList.add("photo-placeholder");
@@ -256,27 +321,6 @@ function initPhotoModal() {
         placeholder.style.height = prevPhoto.element.offsetHeight + "px";
         origParent.insertBefore(placeholder, prevPhoto.element);
         prevPhoto.placeholder = placeholder;
-
-        ensurePhotoInViewport(prevPhoto.element);
-
-        modalImageContainer.innerHTML = "";
-        modalImageContainer.appendChild(prevPhoto.element);
-        
-        // Nova tranzicija koja prati swipe pokret
-        gsap.set(prevPhoto.element, {
-            opacity: 1,
-            x: '-100%',
-            scale: 0.95,
-            rotation: -3
-        });
-
-        gsap.to(prevPhoto.element, {
-            x: 0,
-            scale: 1,
-            rotation: 0,
-            duration: 0.5,
-            ease: "power2.out"
-        });
 
         modalTitle.textContent = prevPhoto.title;
         modalExif.textContent = prevPhoto.exif;
