@@ -193,4 +193,4 @@ function initPhotoModal() {
     closeButton.addEventListener("click", closeModal);
 }
 
-initPhotoModal();
+// initPhotoModal();
