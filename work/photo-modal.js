@@ -175,11 +175,10 @@ function initPhotoModal() {
         // Reset trenutne fotke prije vraćanja u grid
         if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
             gsap.set(currentPhoto.element, {
-                clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-                opacity: 1,
                 x: 0,
-                rotation: 0,
-                scale: 1
+                opacity: 1,
+                scale: 1,
+                rotation: 0
             });
             currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
             currentPhoto.placeholder.remove();
@@ -203,16 +202,20 @@ function initPhotoModal() {
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(nextPhoto.element);
         
-        // Tranzicija za "next"
+        // Nova tranzicija koja prati swipe pokret
         gsap.set(nextPhoto.element, {
             opacity: 1,
-            clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)"
+            x: '100%',
+            scale: 0.95,
+            rotation: 3
         });
 
         gsap.to(nextPhoto.element, {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            duration: 0.8,
-            ease: "power2.inOut"
+            x: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.5,
+            ease: "power2.out"
         });
 
         modalTitle.textContent = nextPhoto.title;
@@ -232,11 +235,10 @@ function initPhotoModal() {
         // Reset trenutne fotke prije vraćanja u grid
         if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
             gsap.set(currentPhoto.element, {
-                clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-                opacity: 1,
                 x: 0,
-                rotation: 0,
-                scale: 1
+                opacity: 1,
+                scale: 1,
+                rotation: 0
             });
             currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
             currentPhoto.placeholder.remove();
@@ -260,16 +262,20 @@ function initPhotoModal() {
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(prevPhoto.element);
         
-        // Tranzicija za "previous"
+        // Nova tranzicija koja prati swipe pokret
         gsap.set(prevPhoto.element, {
             opacity: 1,
-            clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)"
+            x: '-100%',
+            scale: 0.95,
+            rotation: -3
         });
 
         gsap.to(prevPhoto.element, {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            duration: 0.8,
-            ease: "power2.inOut"
+            x: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.5,
+            ease: "power2.out"
         });
 
         modalTitle.textContent = prevPhoto.title;
