@@ -18,7 +18,7 @@ function initPhotoModal() {
     function ensurePhotoInViewport(photo) {
         const buffer = 100;
         const photoRect = photo.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const targetScroll = photoRect.top + scrollTop - buffer;
         window.scrollTo(0, targetScroll);
     }
@@ -59,8 +59,8 @@ function initPhotoModal() {
         // Instantno sakrijemo kliknutu fotku
         gsap.set(photo.element, { opacity: 0 });
         
-        // Sakrijemo SVE s grida (sve fotke i navigaciju)
-    const gridContent = document.querySelectorAll('.photo, .navbar');
+        // Sakrijemo SVE s grida (sve fotke i navigaciju) i navbar
+        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
         gsap.to(gridContent, {
             opacity: 0,
             duration: 0.3,
@@ -124,7 +124,7 @@ function initPhotoModal() {
             document.body.style.overflow = '';
             
             const modalImage = modalImageContainer.querySelector('img');
-            const gridContent = document.querySelectorAll('.photo, .navbar');
+            const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
             
             // Prvo sakrijemo UI elemente modala
             gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
