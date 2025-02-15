@@ -49,21 +49,18 @@ function initPhotoModal() {
     });
 
     function openModal(photo) {
-        // Zaustavi Lenis scroll
         if (window.lenis) {
             window.lenis.stop();
         }
         
-        // Spriječi scroll na body
         document.body.style.overflow = 'hidden';
         
-        // Spremi originalne stilove prije micanja
-        originalStyles = {
-            gridColumn: photo.element.parentElement.style.gridColumnStart,
-            gridRow: photo.element.parentElement.style.gridRowStart,
-            width: photo.element.style.width,
-            height: photo.element.style.height
-        };
+        // Stvori placeholder koji će držati mjesto u gridu
+        const placeholder = document.createElement('div');
+        placeholder.style.gridArea = photo.element.parentElement.style.gridArea;
+        placeholder.style.width = photo.element.parentElement.offsetWidth + 'px';
+        placeholder.style.height = photo.element.parentElement.offsetHeight + 'px';
+        photo.element.parentElement.appendChild(placeholder);
         
         // Spremi stanje prije animacije
         const state = Flip.getState(photo.element);
@@ -112,15 +109,15 @@ function initPhotoModal() {
 
     function closeModal() {
         if (activePhoto) {
-            // Ponovno pokreni Lenis scroll
             if (window.lenis) {
                 window.lenis.start();
             }
             
-            // Vrati scroll na body
             document.body.style.overflow = '';
             
             const modalImage = modalImageContainer.querySelector('img');
+            const originalContainer = photoData[currentPhotoIndex].element.parentElement;
+            const placeholder = originalContainer.querySelector('div');
             
             // Prvo sakrijemo UI elemente modala
             gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
@@ -134,15 +131,11 @@ function initPhotoModal() {
             const state = Flip.getState(modalImage);
             
             // Vrati sliku u originalni container
-            const originalContainer = photoData[currentPhotoIndex].element.parentElement;
             originalContainer.appendChild(modalImage);
-
-            // Vrati originalne grid stilove
-            if (originalStyles) {
-                originalContainer.style.gridColumnStart = originalStyles.gridColumn;
-                originalContainer.style.gridRowStart = originalStyles.gridRow;
-                modalImage.style.width = originalStyles.width;
-                modalImage.style.height = originalStyles.height;
+            
+            // Ukloni placeholder
+            if (placeholder) {
+                placeholder.remove();
             }
 
             // FLIP animacija za povratak
@@ -164,7 +157,6 @@ function initPhotoModal() {
                     modal.classList.remove("active");
                     modal.style.display = "none";
                     activePhoto = null;
-                    originalStyles = null;
                 }
             });
         }
