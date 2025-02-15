@@ -302,15 +302,54 @@ function initPhotoModal() {
 
     // Inicijalizacija Hammer.js
     const hammer = new Hammer(modalImageContainer);
-    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
     
-    // Dodaj event listenere za swipe
-    hammer.on('swipeleft', function() {
-        showNextPhoto();
+    let isDragging = false;
+    
+    hammer.on('panstart', function(e) {
+        isDragging = true;
+        gsap.killTweensOf(activePhoto); // Zaustavi trenutne animacije
     });
     
-    hammer.on('swiperight', function() {
-        showPreviousPhoto();
+    hammer.on('pan', function(e) {
+        if (!isDragging || !activePhoto) return;
+        
+        const moveX = e.deltaX;
+        const movePercent = (moveX / window.innerWidth) * 100;
+        
+        // Limitiramo pomak na 100% u bilo kojem smjeru
+        const limitedMove = Math.max(Math.min(movePercent, 100), -100);
+        
+        gsap.set(activePhoto, {
+            x: limitedMove + '%',
+            rotation: limitedMove * 0.05 // Blaga rotacija za bolji efekt
+        });
+    });
+    
+    hammer.on('panend', function(e) {
+        if (!isDragging || !activePhoto) return;
+        isDragging = false;
+        
+        const velocity = Math.abs(e.velocity);
+        const moveX = e.deltaX;
+        const threshold = window.innerWidth * 0.2; // 20% ekrana
+        
+        if (Math.abs(moveX) > threshold || velocity > 0.5) {
+            // Dovoljno daleko povučeno ili dovoljno brzo
+            if (moveX < 0) {
+                showNextPhoto();
+            } else {
+                showPreviousPhoto();
+            }
+        } else {
+            // Vrati na početnu poziciju
+            gsap.to(activePhoto, {
+                x: '0%',
+                rotation: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        }
     });
 }
 
