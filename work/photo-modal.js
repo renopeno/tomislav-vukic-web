@@ -57,13 +57,16 @@ function initPhotoModal() {
         
         // Stvori placeholder koji će držati mjesto u gridu
         const placeholder = document.createElement('div');
-        placeholder.style.gridArea = photo.element.parentElement.style.gridArea;
-        placeholder.style.width = photo.element.parentElement.offsetWidth + 'px';
-        placeholder.style.height = photo.element.parentElement.offsetHeight + 'px';
-        photo.element.parentElement.appendChild(placeholder);
+        const photoContainer = photo.element.parentElement;
+        placeholder.style.gridArea = photoContainer.style.gridArea;
+        placeholder.style.width = photoContainer.offsetWidth + 'px';
+        placeholder.style.height = photoContainer.offsetHeight + 'px';
+        photoContainer.appendChild(placeholder);
         
         // Spremi stanje prije animacije
-        const state = Flip.getState(photo.element);
+        const state = Flip.getState(photo.element, {
+            props: "all" // Prati sve transformacije
+        });
         
         // Sakrijemo ostale elemente s grida
         const otherGridContent = document.querySelectorAll('.photo:not(:nth-child(' + (currentPhotoIndex + 1) + ')), .navigation, .navbar');
@@ -128,10 +131,12 @@ function initPhotoModal() {
             });
 
             // Spremi stanje prije vraćanja
-            const state = Flip.getState(modalImage);
+            const state = Flip.getState(modalImage, {
+                props: "all" // Prati sve transformacije
+            });
             
-            // Vrati sliku u originalni container
-            originalContainer.appendChild(modalImage);
+            // Vrati sliku u originalni container prije placeholdera
+            originalContainer.insertBefore(modalImage, placeholder);
             
             // Ukloni placeholder
             if (placeholder) {
