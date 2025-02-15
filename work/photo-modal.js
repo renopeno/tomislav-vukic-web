@@ -293,6 +293,63 @@ function initPhotoModal() {
     closeButton.addEventListener("click", closeModal);
     prevButton.addEventListener("click", showPreviousPhoto);
     nextButton.addEventListener("click", showNextPhoto);
+
+    // Inicijalizacija Hammer.js za touch interakcije
+    const hammer = new Hammer(modalImageContainer);
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    
+    let isDragging = false;
+    let startX = 0;
+    
+    hammer.on('panstart', function(e) {
+        isDragging = true;
+        startX = e.center.x;
+        
+        // Zaustavimo trenutnu GSAP animaciju ako postoji
+        gsap.killTweensOf(activePhoto);
+    });
+    
+    hammer.on('pan', function(e) {
+        if (!isDragging || !activePhoto) return;
+        
+        const moveX = e.center.x - startX;
+        const movePercent = (moveX / window.innerWidth) * 100;
+        
+        // Dodajemo malo otpora kad se vuče
+        const resistance = 0.5;
+        const limitedMovePercent = Math.min(Math.max(movePercent * resistance, -50), 50);
+        
+        gsap.set(activePhoto, {
+            x: limitedMovePercent + '%',
+            rotation: limitedMovePercent * 0.05 // blaga rotacija
+        });
+    });
+    
+    hammer.on('panend', function(e) {
+        if (!isDragging || !activePhoto) return;
+        isDragging = false;
+        
+        const velocity = Math.abs(e.velocity);
+        const moveX = e.deltaX;
+        const threshold = window.innerWidth * 0.2; // 20% ekrana
+        
+        if (Math.abs(moveX) > threshold || velocity > 0.5) {
+            // Dovoljno brz swipe ili dovoljno daleko povučeno
+            if (moveX < 0) {
+                showNextPhoto();
+            } else {
+                showPreviousPhoto();
+            }
+        } else {
+            // Vrati na početnu poziciju
+            gsap.to(activePhoto, {
+                x: '0%',
+                rotation: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        }
+    });
 }
 
 // initPhotoModal(); // Ovo mi ne treba trenutno jer ga inicijaliziram u grid.js
