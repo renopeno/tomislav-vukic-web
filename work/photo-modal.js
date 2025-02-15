@@ -20,15 +20,16 @@ function initPhotoModal() {
         const photoRect = photo.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const targetScroll = photoRect.top + scrollTop - buffer;
-        window.scrollTo({ top: targetScroll, behavior: "smooth" });
+        window.scrollTo(0, targetScroll);
     }
 
-    // Priprema podataka za navigaciju unutar modala
     gridPhotos.forEach((photo, index) => {
+        // Pronađi odgovarajući container iz shuffledPhotos array-a
         const container = window.shuffledPhotos.find(container => 
             container.querySelector('.photo') === photo
         );
         
+        // Pronađi stvarni index u shuffledPhotos array-u
         const actualIndex = window.shuffledPhotos.indexOf(container);
         
         photoData[actualIndex] = {
@@ -47,132 +48,186 @@ function initPhotoModal() {
     });
 
     function openModal(photo) {
+        // Zaustavi Lenis scroll
         if (window.lenis) {
             window.lenis.stop();
         }
-        document.body.style.overflow = "hidden";
-
+        
+        // Spriječi scroll na body
+        document.body.style.overflow = 'hidden';
+        
+        // Instantno sakrijemo kliknutu fotku
         gsap.set(photo.element, { opacity: 0 });
-
-        const gridContent = document.querySelectorAll('.photo, .navbar');
-        gsap.to(gridContent, { opacity: 0, duration: 0.3, ease: "power2.inOut" });
-
+        
+        // Sakrijemo SVE s grida (sve fotke i navigaciju)
+    const gridContent = document.querySelectorAll('.photo, .navbar');
+        gsap.to(gridContent, {
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.inOut"
+        });
+        
+        // Spremimo stanje prije animacije
+        const state = Flip.getState(photo.element);
+        
+        // Spremimo stanje prije pomicanja slike
         const state = Flip.getState(photo.element);
 
+        // Prebaci originalni img umjesto kloniranja
         modalImageContainer.appendChild(photo.element);
 
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: true
-        });
-
+        
+        // Osiguramo da je modalna fotka vidljiva
+        gsap.set(photo.element, { opacity: 1 });
+        
+        // Pripremimo modal
         modal.style.display = "grid";
         modal.classList.add("active");
-
+        
+        // Postavimo podatke
         modalTitle.textContent = photo.title;
         modalExif.textContent = photo.exif;
-
+        
+        // Sakrijemo UI elemente modala inicijalno
         gsap.set([modalTitle, modalExif, closeButton, prevButton, nextButton], {
             opacity: 0,
             y: 20
         });
 
-        gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.1,
-            ease: "power2.out"
-        });
-    }
-
-    function closeModal() {
-        if (!activePhoto) return;
-
-        if (window.lenis) {
-            window.lenis.start();
-        }
-        document.body.style.overflow = "";
-
-        const modalImage = modalImageContainer.querySelector("img");
-        const gridContent = document.querySelectorAll(".photo, .navbar");
-
-        gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-            opacity: 0,
-            y: 20,
-            duration: 0.4,
-            ease: "power2.in"
-        });
-
-        const modalRect = modalImage.getBoundingClientRect();
-
-        gsap.set(modalImage, {
-            position: "fixed",
-            top: modalRect.top,
-            left: modalRect.left,
-            width: modalRect.width,
-            height: modalRect.height,
-            zIndex: 1000
-        });
-
-        const targetBounds = activePhoto.getBoundingClientRect();
-        gsap.to(modalImage, {
-            top: targetBounds.top,
-            left: targetBounds.left,
-            width: targetBounds.width,
-            height: targetBounds.height,
+        // FLIP animacija
+        Flip.from(state, {
             duration: 0.8,
             ease: "power2.inOut",
-            onUpdate: function() {
-                if (this.progress() > 0.7) {
-                    gsap.to(gridContent, {
-                        opacity: 1,
-                        duration: 0.3,
-                        ease: "power2.out"
-                    });
-                }
-            },
+            absolute: true,
+            targets: [modalImage],
             onComplete: () => {
-                modal.classList.remove("active");
-                modal.style.display = "none";
-                modalImageContainer.innerHTML = "";
-                activePhoto.parentElement.appendChild(activePhoto);
-                gsap.set(activePhoto, { opacity: 1 });
-                activePhoto = null;
+                // Animiramo UI elemente modala
+                gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.4,
+                    stagger: 0.1,
+                    ease: "power2.out"
+                });
             }
         });
     }
 
+    function closeModal() {
+        if (activePhoto) {
+            // Ponovno pokreni Lenis scroll
+            if (window.lenis) {
+                window.lenis.start();
+            }
+            
+            // Vrati scroll na body
+            document.body.style.overflow = '';
+            
+            const modalImage = modalImageContainer.querySelector('img');
+            const gridContent = document.querySelectorAll('.photo, .navbar');
+            
+            // Prvo sakrijemo UI elemente modala
+            gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
+                opacity: 0,
+                y: 20,
+                duration: 0.4,
+                ease: "power2.in"
+            });
+
+            // Spremimo trenutnu poziciju i dimenzije modalne slike
+            const modalRect = modalImage.getBoundingClientRect();
+            
+            // Fiksiramo modalnu sliku na trenutnoj poziciji
+            gsap.set(modalImage, {
+                position: 'fixed',
+                top: modalRect.top,
+                left: modalRect.left,
+                width: modalRect.width,
+                height: modalRect.height,
+                zIndex: 1000
+            });
+
+            // Animiramo prema poziciji grid slike
+            const targetBounds = activePhoto.getBoundingClientRect();
+            gsap.to(modalImage, {
+                top: targetBounds.top,
+                left: targetBounds.left,
+                width: targetBounds.width,
+                height: targetBounds.height,
+                duration: 0.8,
+                ease: "power2.inOut",
+                onUpdate: function() {
+                    // Kad smo na 70% animacije, počnemo pokazivati grid content
+                    if (this.progress() > 0.7) {
+                        gsap.to(gridContent, {
+                            opacity: 1,
+                            duration: 0.3,
+                            ease: "power2.out"
+                        });
+                    }
+                },
+                onComplete: () => {
+                    modal.classList.remove("active");
+                    modal.style.display = "none";
+                    modalImageContainer.innerHTML = '';
+                    // Instantno pokažemo originalnu fotku
+                    gsap.set(activePhoto, { opacity: 1 });
+                    activePhoto = null;
+                }
+            });
+        }
+    }
+
     function showNextPhoto() {
-        currentPhotoIndex = (currentPhotoIndex + 1) % photoData.length;
-        updateModalPhoto();
+        if (currentPhotoIndex < photoData.length - 1) {
+            currentPhotoIndex++;
+        } else {
+            currentPhotoIndex = 0;
+        }
+        const nextPhoto = photoData[currentPhotoIndex];
+        
+        // Prvo tiho scrollamo do sljedeće fotke
+        ensurePhotoInViewport(nextPhoto.element);
+        
+        // Sakrijemo originalnu fotku u gridu
+        gsap.set(nextPhoto.element, { opacity: 0 });
+        
+        modalImageContainer.innerHTML = '';
+        const modalImage = nextPhoto.element.cloneNode(true);
+        modalImageContainer.appendChild(modalImage);
+        
+        // Osiguramo da je modalna fotka vidljiva
+        gsap.set(modalImage, { opacity: 1 });
+        
+        modalTitle.textContent = nextPhoto.title;
+        modalExif.textContent = nextPhoto.exif;
+        activePhoto = nextPhoto.element;
     }
 
     function showPreviousPhoto() {
-        currentPhotoIndex = (currentPhotoIndex - 1 + photoData.length) % photoData.length;
-        updateModalPhoto();
-    }
-
-    function updateModalPhoto() {
-        const newPhoto = photoData[currentPhotoIndex];
-
-        ensurePhotoInViewport(newPhoto.element);
-
-        gsap.set(newPhoto.element, { opacity: 0 });
-
-        const state = Flip.getState(newPhoto.element);
-        modalImageContainer.appendChild(newPhoto.element);
-
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: true
-        });
-
-        modalTitle.textContent = newPhoto.title;
-        modalExif.textContent = newPhoto.exif;
-        activePhoto = newPhoto.element;
+        if (currentPhotoIndex > 0) {
+            currentPhotoIndex--;
+        } else {
+            currentPhotoIndex = photoData.length - 1;
+        }
+        const prevPhoto = photoData[currentPhotoIndex];
+        
+        // Prvo tiho scrollamo do prethodne fotke
+        ensurePhotoInViewport(prevPhoto.element);
+        
+        // Sakrijemo originalnu fotku u gridu
+        gsap.set(prevPhoto.element, { opacity: 0 });
+        
+        modalImageContainer.innerHTML = '';
+        const modalImage = prevPhoto.element.cloneNode(true);
+        modalImageContainer.appendChild(modalImage);
+        
+        // Osiguramo da je modalna fotka vidljiva
+        gsap.set(modalImage, { opacity: 1 });
+        
+        modalTitle.textContent = prevPhoto.title;
+        modalExif.textContent = prevPhoto.exif;
+        activePhoto = prevPhoto.element;
     }
 
     prevButton.addEventListener("click", showPreviousPhoto);
