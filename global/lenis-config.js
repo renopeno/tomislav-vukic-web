@@ -11,10 +11,8 @@ function initLenis() {
   // Inicijaliziraj novu Lenis instancu
   window.lenis = new Lenis({
     smoothWheel: true,
-    smoothTouch: false,
+    smoothTouch: true,
     wheelMultiplier: 1.2,
-    touchMultiplier: 2,
-    touchInertiaMultiplier: 2.5,
     lerp: 0.07,
   });
 
