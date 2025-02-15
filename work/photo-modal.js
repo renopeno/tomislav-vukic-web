@@ -165,28 +165,23 @@ function initPhotoModal() {
     }
 
     function showNextPhoto() {
-        // Prekini sve postojeće GSAP animacije na foto elementima
         const allPhotos = document.querySelectorAll('.photo');
         gsap.killTweensOf(allPhotos);
 
-        // Odredi sljedeću fotku ciklički
         let newIndex = (currentPhotoIndex < photoData.length - 1) ? currentPhotoIndex + 1 : 0;
         const currentPhoto = photoData[currentPhotoIndex];
         const nextPhoto = photoData[newIndex];
 
-        // Ako postoji placeholder, reinseriramo trenutačnu fotku u grid
         if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
             currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
             currentPhoto.placeholder.remove();
             currentPhoto.placeholder = null;
         }
 
-        // Osiguravamo da sve fotke osim sljedeće ostanu skrivene
         const gridPhotos = Array.from(document.querySelectorAll('.photo'))
             .filter(el => el !== nextPhoto.element);
         gsap.set(gridPhotos, { opacity: 0 });
 
-        // Kreiraj placeholder za sljedeću fotku u gridu
         const origParent = nextPhoto.element.originalParent;
         const placeholder = document.createElement("div");
         placeholder.classList.add("photo-placeholder");
@@ -195,15 +190,23 @@ function initPhotoModal() {
         origParent.insertBefore(placeholder, nextPhoto.element);
         nextPhoto.placeholder = placeholder;
 
-        // Tiho scrollamo grid tako da je sljedeća fotka centrirana u viewportu
         ensurePhotoInViewport(nextPhoto.element);
 
-        // Premještamo sljedeću fotku u modal i instant postavljamo opacity na 1
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(nextPhoto.element);
-        gsap.set(nextPhoto.element, { opacity: 1 });
+        
+        // Ispravljena tranzicija za "next"
+        gsap.set(nextPhoto.element, {
+            opacity: 1,
+            clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)"
+        });
 
-        // Ažuriramo podatke modala
+        gsap.to(nextPhoto.element, {
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            duration: 0.6,
+            ease: "power3.inOut"
+        });
+
         modalTitle.textContent = nextPhoto.title;
         modalExif.textContent = nextPhoto.exif;
         activePhoto = nextPhoto.element;
@@ -211,11 +214,9 @@ function initPhotoModal() {
     }
 
     function showPreviousPhoto() {
-        // Prekini sve postojeće GSAP animacije na foto elementima
         const allPhotos = document.querySelectorAll('.photo');
         gsap.killTweensOf(allPhotos);
 
-        // Odredi prethodnu fotku ciklički
         let newIndex = (currentPhotoIndex > 0) ? currentPhotoIndex - 1 : photoData.length - 1;
         const currentPhoto = photoData[currentPhotoIndex];
         const prevPhoto = photoData[newIndex];
@@ -226,12 +227,10 @@ function initPhotoModal() {
             currentPhoto.placeholder = null;
         }
 
-        // Osiguravamo da sve fotke osim prethodne ostanu skrivene
         const gridPhotos = Array.from(document.querySelectorAll('.photo'))
             .filter(el => el !== prevPhoto.element);
         gsap.set(gridPhotos, { opacity: 0 });
 
-        // Kreiraj placeholder za prethodnu fotku u gridu
         const origParent = prevPhoto.element.originalParent;
         const placeholder = document.createElement("div");
         placeholder.classList.add("photo-placeholder");
@@ -240,15 +239,23 @@ function initPhotoModal() {
         origParent.insertBefore(placeholder, prevPhoto.element);
         prevPhoto.placeholder = placeholder;
 
-        // Tiho scrollamo grid tako da je prethodna fotka centrirana u viewportu
         ensurePhotoInViewport(prevPhoto.element);
 
-        // Premještamo prethodnu fotku u modal i instant postavljamo opacity na 1
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(prevPhoto.element);
-        gsap.set(prevPhoto.element, { opacity: 1 });
+        
+        // Ispravljena tranzicija za "previous"
+        gsap.set(prevPhoto.element, {
+            opacity: 1,
+            clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)"
+        });
 
-        // Ažuriramo podatke modala
+        gsap.to(prevPhoto.element, {
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            duration: 0.6,
+            ease: "power3.inOut"
+        });
+
         modalTitle.textContent = prevPhoto.title;
         modalExif.textContent = prevPhoto.exif;
         activePhoto = prevPhoto.element;
