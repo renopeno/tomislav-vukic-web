@@ -318,17 +318,13 @@ function initPhotoModal() {
     hammer.on('pan', function(e) {
         if (!isDragging || !activePhoto) return;
         
-        const moveX = e.center.x - startX;
+        const moveX = e.deltaX;
         const movePercent = (moveX / window.innerWidth) * 100;
         
-        // Dodajemo malo otpora kad se vuče
-        const resistance = 0.5;
-        const limitedMovePercent = Math.min(Math.max(movePercent * resistance, -50), 50);
-        
-        gsap.set(activePhoto, {
-            x: limitedMovePercent + '%',
-            rotation: limitedMovePercent * 0.05 // blaga rotacija
-        });
+        // Pomičemo sve tri fotke zajedno
+        gsap.set(prevContainer, { x: `${-100 + movePercent}%` });
+        gsap.set(currentContainer, { x: `${movePercent}%` });
+        gsap.set(nextContainer, { x: `${100 + movePercent}%` });
     });
     
     hammer.on('panend', function(e) {
@@ -337,20 +333,18 @@ function initPhotoModal() {
         
         const velocity = Math.abs(e.velocity);
         const moveX = e.deltaX;
-        const threshold = window.innerWidth * 0.2; // 20% ekrana
+        const threshold = window.innerWidth * 0.2;
         
         if (Math.abs(moveX) > threshold || velocity > 0.5) {
-            // Dovoljno brz swipe ili dovoljno daleko povučeno
             if (moveX < 0) {
                 showNextPhoto();
             } else {
                 showPreviousPhoto();
             }
         } else {
-            // Vrati na početnu poziciju
-            gsap.to(activePhoto, {
-                x: '0%',
-                rotation: 0,
+            // Vrati sve na početnu poziciju
+            gsap.to([prevContainer, currentContainer, nextContainer], {
+                x: (i) => (i-1) * 100 + "%",
                 duration: 0.3,
                 ease: "power2.out"
             });
