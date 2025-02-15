@@ -172,23 +172,17 @@ function initPhotoModal() {
         const currentPhoto = photoData[currentPhotoIndex];
         const nextPhoto = photoData[newIndex];
 
-        // Animiramo trenutnu fotku prije nego je vratimo u grid
+        // Reset trenutne fotke prije vraćanja u grid
         if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
-            gsap.to(currentPhoto.element, {
-                x: '-100%',
-                opacity: 0,
-                duration: 0.3,
-                ease: "power2.in",
-                onComplete: () => {
-                    gsap.set(currentPhoto.element, {
-                        x: 0,
-                        opacity: 1
-                    });
-                    currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
-                    currentPhoto.placeholder.remove();
-                    currentPhoto.placeholder = null;
-                }
+            gsap.set(currentPhoto.element, {
+                x: 0,
+                opacity: 1,
+                scale: 1,
+                rotation: 0
             });
+            currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
+            currentPhoto.placeholder.remove();
+            currentPhoto.placeholder = null;
         }
 
         const gridPhotos = Array.from(document.querySelectorAll('.photo'))
@@ -208,11 +202,21 @@ function initPhotoModal() {
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(nextPhoto.element);
         
-        // Nova fotka ulazi s desne strane
-        gsap.fromTo(nextPhoto.element, 
-            { x: '100%', opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.3, ease: "power2.out" }
-        );
+        // Nova tranzicija koja prati swipe pokret
+        gsap.set(nextPhoto.element, {
+            opacity: 1,
+            x: '100%',
+            scale: 0.95,
+            rotation: 3
+        });
+
+        gsap.to(nextPhoto.element, {
+            x: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.5,
+            ease: "power2.out"
+        });
 
         modalTitle.textContent = nextPhoto.title;
         modalExif.textContent = nextPhoto.exif;
@@ -228,23 +232,17 @@ function initPhotoModal() {
         const currentPhoto = photoData[currentPhotoIndex];
         const prevPhoto = photoData[newIndex];
 
-        // Animiramo trenutnu fotku prije nego je vratimo u grid
+        // Reset trenutne fotke prije vraćanja u grid
         if (currentPhoto.placeholder && currentPhoto.element.originalParent) {
-            gsap.to(currentPhoto.element, {
-                x: '100%',
-                opacity: 0,
-                duration: 0.3,
-                ease: "power2.in",
-                onComplete: () => {
-                    gsap.set(currentPhoto.element, {
-                        x: 0,
-                        opacity: 1
-                    });
-                    currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
-                    currentPhoto.placeholder.remove();
-                    currentPhoto.placeholder = null;
-                }
+            gsap.set(currentPhoto.element, {
+                x: 0,
+                opacity: 1,
+                scale: 1,
+                rotation: 0
             });
+            currentPhoto.element.originalParent.insertBefore(currentPhoto.element, currentPhoto.placeholder);
+            currentPhoto.placeholder.remove();
+            currentPhoto.placeholder = null;
         }
 
         const gridPhotos = Array.from(document.querySelectorAll('.photo'))
@@ -264,11 +262,21 @@ function initPhotoModal() {
         modalImageContainer.innerHTML = "";
         modalImageContainer.appendChild(prevPhoto.element);
         
-        // Nova fotka ulazi s lijeve strane
-        gsap.fromTo(prevPhoto.element, 
-            { x: '-100%', opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.3, ease: "power2.out" }
-        );
+        // Nova tranzicija koja prati swipe pokret
+        gsap.set(prevPhoto.element, {
+            opacity: 1,
+            x: '-100%',
+            scale: 0.95,
+            rotation: -3
+        });
+
+        gsap.to(prevPhoto.element, {
+            x: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 0.5,
+            ease: "power2.out"
+        });
 
         modalTitle.textContent = prevPhoto.title;
         modalExif.textContent = prevPhoto.exif;
