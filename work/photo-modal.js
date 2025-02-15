@@ -70,15 +70,15 @@ function initPhotoModal() {
         // Spremimo stanje prije animacije
         const state = Flip.getState(photo.element);
         
-        // Spremimo stanje prije pomicanja slike
-        const state = Flip.getState(photo.element);
-
-        // Prebaci originalni img umjesto kloniranja
-        modalImageContainer.appendChild(photo.element);
-
+        // Očistimo prethodni sadržaj
+        modalImageContainer.innerHTML = '';
+        
+        // Napravimo klon i dodamo ga u modal
+        const modalImage = photo.element.cloneNode(true);
+        modalImageContainer.appendChild(modalImage);
         
         // Osiguramo da je modalna fotka vidljiva
-        gsap.set(photo.element, { opacity: 1 });
+        gsap.set(modalImage, { opacity: 1 });
         
         // Pripremimo modal
         modal.style.display = "grid";
