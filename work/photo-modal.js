@@ -176,16 +176,22 @@ function initPhotoModal() {
         const nextWrapper = document.createElement("div");
 
         [prevWrapper, currentWrapper, nextWrapper].forEach(wrapper => {
-            wrapper.style.position = "absolute";
-            wrapper.style.width = "100%";
-            wrapper.style.height = "100%";
-            wrapper.style.top = "0";
-            wrapper.style.left = "0";
+            wrapper.style.cssText = `
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
         });
 
-        prevWrapper.appendChild(photoData[prevIndex].element.cloneNode(true));
+        // Koristimo originalne fotke umjesto klonova
+        prevWrapper.appendChild(photoData[prevIndex].element);
         currentWrapper.appendChild(activePhoto);
-        nextWrapper.appendChild(photoData[nextIndex].element.cloneNode(true));
+        nextWrapper.appendChild(photoData[nextIndex].element);
 
         modalImageContainer.appendChild(prevWrapper);
         modalImageContainer.appendChild(currentWrapper);
@@ -205,27 +211,28 @@ function initPhotoModal() {
     
     let isDragging = false;
     
+    let currentPhotos = null;
+
     hammer.on('panstart', function(e) {
         isDragging = true;
         gsap.killTweensOf(modalImageContainer.children);
-        const photos = setupModalPhotos();
+        currentPhotos = setupModalPhotos();
     });
     
     hammer.on('pan', function(e) {
-        if (!isDragging) return;
+        if (!isDragging || !currentPhotos) return;
         
         const moveX = e.deltaX;
         const movePercent = (moveX / window.innerWidth) * 100;
         const limitedMove = Math.max(Math.min(movePercent, 100), -100);
         
-        // Pomičemo sve tri fotke zajedno
         gsap.set(modalImageContainer.children[0], { x: -100 + limitedMove + '%' });
         gsap.set(modalImageContainer.children[1], { x: limitedMove + '%' });
         gsap.set(modalImageContainer.children[2], { x: 100 + limitedMove + '%' });
     });
     
     hammer.on('panend', function(e) {
-        if (!isDragging) return;
+        if (!isDragging || !currentPhotos) return;
         isDragging = false;
         
         const velocity = Math.abs(e.velocity);
@@ -239,7 +246,6 @@ function initPhotoModal() {
                 showPreviousPhoto();
             }
         } else {
-            // Vrati sve na početnu poziciju
             gsap.to(modalImageContainer.children[0], { x: '-100%', duration: 0.3, ease: "power2.out" });
             gsap.to(modalImageContainer.children[1], { x: '0%', duration: 0.3, ease: "power2.out" });
             gsap.to(modalImageContainer.children[2], { x: '100%', duration: 0.3, ease: "power2.out" });
