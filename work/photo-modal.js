@@ -164,6 +164,89 @@ function initPhotoModal() {
         });
     }
 
+    function setupModalPhotos() {
+        const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
+        const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
+
+        modalImageContainer.innerHTML = "";
+
+        // Kreiramo wrappere za sve tri fotke
+        const prevWrapper = document.createElement("div");
+        const currentWrapper = document.createElement("div");
+        const nextWrapper = document.createElement("div");
+
+        [prevWrapper, currentWrapper, nextWrapper].forEach(wrapper => {
+            wrapper.style.position = "absolute";
+            wrapper.style.width = "100%";
+            wrapper.style.height = "100%";
+            wrapper.style.top = "0";
+            wrapper.style.left = "0";
+        });
+
+        prevWrapper.appendChild(photoData[prevIndex].element.cloneNode(true));
+        currentWrapper.appendChild(activePhoto);
+        nextWrapper.appendChild(photoData[nextIndex].element.cloneNode(true));
+
+        modalImageContainer.appendChild(prevWrapper);
+        modalImageContainer.appendChild(currentWrapper);
+        modalImageContainer.appendChild(nextWrapper);
+
+        // Postavljamo početne pozicije
+        gsap.set(prevWrapper, { x: "-100%" });
+        gsap.set(currentWrapper, { x: "0%" });
+        gsap.set(nextWrapper, { x: "100%" });
+
+        return { prevWrapper, currentWrapper, nextWrapper };
+    }
+
+    // Inicijalizacija Hammer.js
+    const hammer = new Hammer(modalImageContainer);
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    
+    let isDragging = false;
+    
+    hammer.on('panstart', function(e) {
+        isDragging = true;
+        gsap.killTweensOf(modalImageContainer.children);
+        const photos = setupModalPhotos();
+    });
+    
+    hammer.on('pan', function(e) {
+        if (!isDragging) return;
+        
+        const moveX = e.deltaX;
+        const movePercent = (moveX / window.innerWidth) * 100;
+        const limitedMove = Math.max(Math.min(movePercent, 100), -100);
+        
+        // Pomičemo sve tri fotke zajedno
+        gsap.set(modalImageContainer.children[0], { x: -100 + limitedMove + '%' });
+        gsap.set(modalImageContainer.children[1], { x: limitedMove + '%' });
+        gsap.set(modalImageContainer.children[2], { x: 100 + limitedMove + '%' });
+    });
+    
+    hammer.on('panend', function(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const velocity = Math.abs(e.velocity);
+        const moveX = e.deltaX;
+        const threshold = window.innerWidth * 0.2;
+        
+        if (Math.abs(moveX) > threshold || velocity > 0.5) {
+            if (moveX < 0) {
+                showNextPhoto();
+            } else {
+                showPreviousPhoto();
+            }
+        } else {
+            // Vrati sve na početnu poziciju
+            gsap.to(modalImageContainer.children[0], { x: '-100%', duration: 0.3, ease: "power2.out" });
+            gsap.to(modalImageContainer.children[1], { x: '0%', duration: 0.3, ease: "power2.out" });
+            gsap.to(modalImageContainer.children[2], { x: '100%', duration: 0.3, ease: "power2.out" });
+        }
+    });
+
+    // Modificiramo postojeće funkcije za promjenu fotke
     function showNextPhoto() {
         const allPhotos = document.querySelectorAll('.photo');
         gsap.killTweensOf(allPhotos);
@@ -299,58 +382,6 @@ function initPhotoModal() {
     closeButton.addEventListener("click", closeModal);
     prevButton.addEventListener("click", showPreviousPhoto);
     nextButton.addEventListener("click", showNextPhoto);
-
-    // Inicijalizacija Hammer.js
-    const hammer = new Hammer(modalImageContainer);
-    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-    
-    let isDragging = false;
-    
-    hammer.on('panstart', function(e) {
-        isDragging = true;
-        gsap.killTweensOf(activePhoto); // Zaustavi trenutne animacije
-    });
-    
-    hammer.on('pan', function(e) {
-        if (!isDragging || !activePhoto) return;
-        
-        const moveX = e.deltaX;
-        const movePercent = (moveX / window.innerWidth) * 100;
-        
-        // Limitiramo pomak na 100% u bilo kojem smjeru
-        const limitedMove = Math.max(Math.min(movePercent, 100), -100);
-        
-        gsap.set(activePhoto, {
-            x: limitedMove + '%',
-            rotation: limitedMove * 0.05 // Blaga rotacija za bolji efekt
-        });
-    });
-    
-    hammer.on('panend', function(e) {
-        if (!isDragging || !activePhoto) return;
-        isDragging = false;
-        
-        const velocity = Math.abs(e.velocity);
-        const moveX = e.deltaX;
-        const threshold = window.innerWidth * 0.2; // 20% ekrana
-        
-        if (Math.abs(moveX) > threshold || velocity > 0.5) {
-            // Dovoljno daleko povučeno ili dovoljno brzo
-            if (moveX < 0) {
-                showNextPhoto();
-            } else {
-                showPreviousPhoto();
-            }
-        } else {
-            // Vrati na početnu poziciju
-            gsap.to(activePhoto, {
-                x: '0%',
-                rotation: 0,
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        }
-    });
 }
 
 // initPhotoModal(); // Ovo mi ne treba trenutno jer ga inicijaliziram u grid.js
