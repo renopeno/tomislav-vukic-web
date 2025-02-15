@@ -101,6 +101,11 @@ function initGrid() {
   // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
   window.shuffledPhotos = shuffledPhotos;
 
+  // Inicijaliziraj modal PRIJE animacija
+  if (typeof initPhotoModal === "function") {
+    initPhotoModal();
+  }
+
   // GSAP animacija za ulazak fotografija
   gsap.fromTo(
     shuffledPhotos,
@@ -114,11 +119,6 @@ function initGrid() {
       stagger: 0.1,
     }
   );
-
-  // Inicijaliziraj modal nakon što su shuffledPhotos postavljeni
-  if (typeof initPhotoModal === "function") {
-    initPhotoModal();
-  }
 }
 
 // Inicijalizacija
