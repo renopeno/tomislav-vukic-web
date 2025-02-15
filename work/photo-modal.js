@@ -65,8 +65,9 @@ function initPhotoModal() {
             ease: "power2.inOut"
         });
         
-        // Premjestimo originalnu fotku u modal (umjesto kloniranja)
+        // Premjestimo originalnu fotku u modal i osiguramo da je vidljiva
         modalImageContainer.appendChild(photo.element);
+        gsap.set(photo.element, { autoAlpha: 1 });
         
         // Pripremimo modal
         modal.style.display = "grid";
@@ -159,15 +160,20 @@ function initPhotoModal() {
         // Prvo tiho scrollamo do sljedeće fotke
         ensurePhotoInViewport(nextPhoto.element);
         
+        // Spremimo stanje trenutne fotke
+        const currentImage = modalImageContainer.querySelector('img');
+        const state = Flip.getState(currentImage);
+        
         // Sakrijemo originalnu fotku u gridu
-        gsap.set(nextPhoto.element, { opacity: 0 });
+        gsap.set(nextPhoto.element, { autoAlpha: 0 });
         
-        modalImageContainer.innerHTML = '';
-        const modalImage = nextPhoto.element.cloneNode(true);
-        modalImageContainer.appendChild(modalImage);
+        // Premjestimo novu fotku u modal
+        modalImageContainer.appendChild(nextPhoto.element);
+        gsap.set(nextPhoto.element, { autoAlpha: 1 });
         
-        // Osiguramo da je modalna fotka vidljiva
-        gsap.set(modalImage, { opacity: 1 });
+        // Vratimo trenutnu fotku u grid
+        const originalContainer = currentImage.parentElement;
+        originalContainer.appendChild(currentImage);
         
         modalTitle.textContent = nextPhoto.title;
         modalExif.textContent = nextPhoto.exif;
@@ -185,15 +191,20 @@ function initPhotoModal() {
         // Prvo tiho scrollamo do prethodne fotke
         ensurePhotoInViewport(prevPhoto.element);
         
+        // Spremimo stanje trenutne fotke
+        const currentImage = modalImageContainer.querySelector('img');
+        const state = Flip.getState(currentImage);
+        
         // Sakrijemo originalnu fotku u gridu
-        gsap.set(prevPhoto.element, { opacity: 0 });
+        gsap.set(prevPhoto.element, { autoAlpha: 0 });
         
-        modalImageContainer.innerHTML = '';
-        const modalImage = prevPhoto.element.cloneNode(true);
-        modalImageContainer.appendChild(modalImage);
+        // Premjestimo novu fotku u modal
+        modalImageContainer.appendChild(prevPhoto.element);
+        gsap.set(prevPhoto.element, { autoAlpha: 1 });
         
-        // Osiguramo da je modalna fotka vidljiva
-        gsap.set(modalImage, { opacity: 1 });
+        // Vratimo trenutnu fotku u grid
+        const originalContainer = currentImage.parentElement;
+        originalContainer.appendChild(currentImage);
         
         modalTitle.textContent = prevPhoto.title;
         modalExif.textContent = prevPhoto.exif;
