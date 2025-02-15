@@ -13,6 +13,7 @@ function initPhotoModal() {
     let currentPhotoIndex = 0;
     let photoData = [];
     let activePhoto = null;
+    let originalStyles = null; // Spremamo originalne stilove
 
     // Tiho scrollanje do fotke u pozadini (dok je modal aktivan)
     function ensurePhotoInViewport(photo) {
@@ -56,12 +57,20 @@ function initPhotoModal() {
         // Spriječi scroll na body
         document.body.style.overflow = 'hidden';
         
+        // Spremi originalne stilove prije micanja
+        originalStyles = {
+            gridColumn: photo.element.parentElement.style.gridColumnStart,
+            gridRow: photo.element.parentElement.style.gridRowStart,
+            width: photo.element.style.width,
+            height: photo.element.style.height
+        };
+        
         // Spremi stanje prije animacije
         const state = Flip.getState(photo.element);
         
-        // Sakrijemo SVE s grida (sve fotke i navigaciju) i navbar
-        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
-        gsap.to(gridContent, {
+        // Sakrijemo ostale elemente s grida
+        const otherGridContent = document.querySelectorAll('.photo:not(:nth-child(' + (currentPhotoIndex + 1) + ')), .navigation, .navbar');
+        gsap.to(otherGridContent, {
             opacity: 0,
             duration: 0.3,
             ease: "power2.inOut"
@@ -90,7 +99,6 @@ function initPhotoModal() {
             ease: "power2.inOut",
             absolute: true,
             onComplete: () => {
-                // Animiramo UI elemente modala
                 gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
                     opacity: 1,
                     y: 0,
@@ -113,7 +121,6 @@ function initPhotoModal() {
             document.body.style.overflow = '';
             
             const modalImage = modalImageContainer.querySelector('img');
-            const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
             
             // Prvo sakrijemo UI elemente modala
             gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
@@ -130,13 +137,23 @@ function initPhotoModal() {
             const originalContainer = photoData[currentPhotoIndex].element.parentElement;
             originalContainer.appendChild(modalImage);
 
+            // Vrati originalne grid stilove
+            if (originalStyles) {
+                originalContainer.style.gridColumnStart = originalStyles.gridColumn;
+                originalContainer.style.gridRowStart = originalStyles.gridRow;
+                modalImage.style.width = originalStyles.width;
+                modalImage.style.height = originalStyles.height;
+            }
+
             // FLIP animacija za povratak
             Flip.from(state, {
                 duration: 0.8,
                 ease: "power2.inOut",
                 onUpdate: function() {
                     if (this.progress() > 0.7) {
-                        gsap.to(gridContent, {
+                        // Vraćamo vidljivost ostalim elementima
+                        const otherGridContent = document.querySelectorAll('.photo:not(:nth-child(' + (currentPhotoIndex + 1) + ')), .navigation, .navbar');
+                        gsap.to(otherGridContent, {
                             opacity: 1,
                             duration: 0.3,
                             ease: "power2.out"
@@ -147,6 +164,7 @@ function initPhotoModal() {
                     modal.classList.remove("active");
                     modal.style.display = "none";
                     activePhoto = null;
+                    originalStyles = null;
                 }
             });
         }
