@@ -54,6 +54,9 @@ function initPhotoModal() {
         
         document.body.style.overflow = 'hidden';
         
+        // Osigurajmo da je slika vidljiva prije FLIP animacije
+        gsap.set(photo.element, { autoAlpha: 1, visibility: "visible" });
+        
         // Spremimo stanje prije animacije
         const state = Flip.getState(photo.element);
         
@@ -62,12 +65,19 @@ function initPhotoModal() {
         gsap.to(gridContent, {
             autoAlpha: 0,
             duration: 0.3,
-            ease: "power2.inOut"
+            ease: "power2.inOut",
+            exclude: [photo.element] // Isključimo trenutnu fotku iz sakrivanja
         });
         
-        // Premjestimo originalnu fotku u modal i osiguramo da je vidljiva
+        // Premjestimo originalnu fotku u modal
         modalImageContainer.appendChild(photo.element);
-        gsap.set(photo.element, { autoAlpha: 1 });
+        
+        // Dodatno osiguranje da je slika vidljiva nakon premještanja
+        gsap.set(photo.element, { 
+            autoAlpha: 1, 
+            visibility: "visible",
+            clearProps: "visibility" // Očisti visibility property nakon postavljanja
+        });
         
         // Pripremimo modal
         modal.style.display = "grid";
