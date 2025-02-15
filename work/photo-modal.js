@@ -300,55 +300,17 @@ function initPhotoModal() {
     prevButton.addEventListener("click", showPreviousPhoto);
     nextButton.addEventListener("click", showNextPhoto);
 
-    // Inicijalizacija Hammer.js za touch interakcije
+    // Inicijalizacija Hammer.js
     const hammer = new Hammer(modalImageContainer);
-    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
     
-    let isDragging = false;
-    let startX = 0;
-    
-    hammer.on('panstart', function(e) {
-        isDragging = true;
-        startX = e.center.x;
-        
-        // Zaustavimo trenutnu GSAP animaciju ako postoji
-        gsap.killTweensOf(activePhoto);
+    // Dodaj event listenere za swipe
+    hammer.on('swipeleft', function() {
+        showNextPhoto();
     });
     
-    hammer.on('pan', function(e) {
-        if (!isDragging || !activePhoto) return;
-        
-        const moveX = e.deltaX;
-        const movePercent = (moveX / window.innerWidth) * 100;
-        
-        // Pomičemo sve tri fotke zajedno
-        gsap.set(prevContainer, { x: `${-100 + movePercent}%` });
-        gsap.set(currentContainer, { x: `${movePercent}%` });
-        gsap.set(nextContainer, { x: `${100 + movePercent}%` });
-    });
-    
-    hammer.on('panend', function(e) {
-        if (!isDragging || !activePhoto) return;
-        isDragging = false;
-        
-        const velocity = Math.abs(e.velocity);
-        const moveX = e.deltaX;
-        const threshold = window.innerWidth * 0.2;
-        
-        if (Math.abs(moveX) > threshold || velocity > 0.5) {
-            if (moveX < 0) {
-                showNextPhoto();
-            } else {
-                showPreviousPhoto();
-            }
-        } else {
-            // Vrati sve na početnu poziciju
-            gsap.to([prevContainer, currentContainer, nextContainer], {
-                x: (i) => (i-1) * 100 + "%",
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        }
+    hammer.on('swiperight', function() {
+        showPreviousPhoto();
     });
 }
 
