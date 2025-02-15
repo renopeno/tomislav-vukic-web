@@ -56,33 +56,23 @@ function initPhotoModal() {
         // Spriječi scroll na body
         document.body.style.overflow = 'hidden';
         
-        // Instantno sakrijemo kliknutu fotku
-        gsap.set(photo.element, { opacity: 0 });
+        // Spremimo stanje prije animacije
+        const state = Flip.getState(photo.element);
         
-        // Sakrijemo SVE s grida (sve fotke i navigaciju) i navbar
-        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
+        // Sakrijemo SVE s grida (sve fotke i navigaciju) osim trenutne fotke
+        const gridContent = document.querySelectorAll('.photo:not([src="' + photo.src + '"]), .navigation, .navbar');
         gsap.to(gridContent, {
             opacity: 0,
             duration: 0.3,
             ease: "power2.inOut"
         });
         
-        // Spremimo stanje prije animacije
-        const state = Flip.getState(photo.element);
-        
-        // Očistimo prethodni sadržaj
-        modalImageContainer.innerHTML = '';
-        
-        // Napravimo klon i dodamo ga u modal
-        const modalImage = photo.element.cloneNode(true);
-        modalImageContainer.appendChild(modalImage);
-        
-        // Osiguramo da je modalna fotka vidljiva
-        gsap.set(modalImage, { opacity: 1 });
-        
         // Pripremimo modal
         modal.style.display = "grid";
         modal.classList.add("active");
+        
+        // Premjestimo originalnu fotku u modal container
+        modalImageContainer.appendChild(photo.element);
         
         // Postavimo podatke
         modalTitle.textContent = photo.title;
@@ -99,7 +89,6 @@ function initPhotoModal() {
             duration: 0.8,
             ease: "power2.inOut",
             absolute: true,
-            targets: [modalImage],
             onComplete: () => {
                 // Animiramo UI elemente modala
                 gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
@@ -124,7 +113,6 @@ function initPhotoModal() {
             document.body.style.overflow = '';
             
             const modalImage = modalImageContainer.querySelector('img');
-            const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
             
             // Prvo sakrijemo UI elemente modala
             gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
@@ -134,44 +122,32 @@ function initPhotoModal() {
                 ease: "power2.in"
             });
 
-            // Spremimo trenutnu poziciju i dimenzije modalne slike
-            const modalRect = modalImage.getBoundingClientRect();
+            // Spremimo stanje prije animacije
+            const state = Flip.getState(modalImage);
             
-            // Fiksiramo modalnu sliku na trenutnoj poziciji
-            gsap.set(modalImage, {
-                position: 'fixed',
-                top: modalRect.top,
-                left: modalRect.left,
-                width: modalRect.width,
-                height: modalRect.height,
-                zIndex: 1000
-            });
+            // Vratimo fotku nazad u grid
+            const originalContainer = window.shuffledPhotos.find(container => 
+                container.querySelector('.photo[src="' + modalImage.getAttribute("src") + '"]') === activePhoto
+            );
+            originalContainer.appendChild(modalImage);
 
-            // Animiramo prema poziciji grid slike
-            const targetBounds = activePhoto.getBoundingClientRect();
-            gsap.to(modalImage, {
-                top: targetBounds.top,
-                left: targetBounds.left,
-                width: targetBounds.width,
-                height: targetBounds.height,
+            // FLIP animacija nazad
+            Flip.from(state, {
                 duration: 0.8,
                 ease: "power2.inOut",
-                onUpdate: function() {
-                    // Kad smo na 70% animacije, počnemo pokazivati grid content
-                    if (this.progress() > 0.7) {
-                        gsap.to(gridContent, {
-                            opacity: 1,
-                            duration: 0.3,
-                            ease: "power2.out"
-                        });
-                    }
-                },
+                absolute: true,
                 onComplete: () => {
                     modal.classList.remove("active");
                     modal.style.display = "none";
-                    modalImageContainer.innerHTML = '';
-                    // Instantno pokažemo originalnu fotku
-                    gsap.set(activePhoto, { opacity: 1 });
+                    
+                    // Pokažemo grid content
+                    const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
+                    gsap.to(gridContent, {
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                    
                     activePhoto = null;
                 }
             });
