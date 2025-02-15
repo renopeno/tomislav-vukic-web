@@ -48,31 +48,29 @@ function initPhotoModal() {
     });
 
     function openModal(photo) {
-        // Zaustavi Lenis scroll
         if (window.lenis) {
             window.lenis.stop();
         }
         
-        // Spriječi scroll na body
         document.body.style.overflow = 'hidden';
         
         // Spremimo stanje prije animacije
         const state = Flip.getState(photo.element);
         
-        // Sakrijemo SVE s grida (sve fotke i navigaciju) osim trenutne fotke
-        const gridContent = document.querySelectorAll('.photo:not([src="' + photo.src + '"]), .navigation, .navbar');
+        // Sakrijemo SVE s grida (sve fotke i navigaciju) i navbar
+        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
         gsap.to(gridContent, {
-            opacity: 0,
+            autoAlpha: 0,
             duration: 0.3,
             ease: "power2.inOut"
         });
         
+        // Premjestimo originalnu fotku u modal (umjesto kloniranja)
+        modalImageContainer.appendChild(photo.element);
+        
         // Pripremimo modal
         modal.style.display = "grid";
         modal.classList.add("active");
-        
-        // Premjestimo originalnu fotku u modal container
-        modalImageContainer.appendChild(photo.element);
         
         // Postavimo podatke
         modalTitle.textContent = photo.title;
@@ -80,7 +78,7 @@ function initPhotoModal() {
         
         // Sakrijemo UI elemente modala inicijalno
         gsap.set([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-            opacity: 0,
+            autoAlpha: 0,
             y: 20
         });
 
@@ -92,7 +90,7 @@ function initPhotoModal() {
             onComplete: () => {
                 // Animiramo UI elemente modala
                 gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-                    opacity: 1,
+                    autoAlpha: 1,
                     y: 0,
                     duration: 0.4,
                     stagger: 0.1,
@@ -104,50 +102,46 @@ function initPhotoModal() {
 
     function closeModal() {
         if (activePhoto) {
-            // Ponovno pokreni Lenis scroll
             if (window.lenis) {
                 window.lenis.start();
             }
             
-            // Vrati scroll na body
             document.body.style.overflow = '';
             
             const modalImage = modalImageContainer.querySelector('img');
+            const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
             
             // Prvo sakrijemo UI elemente modala
             gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-                opacity: 0,
+                autoAlpha: 0,
                 y: 20,
                 duration: 0.4,
                 ease: "power2.in"
             });
 
-            // Spremimo stanje prije animacije
+            // Spremimo trenutno stanje
             const state = Flip.getState(modalImage);
             
-            // Vratimo fotku nazad u grid
-            const originalContainer = window.shuffledPhotos.find(container => 
-                container.querySelector('.photo[src="' + modalImage.getAttribute("src") + '"]') === activePhoto
-            );
+            // Vratimo sliku u originalni container
+            const originalContainer = photoData[currentPhotoIndex].element.parentElement;
             originalContainer.appendChild(modalImage);
 
-            // FLIP animacija nazad
+            // FLIP animacija za povratak
             Flip.from(state, {
                 duration: 0.8,
                 ease: "power2.inOut",
-                absolute: true,
+                onUpdate: function() {
+                    if (this.progress() > 0.7) {
+                        gsap.to(gridContent, {
+                            autoAlpha: 1,
+                            duration: 0.3,
+                            ease: "power2.out"
+                        });
+                    }
+                },
                 onComplete: () => {
                     modal.classList.remove("active");
                     modal.style.display = "none";
-                    
-                    // Pokažemo grid content
-                    const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
-                    gsap.to(gridContent, {
-                        opacity: 1,
-                        duration: 0.3,
-                        ease: "power2.out"
-                    });
-                    
                     activePhoto = null;
                 }
             });
@@ -165,27 +159,15 @@ function initPhotoModal() {
         // Prvo tiho scrollamo do sljedeće fotke
         ensurePhotoInViewport(nextPhoto.element);
         
-        // Spremimo stanje trenutne fotke
-        const currentImage = modalImageContainer.querySelector('img');
-        const state = Flip.getState(nextPhoto.element);
+        // Sakrijemo originalnu fotku u gridu
+        gsap.set(nextPhoto.element, { opacity: 0 });
         
-        // Vratimo trenutnu fotku nazad u grid
-        const currentContainer = window.shuffledPhotos.find(container => 
-            container.querySelector('.photo[src="' + currentImage.getAttribute("src") + '"]')
-        );
-        if (currentContainer) {
-            currentContainer.appendChild(currentImage);
-        }
+        modalImageContainer.innerHTML = '';
+        const modalImage = nextPhoto.element.cloneNode(true);
+        modalImageContainer.appendChild(modalImage);
         
-        // Premjestimo novu fotku u modal
-        modalImageContainer.appendChild(nextPhoto.element);
-        
-        // FLIP animacija
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: true
-        });
+        // Osiguramo da je modalna fotka vidljiva
+        gsap.set(modalImage, { opacity: 1 });
         
         modalTitle.textContent = nextPhoto.title;
         modalExif.textContent = nextPhoto.exif;
@@ -203,27 +185,15 @@ function initPhotoModal() {
         // Prvo tiho scrollamo do prethodne fotke
         ensurePhotoInViewport(prevPhoto.element);
         
-        // Spremimo stanje trenutne fotke
-        const currentImage = modalImageContainer.querySelector('img');
-        const state = Flip.getState(prevPhoto.element);
+        // Sakrijemo originalnu fotku u gridu
+        gsap.set(prevPhoto.element, { opacity: 0 });
         
-        // Vratimo trenutnu fotku nazad u grid
-        const currentContainer = window.shuffledPhotos.find(container => 
-            container.querySelector('.photo[src="' + currentImage.getAttribute("src") + '"]')
-        );
-        if (currentContainer) {
-            currentContainer.appendChild(currentImage);
-        }
+        modalImageContainer.innerHTML = '';
+        const modalImage = prevPhoto.element.cloneNode(true);
+        modalImageContainer.appendChild(modalImage);
         
-        // Premjestimo novu fotku u modal
-        modalImageContainer.appendChild(prevPhoto.element);
-        
-        // FLIP animacija
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: true
-        });
+        // Osiguramo da je modalna fotka vidljiva
+        gsap.set(modalImage, { opacity: 1 });
         
         modalTitle.textContent = prevPhoto.title;
         modalExif.textContent = prevPhoto.exif;
