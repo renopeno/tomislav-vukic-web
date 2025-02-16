@@ -327,8 +327,8 @@ function initPhotoModal() {
         
         // Računamo scale i opacity bazirano na pomaku
         const moveAbs = Math.abs(limitedMovePercent);
-        const scale = gsap.utils.mapRange(0, 50, 1, 0.8)(moveAbs);
-        const opacity = gsap.utils.mapRange(0, 50, 1, 0.3)(moveAbs);
+        const scale = gsap.utils.mapRange(0, 50, 1, 0.3)(moveAbs);
+        const opacity = gsap.utils.mapRange(0, 50, 1, 0)(moveAbs);
         
         gsap.set(activePhoto, {
             x: limitedMovePercent + '%',
