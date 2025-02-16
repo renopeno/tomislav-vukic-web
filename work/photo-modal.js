@@ -47,64 +47,58 @@ function initPhotoModal() {
         });
     });
 
+    function setupModalPhotos() {
+        // Očisti container
+        modalImageContainer.innerHTML = "";
+        
+        // Izračunaj indekse
+        const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
+        const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
+
+        // Kreiraj wrappere
+        const prevWrapper = document.createElement("div");
+        const currentWrapper = document.createElement("div");
+        const nextWrapper = document.createElement("div");
+
+        // Osnovni stil za wrappere
+        const wrapperStyle = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        `;
+
+        prevWrapper.style.cssText = wrapperStyle;
+        currentWrapper.style.cssText = wrapperStyle;
+        nextWrapper.style.cssText = wrapperStyle;
+
+        // Dodaj fotke
+        prevWrapper.appendChild(photoData[prevIndex].element);
+        currentWrapper.appendChild(activePhoto);
+        nextWrapper.appendChild(photoData[nextIndex].element);
+
+        // Dodaj u container
+        modalImageContainer.appendChild(prevWrapper);
+        modalImageContainer.appendChild(currentWrapper);
+        modalImageContainer.appendChild(nextWrapper);
+
+        // Početne pozicije
+        gsap.set(prevWrapper, { x: "-100%" });
+        gsap.set(currentWrapper, { x: "0%" });
+        gsap.set(nextWrapper, { x: "100%" });
+    }
+
     function openModal(photo) {
-        if (window.lenis) {
-            window.lenis.stop();
-        }
+        if (window.lenis) window.lenis.stop();
         document.body.style.overflow = 'hidden';
-
-        // Bilježimo FLIP stanje prije nego što napravimo bilo kakve promjene (prije placeholdera)
-        const state = Flip.getState(photo.element, { props: "all" });
-
-        // Kreiramo placeholder u originalnom containeru da grid ostane statičan
-        const originalParent = photo.element.originalParent;
-        const placeholder = document.createElement("div");
-        placeholder.classList.add("photo-placeholder");
-        placeholder.style.width = photo.element.offsetWidth + "px";
-        placeholder.style.height = photo.element.offsetHeight + "px";
-        originalParent.insertBefore(placeholder, photo.element);
-        photo.placeholder = placeholder;
-
-        /// Izaberemo grid sadržaj, ali izostavljamo aktuelnu fotku (koja se premješta)
-        const gridContent = Array.from(document.querySelectorAll('.photo, .navigation, .navbar'))
-            .filter(el => el !== photo.element);
-                gsap.to(gridContent, {
-                opacity: 0,
-                duration: 0.3,
-                ease: "power2.inOut"
-        });
-
-        // Doslovno premještamo originalnu fotku u modal
-        modalImageContainer.appendChild(photo.element);
-        gsap.set(photo.element, { opacity: 1 });
-
-        // Prikazujemo modal i postavljamo podatke (naslov i exif)
+        
         modal.style.display = "grid";
         modal.classList.add("active");
         modalTitle.textContent = photo.title;
         modalExif.textContent = photo.exif;
-
-        // Sakrivamo UI elemente modala inicijalno
-        gsap.set([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-            opacity: 0,
-            y: 20
-        });
-
-        // FLIP animacija – fotografija se "prenosi" iz grida u modal
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: true,
-            onComplete: () => {
-                gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.4,
-                    stagger: 0.1,
-                    ease: "power2.out"
-                });
-            }
-        });
+        
+        setupModalPhotos();
     }
 
     function closeModal() {
@@ -307,71 +301,22 @@ function initPhotoModal() {
     let isDragging = false;
     let startX = 0;
     
-    function setupModalPhotos() {
-        // Očisti container
-        modalImageContainer.innerHTML = "";
-        
-        // Kreiraj wrappere
-        const wrappers = {
-            prev: document.createElement("div"),
-            current: document.createElement("div"),
-            next: document.createElement("div")
-        };
-
-        // Postavi stil za wrappere
-        Object.values(wrappers).forEach(wrapper => {
-            wrapper.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-        });
-
-        // Izračunaj indekse
-        const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
-        const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
-
-        // Dodaj fotke u wrappere
-        wrappers.prev.appendChild(photoData[prevIndex].element);
-        wrappers.current.appendChild(activePhoto);
-        wrappers.next.appendChild(photoData[nextIndex].element);
-
-        // Dodaj wrappere u container
-        modalImageContainer.appendChild(wrappers.prev);
-        modalImageContainer.appendChild(wrappers.current);
-        modalImageContainer.appendChild(wrappers.next);
-
-        // Postavi početne pozicije
-        gsap.set(wrappers.prev, { x: "-100%" });
-        gsap.set(wrappers.current, { x: "0%" });
-        gsap.set(wrappers.next, { x: "100%" });
-
-        return wrappers;
-    }
-
     hammer.on('panstart', function(e) {
         isDragging = true;
-        gsap.killTweensOf(modalImageContainer.children);
-        const wrappers = setupModalPhotos();
+        gsap.killTweensOf(activePhoto);
     });
     
     hammer.on('pan', function(e) {
-        if (!isDragging) return;
+        if (!isDragging || !activePhoto) return;
         
         const moveX = e.deltaX;
         const movePercent = (moveX / window.innerWidth) * 100;
         const limitedMove = Math.max(Math.min(movePercent, 100), -100);
         
-        // Pomakni sve wrappere
-        const wrappers = modalImageContainer.children;
-        gsap.set(wrappers[0], { x: -100 + limitedMove + '%' });
-        gsap.set(wrappers[1], { x: limitedMove + '%' });
-        gsap.set(wrappers[2], { x: 100 + limitedMove + '%' });
+        gsap.set(activePhoto, {
+            x: limitedMove + '%',
+            rotation: limitedMove * 0.05
+        });
     });
     
     hammer.on('panend', function(e) {
