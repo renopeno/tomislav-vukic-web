@@ -187,13 +187,37 @@ function initPhotoModal() {
             `;
         });
 
-        // Dodajemo originalne fotke u wrappere
+        // Pripremamo susjedne fotke
         const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
         const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
 
-        prevWrapper.appendChild(photoData[prevIndex].element);
+        // Kreiramo placeholdere za susjedne fotke
+        const prevPhoto = photoData[prevIndex];
+        const nextPhoto = photoData[nextIndex];
+
+        // Kreiramo i postavljamo placeholdere
+        if (prevPhoto.element.originalParent) {
+            const prevPlaceholder = document.createElement("div");
+            prevPlaceholder.classList.add("photo-placeholder");
+            prevPlaceholder.style.width = prevPhoto.element.offsetWidth + "px";
+            prevPlaceholder.style.height = prevPhoto.element.offsetHeight + "px";
+            prevPhoto.element.originalParent.insertBefore(prevPlaceholder, prevPhoto.element);
+            prevPhoto.placeholder = prevPlaceholder;
+        }
+
+        if (nextPhoto.element.originalParent) {
+            const nextPlaceholder = document.createElement("div");
+            nextPlaceholder.classList.add("photo-placeholder");
+            nextPlaceholder.style.width = nextPhoto.element.offsetWidth + "px";
+            nextPlaceholder.style.height = nextPhoto.element.offsetHeight + "px";
+            nextPhoto.element.originalParent.insertBefore(nextPlaceholder, nextPhoto.element);
+            nextPhoto.placeholder = nextPlaceholder;
+        }
+
+        // Dodajemo fotke u wrappere
+        prevWrapper.appendChild(prevPhoto.element);
         currentWrapper.appendChild(activePhoto);
-        nextWrapper.appendChild(photoData[nextIndex].element);
+        nextWrapper.appendChild(nextPhoto.element);
 
         // Dodajemo wrappere u container
         modalImageContainer.appendChild(prevWrapper);
