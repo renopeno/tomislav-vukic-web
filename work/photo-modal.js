@@ -1,4 +1,5 @@
 function initPhotoModal() {
+    // DOM elementi
     const modal = document.querySelector(".modal-photo");
     const modalImageContainer = modal.querySelector(".modal-photo-container");
     const modalTitle = modal.querySelector(".modal-title");
@@ -8,11 +9,84 @@ function initPhotoModal() {
     const nextButton = modal.querySelector('[data-photo-nav="next"]');
     const gridPhotos = document.querySelectorAll(".photo");
 
-    gsap.registerPlugin(Flip);
-
+    // State management
     let currentPhotoIndex = 0;
     let photoData = [];
     let activePhoto = null;
+    let isDragging = false;
+
+    // Inicijalizacija Hammer.js za touch interakcije
+    const hammer = new Hammer(modalImageContainer);
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    
+    // Touch event handlers
+    hammer.on('panstart', function(e) {
+        isDragging = true;
+        gsap.killTweensOf(activePhoto); // Zaustavi trenutne animacije
+    });
+    
+    hammer.on('pan', function(e) {
+        if (!isDragging || !activePhoto) return;
+        
+        // Izračunaj pomak u postocima
+        const moveX = e.deltaX;
+        const movePercent = (moveX / window.innerWidth) * 100;
+        const limitedMove = Math.max(Math.min(movePercent, 100), -100);
+        
+        // Pomakni aktivnu fotku
+        gsap.set(activePhoto, {
+            x: limitedMove + '%',
+            rotation: limitedMove * 0.05 // Blaga rotacija za bolji efekt
+        });
+    });
+    
+    hammer.on('panend', function(e) {
+        if (!isDragging || !activePhoto) return;
+        isDragging = false;
+        
+        const velocity = Math.abs(e.velocity);
+        const moveX = e.deltaX;
+        const threshold = window.innerWidth * 0.2; // 20% ekrana
+        
+        if (Math.abs(moveX) > threshold || velocity > 0.5) {
+            // Ako je pomak dovoljno velik ili brz, promijeni fotku
+            if (moveX < 0) {
+                showNextPhoto();
+            } else {
+                showPreviousPhoto();
+            }
+        } else {
+            // Vrati fotku na početnu poziciju
+            gsap.to(activePhoto, {
+                x: '0%',
+                rotation: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        }
+    });
+
+    // Event listeneri za tipkovnicu i gumbe
+    document.addEventListener("keydown", (e) => {
+        if (modal.classList.contains("active")) {
+            if (e.key === "Escape") closeModal();
+            if (e.key === "ArrowRight") showNextPhoto();
+            if (e.key === "ArrowLeft") showPreviousPhoto();
+        }
+    });
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    closeButton.addEventListener("click", closeModal);
+    prevButton.addEventListener("click", showPreviousPhoto);
+    nextButton.addEventListener("click", showNextPhoto);
+
+    // TODO: Implementacija prikaza susjednih fotki
+    // 1. Trebamo kreirati containere za prethodnu i sljedeću fotku
+    // 2. Postaviti ih lijevo i desno od trenutne fotke
+    // 3. Animirati ih zajedno s trenutnom fotkom tijekom swipea
 
     // Funkcija za tiho scrollanje do fotke u pozadini (dok je modal aktivan)
     function ensurePhotoInViewport(photo) {
@@ -232,54 +306,6 @@ function initPhotoModal() {
         return [prevWrapper, currentWrapper, nextWrapper];
     }
 
-    // Inicijalizacija Hammer.js
-    const hammer = new Hammer(modalImageContainer);
-    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-    
-    let isDragging = false;
-    
-    hammer.on('panstart', function(e) {
-        isDragging = true;
-        gsap.killTweensOf(activePhoto);
-    });
-    
-    hammer.on('pan', function(e) {
-        if (!isDragging || !activePhoto) return;
-        
-        const moveX = e.deltaX;
-        const movePercent = (moveX / window.innerWidth) * 100;
-        const limitedMove = Math.max(Math.min(movePercent, 100), -100);
-        
-        gsap.set(activePhoto, {
-            x: limitedMove + '%',
-            rotation: limitedMove * 0.05
-        });
-    });
-    
-    hammer.on('panend', function(e) {
-        if (!isDragging || !activePhoto) return;
-        isDragging = false;
-        
-        const velocity = Math.abs(e.velocity);
-        const moveX = e.deltaX;
-        const threshold = window.innerWidth * 0.2;
-        
-        if (Math.abs(moveX) > threshold || velocity > 0.5) {
-            if (moveX < 0) {
-                showNextPhoto();
-            } else {
-                showPreviousPhoto();
-            }
-        } else {
-            gsap.to(activePhoto, {
-                x: '0%',
-                rotation: 0,
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        }
-    });
-
     // Modificiramo postojeće funkcije za promjenu fotke
     function showNextPhoto() {
         const allPhotos = document.querySelectorAll('.photo');
@@ -400,22 +426,6 @@ function initPhotoModal() {
         activePhoto = prevPhoto.element;
         currentPhotoIndex = newIndex;
     }
-
-    document.addEventListener("keydown", (e) => {
-        if (modal.classList.contains("active")) {
-            if (e.key === "Escape") closeModal();
-            if (e.key === "ArrowRight") showNextPhoto();
-            if (e.key === "ArrowLeft") showPreviousPhoto();
-        }
-    });
-
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) closeModal();
-    });
-
-    closeButton.addEventListener("click", closeModal);
-    prevButton.addEventListener("click", showPreviousPhoto);
-    nextButton.addEventListener("click", showNextPhoto);
 }
 
 // initPhotoModal(); // Ovo mi ne treba trenutno jer ga inicijaliziram u grid.js
