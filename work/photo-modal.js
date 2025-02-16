@@ -176,22 +176,16 @@ function initPhotoModal() {
         const nextWrapper = document.createElement("div");
 
         [prevWrapper, currentWrapper, nextWrapper].forEach(wrapper => {
-            wrapper.style.cssText = `
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                top: 0;
-                left: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
+            wrapper.style.position = "absolute";
+            wrapper.style.width = "100%";
+            wrapper.style.height = "100%";
+            wrapper.style.top = "0";
+            wrapper.style.left = "0";
         });
 
-        // Koristimo originalne fotke umjesto klonova
-        prevWrapper.appendChild(photoData[prevIndex].element);
+        prevWrapper.appendChild(photoData[prevIndex].element.cloneNode(true));
         currentWrapper.appendChild(activePhoto);
-        nextWrapper.appendChild(photoData[nextIndex].element);
+        nextWrapper.appendChild(photoData[nextIndex].element.cloneNode(true));
 
         modalImageContainer.appendChild(prevWrapper);
         modalImageContainer.appendChild(currentWrapper);
@@ -211,28 +205,26 @@ function initPhotoModal() {
     
     let isDragging = false;
     
-    let currentPhotos = null;
-
     hammer.on('panstart', function(e) {
         isDragging = true;
-        gsap.killTweensOf(modalImageContainer.children);
-        currentPhotos = setupModalPhotos();
+        gsap.killTweensOf(activePhoto);
     });
     
     hammer.on('pan', function(e) {
-        if (!isDragging || !currentPhotos) return;
+        if (!isDragging || !activePhoto) return;
         
         const moveX = e.deltaX;
         const movePercent = (moveX / window.innerWidth) * 100;
         const limitedMove = Math.max(Math.min(movePercent, 100), -100);
         
-        gsap.set(modalImageContainer.children[0], { x: -100 + limitedMove + '%' });
-        gsap.set(modalImageContainer.children[1], { x: limitedMove + '%' });
-        gsap.set(modalImageContainer.children[2], { x: 100 + limitedMove + '%' });
+        gsap.set(activePhoto, {
+            x: limitedMove + '%',
+            rotation: limitedMove * 0.05
+        });
     });
     
     hammer.on('panend', function(e) {
-        if (!isDragging || !currentPhotos) return;
+        if (!isDragging || !activePhoto) return;
         isDragging = false;
         
         const velocity = Math.abs(e.velocity);
@@ -246,9 +238,12 @@ function initPhotoModal() {
                 showPreviousPhoto();
             }
         } else {
-            gsap.to(modalImageContainer.children[0], { x: '-100%', duration: 0.3, ease: "power2.out" });
-            gsap.to(modalImageContainer.children[1], { x: '0%', duration: 0.3, ease: "power2.out" });
-            gsap.to(modalImageContainer.children[2], { x: '100%', duration: 0.3, ease: "power2.out" });
+            gsap.to(activePhoto, {
+                x: '0%',
+                rotation: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
         }
     });
 
