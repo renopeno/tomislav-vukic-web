@@ -165,38 +165,47 @@ function initPhotoModal() {
     }
 
     function setupModalPhotos() {
-        const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
-        const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
-
         modalImageContainer.innerHTML = "";
-
-        // Kreiramo wrappere za sve tri fotke
+        
+        // Kreiramo containere
         const prevWrapper = document.createElement("div");
         const currentWrapper = document.createElement("div");
         const nextWrapper = document.createElement("div");
 
+        // Osnovni stil za sve wrappere
         [prevWrapper, currentWrapper, nextWrapper].forEach(wrapper => {
-            wrapper.style.position = "absolute";
-            wrapper.style.width = "100%";
-            wrapper.style.height = "100%";
-            wrapper.style.top = "0";
-            wrapper.style.left = "0";
+            wrapper.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none;
+            `;
         });
 
-        prevWrapper.appendChild(photoData[prevIndex].element.cloneNode(true));
-        currentWrapper.appendChild(activePhoto);
-        nextWrapper.appendChild(photoData[nextIndex].element.cloneNode(true));
+        // Dodajemo originalne fotke u wrappere
+        const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
+        const nextIndex = currentPhotoIndex < photoData.length - 1 ? currentPhotoIndex + 1 : 0;
 
+        prevWrapper.appendChild(photoData[prevIndex].element);
+        currentWrapper.appendChild(activePhoto);
+        nextWrapper.appendChild(photoData[nextIndex].element);
+
+        // Dodajemo wrappere u container
         modalImageContainer.appendChild(prevWrapper);
         modalImageContainer.appendChild(currentWrapper);
         modalImageContainer.appendChild(nextWrapper);
 
-        // Postavljamo početne pozicije
+        // Početne pozicije
         gsap.set(prevWrapper, { x: "-100%" });
         gsap.set(currentWrapper, { x: "0%" });
         gsap.set(nextWrapper, { x: "100%" });
 
-        return { prevWrapper, currentWrapper, nextWrapper };
+        return [prevWrapper, currentWrapper, nextWrapper];
     }
 
     // Inicijalizacija Hammer.js
