@@ -18,6 +18,13 @@ function initPhotoModal() {
     swiperWrapper.classList.add('swiper-wrapper');
     modalImageContainer.appendChild(swiperWrapper);
 
+    function updatePhotoInfo(photo) {
+        if (photo) {
+            modalTitle.textContent = photo.title;
+            modalExif.textContent = photo.exif;
+        }
+    }
+
     // Inicijalizacija Swipera
     const swiper = new Swiper(modalImageContainer, {
         slidesPerView: 1,
@@ -28,17 +35,14 @@ function initPhotoModal() {
         loop: true,
         on: {
             slideChange: function () {
-                const realIndex = this.realIndex;
-                currentPhotoIndex = realIndex;
-                updatePhotoInfo(photoData[realIndex]);
+                if (photoData.length) {
+                    const realIndex = this.realIndex;
+                    currentPhotoIndex = realIndex;
+                    updatePhotoInfo(photoData[realIndex]);
+                }
             }
         }
     });
-
-    function updatePhotoInfo(photo) {
-        modalTitle.textContent = photo.title;
-        modalExif.textContent = photo.exif;
-    }
 
     function openModal(photo) {
         if (window.lenis) window.lenis.stop();
@@ -56,7 +60,8 @@ function initPhotoModal() {
         });
 
         // Postavi trenutnu fotku
-        swiper.slideTo(currentPhotoIndex, 0);
+        swiper.update();
+        swiper.slideTo(currentPhotoIndex, 0, false);
         updatePhotoInfo(photo);
 
         modal.style.display = "grid";
