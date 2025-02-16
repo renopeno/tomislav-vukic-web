@@ -48,8 +48,14 @@ function initPhotoModal() {
     });
 
     function setupModalPhotos() {
-        // Očisti container
+        // Očisti container i postavi mu stil
         modalImageContainer.innerHTML = "";
+        modalImageContainer.style.cssText = `
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        `;
         
         // Izračunaj indekse
         const prevIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : photoData.length - 1;
@@ -67,16 +73,27 @@ function initPhotoModal() {
             left: 0;
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         `;
 
         prevWrapper.style.cssText = wrapperStyle;
         currentWrapper.style.cssText = wrapperStyle;
         nextWrapper.style.cssText = wrapperStyle;
 
-        // Dodaj fotke
-        prevWrapper.appendChild(photoData[prevIndex].element);
-        currentWrapper.appendChild(activePhoto);
-        nextWrapper.appendChild(photoData[nextIndex].element);
+        // Dodaj fotke i postavi im stil
+        [prevWrapper, currentWrapper, nextWrapper].forEach(wrapper => {
+            const img = wrapper.appendChild(wrapper === currentWrapper ? activePhoto : 
+                                         wrapper === prevWrapper ? photoData[prevIndex].element :
+                                         photoData[nextIndex].element);
+            img.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            `;
+        });
 
         // Dodaj u container
         modalImageContainer.appendChild(prevWrapper);
