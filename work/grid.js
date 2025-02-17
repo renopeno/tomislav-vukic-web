@@ -43,10 +43,6 @@ function initGrid() {
       newPath: window.location.pathname
     });
     
-    console.log('💀 Ubijanje GSAP animacija...');
-    gsap.killTweensOf(".photo-container");
-    gsap.killTweensOf(".photo");
-    
     window.shuffledPhotos = shuffleArray([...photoContainers]);
     window.lastPath = window.location.pathname;
   } else {
