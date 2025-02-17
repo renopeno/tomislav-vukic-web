@@ -28,6 +28,8 @@ function destroyPageSpecificFunctions(namespace) {
 }
 
 function initGlobalFunctions(data) {
+  destroyPageSpecificFunctions?.(data?.current?.namespace);
+  
   // Prvo resetiraj scroll
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
@@ -54,10 +56,25 @@ function initPageSpecificFunctions(namespace) {
       initCategories?.();
       break;
     case 'work':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
     case 'work-abstract':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
     case 'work-nature':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
     case 'work-people':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
     case 'work-products':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
     case 'work-architecture':
       initGrid?.();
       initPhotoModal?.();
@@ -84,28 +101,18 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
-        console.log(`🔄 Leave: ${data.current.namespace}`);
         return gsap.to(data.current.container, { 
           opacity: 0, 
           duration: 0.3
         });
       },
       beforeEnter(data) {
-        console.log(`🔄 BeforeEnter: ${data.next.namespace}`);
-        
-        // Čistimo prethodno stanje samo jednom
-        if (data.current) {
-          destroyPageSpecificFunctions(data.current.namespace);
-        }
-        
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
         initPageSpecificFunctions(data.next.namespace);
-        
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
-        console.log(`�� Enter: ${data.next.namespace}`);
         updateNavigationWithHref();
         return gsap.to(data.next.container, { 
           opacity: 1, 
