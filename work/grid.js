@@ -1,6 +1,12 @@
 function initGrid() {
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
+  
+  // Prvo resetiraj sve containere na visible
+  allPhotoContainers.forEach(container => {
+    container.style.display = '';
+  });
+  
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
   
   // Sakrij ostale fotke iz CMS koje nisu u našem odabranom setu
