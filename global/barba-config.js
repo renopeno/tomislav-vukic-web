@@ -83,104 +83,39 @@ function initBarba() {
   }
 
   barba.init({
-    transitions: [
-      {
-        name: 'work-to-category',
-        from: { 
-          namespace: 'work'
-        },
-        to: { 
-          namespace: [
-            'work-abstract',
-            'work-nature',
-            'work-people',
-            'work-products',
-            'work-architecture'
-          ]
-        },
-        leave(data) {
-          return gsap.to(data.current.container, { 
-            opacity: 0, 
-            duration: 0.3
-          });
-        },
-        beforeEnter(data) {
-          window.scrollTo(0, 0);
-          initGlobalFunctions(data);
-          initPageSpecificFunctions(data.next.namespace);
-          gsap.set(data.next.container, { opacity: 0 });
-        },
-        enter(data) {
-          updateNavigationWithHref();
-          return gsap.to(data.next.container, { 
-            opacity: 1, 
-            duration: 0.3
-          });
-        }
+    transitions: [{
+      name: 'fade',
+      leave(data) {
+        console.log(`🔄 Leave: ${data.current.namespace}`);
+        return gsap.to(data.current.container, { 
+          opacity: 0, 
+          duration: 0.3
+        });
       },
-      {
-        name: 'category-to-category',
-        from: { 
-          namespace: [
-            'work-abstract',
-            'work-nature',
-            'work-people',
-            'work-products',
-            'work-architecture'
-          ]
-        },
-        to: { 
-          namespace: [
-            'work-abstract',
-            'work-nature',
-            'work-people',
-            'work-products',
-            'work-architecture'
-          ]
-        },
-        leave(data) {
-          return gsap.to(data.current.container, { 
-            opacity: 0, 
-            duration: 0.3
-          });
-        },
-        beforeEnter(data) {
-          window.scrollTo(0, 0);
-          initGlobalFunctions(data);
-          initPageSpecificFunctions(data.next.namespace);
-          gsap.set(data.next.container, { opacity: 0 });
-        },
-        enter(data) {
-          updateNavigationWithHref();
-          return gsap.to(data.next.container, { 
-            opacity: 1, 
-            duration: 0.3
-          });
-        }
+      beforeEnter(data) {
+        console.log(`🔄 BeforeEnter: ${data.next.namespace}`);
+        window.scrollTo(0, 0);
+        
+        // Čistimo prethodno stanje
+        destroyPageSpecificFunctions(data.current.namespace);
+        
+        // Inicijaliziramo globalne funkcije
+        initGlobalFunctions(data);
+        
+        // Inicijaliziramo page-specific funkcije
+        initPageSpecificFunctions(data.next.namespace);
+        
+        gsap.set(data.next.container, { opacity: 0 });
       },
-      {
-        name: 'default-transition',
-        leave(data) {
-          return gsap.to(data.current.container, { 
-            opacity: 0, 
-            duration: 0.3
-          });
-        },
-        beforeEnter(data) {
-          window.scrollTo(0, 0);
-          initGlobalFunctions(data);
-          initPageSpecificFunctions(data.next.namespace);
-          gsap.set(data.next.container, { opacity: 0 });
-        },
-        enter(data) {
-          updateNavigationWithHref();
-          return gsap.to(data.next.container, { 
-            opacity: 1, 
-            duration: 0.3
-          });
-        }
+      enter(data) {
+        console.log(`�� Enter: ${data.next.namespace}`);
+        updateNavigationWithHref();
+        return gsap.to(data.next.container, { 
+          opacity: 1, 
+          duration: 0.3
+        });
       }
-    ],
+    }],
     views: [
       { namespace: 'home' },
       { namespace: 'work' },
