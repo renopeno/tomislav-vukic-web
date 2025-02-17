@@ -66,7 +66,7 @@ function initPhotoModal() {
         photo.placeholder = placeholder;
 
         /// Izaberemo grid sadržaj, ali izostavljamo aktuelnu fotku (koja se premješta)
-        const gridContent = Array.from(document.querySelectorAll('.photo, .navigation, .navbar'))
+        const gridContent = Array.from(document.querySelectorAll('.photo, .navigation, .navbar, .work-categories-wrapper, .category-title'))
             .filter(el => el !== photo.element);
                 gsap.to(gridContent, {
                 opacity: 0,
