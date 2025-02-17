@@ -56,6 +56,11 @@ function initPageSpecificFunctions(namespace) {
       initCategories?.();
       break;
     case 'work':
+    case 'work-abstract':
+    case 'work-nature':
+    case 'work-people':
+    case 'work-products':
+    case 'work-architecture':
       initGrid?.();
       initPhotoModal?.();
       break;
