@@ -2,14 +2,20 @@ function initGrid() {
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
   
-  // Prvo resetiraj sve containere na visible
+  // Prvo očisti sve postojeće grid postavke
   allPhotoContainers.forEach(container => {
+    // Resetiraj grid svojstva
+    container.style.gridColumn = '';
+    container.style.gridColumnStart = '';
+    container.style.gridColumnEnd = '';
+    container.style.gridRowStart = '';
+    // Resetiraj display
     container.style.display = '';
   });
   
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
   
-  // Sakrij ostale fotke iz CMS koje nisu u našem odabranom setu
+  // Sakrij ostale fotke
   allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
     container.style.display = 'none';
   });
@@ -53,21 +59,12 @@ function initGrid() {
 
   // Funkcija za postavljanje grida
   function setupGrid() {
-    // Resetiramo sve varijable na početne vrijednosti
     const config = getCurrentConfig();
     let isLeft = true;
     let currentRow = 1;
     let lastLeftCol = null;
     let lastRightCol = null;
 
-    // Prvo očistimo sve postojeće grid postavke
-    shuffledPhotos.forEach((container) => {
-      container.style.gridColumnStart = '';
-      container.style.gridColumnEnd = '';
-      container.style.gridRowStart = '';
-    });
-
-    // Zatim postavimo novi grid
     shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
