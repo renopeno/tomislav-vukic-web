@@ -1,26 +1,19 @@
 function initGrid() {
-  console.log('🎯 initGrid() pokrenut', {
-    path: window.location.pathname,
-    lastPath: window.lastPath,
-    hasShuffledPhotos: !!window.shuffledPhotos,
-    isSettingUpGrid: window.isSettingUpGrid
-  });
-
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
-  console.log('📸 Pronađeno fotografija:', allPhotoContainers.length);
   
   // Prvo očisti sve postojeće grid postavke i zaustavi sve tranzicije
   allPhotoContainers.forEach(container => {
-    container.style.transition = 'none';
+    container.style.transition = 'none'; // Privremeno isključi tranzicije
     container.style.display = '';
     container.style.gridColumn = '';
     container.style.gridColumnStart = '';
     container.style.gridColumnEnd = '';
     container.style.gridRowStart = '';
-    container.style.transform = '';
+    container.style.transform = ''; // Reset transformacija
   });
   
+  // Force reflow da se primijene promjene prije nastavka
   document.body.offsetHeight;
   
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
@@ -32,12 +25,7 @@ function initGrid() {
 
   // Funkcija za miješanje redoslijeda
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
-  
-  // Stvori novi shuffled array samo ako ne postoji ili ako je nova navigacija
-  if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
-    window.shuffledPhotos = shuffleArray([...photoContainers]);
-    window.lastPath = window.location.pathname;
-  }
+  const shuffledPhotos = shuffleArray([...photoContainers]);
 
   // Responsive grid konfiguracija
   const gridConfig = {
@@ -80,7 +68,7 @@ function initGrid() {
     let lastLeftCol = null;
     let lastRightCol = null;
 
-    window.shuffledPhotos.forEach((container) => {
+    shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
       const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
@@ -121,6 +109,9 @@ function initGrid() {
     window.isSettingUpGrid = false;
   }
 
+  // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
+  window.shuffledPhotos = shuffledPhotos;
+
   // Inicijaliziraj modal PRIJE animacija
   if (typeof initPhotoModal === "function") {
     initPhotoModal();
@@ -128,7 +119,7 @@ function initGrid() {
 
   // GSAP animacija za ulazak fotografija
   gsap.fromTo(
-    window.shuffledPhotos,
+    shuffledPhotos,
     { opacity: 0, scale: 0.8, y: window.innerHeight / 2 },
     { 
       opacity: 1, 
@@ -136,7 +127,7 @@ function initGrid() {
       y: 0,
       duration: 0.8,
       ease: "power3.out",
-      stagger: 0.1
+      stagger: 0.1,
     }
   );
 }
