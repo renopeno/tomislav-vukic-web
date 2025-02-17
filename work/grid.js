@@ -95,11 +95,18 @@ function initGrid() {
     initPhotoModal();
   }
 
-  // **VRATILI SMO BLAGU Y TRANZICIJU I FADE-IN**
+  // Tranzicija za ulazak fotki u view
   gsap.fromTo(
     window.shuffledPhotos,
-    { opacity: 0, y: 30 },
-    { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.1 }
+    { opacity: 0, scale: 0.8, y: window.innerHeight / 3 },
+    { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      duration: 0.8,
+      ease: "power3.out",
+      stagger: 0.1,
+    }
   );
 
   console.log("✅ Grid postavljen.");
