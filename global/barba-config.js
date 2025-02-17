@@ -83,67 +83,74 @@ function initBarba() {
   }
 
   barba.init({
-    transitions: [{
-      name: 'fade',
-      leave(data) {
-        return gsap.to(data.current.container, { 
-          opacity: 0, 
-          duration: 0.3
-        });
-      },
-      beforeEnter(data) {
-        window.scrollTo(0, 0);
-        // Prvo inicijaliziramo globalne funkcije
-        initGlobalFunctions(data);
-        
-        // Zatim inicijaliziramo page-specific funkcije
-        initPageSpecificFunctions(data.next.namespace);
-        
-        // Postavimo početnu prozirnost
-        gsap.set(data.next.container, { opacity: 0 });
-      },
-      enter(data) {
-        // Osiguravamo da su sve slike učitane prije nego što pokažemo sadržaj
-        return new Promise((resolve) => {
-          const images = data.next.container.querySelectorAll('img');
-          let loadedImages = 0;
-          
-          const checkIfLoaded = () => {
-            loadedImages++;
-            if (loadedImages === images.length) {
-              // Sve slike su učitane, možemo pokazati sadržaj
-              updateNavigationWithHref();
-              gsap.to(data.next.container, { 
-                opacity: 1, 
-                duration: 0.3,
-                onComplete: resolve
-              });
-            }
-          };
-
-          if (images.length === 0) {
-            // Ako nema slika, odmah pokazujemo sadržaj
-            updateNavigationWithHref();
-            gsap.to(data.next.container, { 
-              opacity: 1, 
-              duration: 0.3,
-              onComplete: resolve
-            });
-            return;
-          }
-
-          // Čekamo da se sve slike učitaju
-          images.forEach(img => {
-            if (img.complete) {
-              checkIfLoaded();
-            } else {
-              img.onload = checkIfLoaded;
-              img.onerror = checkIfLoaded; // Također hendlamo greške
-            }
+    transitions: [
+      {
+        name: 'work-transitions',
+        // Ova tranzicija će se aktivirati samo između work i work-category stranica
+        from: { 
+          namespace: [
+            'work',
+            'work-abstract',
+            'work-nature',
+            'work-people',
+            'work-products',
+            'work-architecture'
+          ]
+        },
+        to: { 
+          namespace: [
+            'work',
+            'work-abstract',
+            'work-nature',
+            'work-people',
+            'work-products',
+            'work-architecture'
+          ]
+        },
+        leave(data) {
+          return gsap.to(data.current.container, { 
+            opacity: 0, 
+            duration: 0.3
           });
-        });
+        },
+        beforeEnter(data) {
+          window.scrollTo(0, 0);
+          initGlobalFunctions(data);
+          initPageSpecificFunctions(data.next.namespace);
+          gsap.set(data.next.container, { opacity: 0 });
+        },
+        enter(data) {
+          updateNavigationWithHref();
+          return gsap.to(data.next.container, { 
+            opacity: 1, 
+            duration: 0.3
+          });
+        }
+      },
+      {
+        name: 'default-transition',
+        // Ovo je default tranzicija za sve ostale slučajeve
+        leave(data) {
+          return gsap.to(data.current.container, { 
+            opacity: 0, 
+            duration: 0.3
+          });
+        },
+        beforeEnter(data) {
+          window.scrollTo(0, 0);
+          initGlobalFunctions(data);
+          initPageSpecificFunctions(data.next.namespace);
+          gsap.set(data.next.container, { opacity: 0 });
+        },
+        enter(data) {
+          updateNavigationWithHref();
+          return gsap.to(data.next.container, { 
+            opacity: 1, 
+            duration: 0.3
+          });
+        }
       }
-    }],
+    ],
     views: [
       { namespace: 'home' },
       { namespace: 'work' },
