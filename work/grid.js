@@ -98,7 +98,7 @@ function initGrid() {
   // Tranzicija za ulazak fotki u view
   gsap.fromTo(
     window.shuffledPhotos,
-    { opacity: 0, scale: 0.8, y: window.innerHeight / 3 },
+    { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
     { 
       opacity: 1, 
       scale: 1, 
