@@ -48,12 +48,15 @@ function initPhotoModal() {
     });
 
     function openModal(photo) {
-        if (window.lenis) window.lenis.stop();
+        if (window.lenis) {
+            window.lenis.stop();
+        }
         document.body.style.overflow = 'hidden';
-    
+
+        // Bilježimo FLIP stanje prije nego što napravimo bilo kakve promjene (prije placeholdera)
         const state = Flip.getState(photo.element, { props: "all" });
-    
-        // Kreiraj placeholder u originalnom containeru
+
+        // Kreiramo placeholder u originalnom containeru da grid ostane statičan
         const originalParent = photo.element.originalParent;
         const placeholder = document.createElement("div");
         placeholder.classList.add("photo-placeholder");
@@ -61,43 +64,38 @@ function initPhotoModal() {
         placeholder.style.height = photo.element.offsetHeight + "px";
         originalParent.insertBefore(placeholder, photo.element);
         photo.placeholder = placeholder;
-    
-        // Sakrij grid sadržaj
+
+        /// Izaberemo grid sadržaj, ali izostavljamo aktuelnu fotku (koja se premješta)
         const gridContent = Array.from(document.querySelectorAll('.photo, .navigation, .navbar, .work-categories-wrapper, .category-title'))
             .filter(el => el !== photo.element);
-        gsap.to(gridContent, { opacity: 0, duration: 0.3, ease: "power2.inOut" });
-    
-        // Dodaj originalni element u modal
+                gsap.to(gridContent, {
+                opacity: 0,
+                duration: 0.3,
+                ease: "power2.inOut"
+        });
+
+        // Doslovno premještamo originalnu fotku u modal
         modalImageContainer.appendChild(photo.element);
         gsap.set(photo.element, { opacity: 1 });
-    
-        // Prikaz modala BEZ boje
+
+        // Prikazujemo modal i postavljamo podatke (naslov i exif)
         modal.style.display = "grid";
         modal.classList.add("active");
-        modal.style.backgroundColor = "transparent";
-    
         modalTitle.textContent = photo.title;
         modalExif.textContent = photo.exif;
-    
+
+        // Sakrivamo UI elemente modala inicijalno
         gsap.set([modalTitle, modalExif, closeButton, prevButton, nextButton], {
             opacity: 0,
             y: 20
         });
-    
-        // FLIP animacija
+
+        // FLIP animacija – fotografija se "prenosi" iz grida u modal
         Flip.from(state, {
             duration: 0.8,
             ease: "power2.inOut",
             absolute: true,
             onComplete: () => {
-                // Tek nakon FLIP-a fade-inamo pozadinsku boju modala
-                gsap.to(modal, {
-                    backgroundColor: "var(--_colors---off-white)",
-                    duration: 0.4,
-                    ease: "power2.out"
-                });
-    
-                // Animiraj UI elemente
                 gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
                     opacity: 1,
                     y: 0,
@@ -118,18 +116,14 @@ function initPhotoModal() {
         const photoElement = photo.element;
         const gridContent = document.querySelectorAll('.photo, .navigation, .navbar, .work-categories-wrapper, .category-title');
     
-        // Prvo sakrijemo pozadinsku boju modala (da FLIP bude čist)
-        gsap.to(modal, {
-            backgroundColor: "transparent",
-            duration: 0.2,
-            ease: "power2.in"
-        });
+        // **1. Sakrij pozadinu odmah**
+        gsap.set(modal, { backgroundColor: "transparent" });
     
-        // Sakrij UI elemente modala
+        // **2. Sakrij UI elemente modala**
         gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
             opacity: 0,
             y: 20,
-            duration: 0.4,
+            duration: 0.3,
             ease: "power2.in"
         });
     
@@ -140,7 +134,7 @@ function initPhotoModal() {
         const targetScroll = originalRect.top + scrollTop - (window.innerHeight / 2) + (originalRect.height / 2);
         window.scrollTo({ top: targetScroll, behavior: "auto" });
     
-        // FLIP animacija povratka
+        // **3. Pripremi FLIP animaciju**
         const state = Flip.getState(photoElement, { props: "all" });
     
         if (photo.placeholder && originalParent) {
@@ -149,6 +143,7 @@ function initPhotoModal() {
             photo.placeholder = null;
         }
     
+        // **4. Izvrši FLIP animaciju povratka**
         Flip.from(state, {
             duration: 0.8,
             ease: "power2.inOut",
