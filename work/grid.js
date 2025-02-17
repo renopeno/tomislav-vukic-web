@@ -25,7 +25,12 @@ function initGrid() {
 
   // Funkcija za miješanje redoslijeda
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
-  const shuffledPhotos = shuffleArray([...photoContainers]);
+  
+  // Stvori novi shuffled array samo ako ne postoji ili ako je nova navigacija
+  if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
+    window.shuffledPhotos = shuffleArray([...photoContainers]);
+    window.lastPath = window.location.pathname;
+  }
 
   // Responsive grid konfiguracija
   const gridConfig = {
@@ -68,7 +73,7 @@ function initGrid() {
     let lastLeftCol = null;
     let lastRightCol = null;
 
-    shuffledPhotos.forEach((container) => {
+    window.shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
       const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
@@ -109,9 +114,6 @@ function initGrid() {
     window.isSettingUpGrid = false;
   }
 
-  // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
-  window.shuffledPhotos = shuffledPhotos;
-
   // Inicijaliziraj modal PRIJE animacija
   if (typeof initPhotoModal === "function") {
     initPhotoModal();
@@ -119,7 +121,7 @@ function initGrid() {
 
   // GSAP animacija za ulazak fotografija
   gsap.fromTo(
-    shuffledPhotos,
+    window.shuffledPhotos,
     { opacity: 0, scale: 0.8, y: window.innerHeight / 2 },
     { 
       opacity: 1, 
