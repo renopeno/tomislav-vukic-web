@@ -11,9 +11,7 @@ function initGrid() {
   console.log('📸 Pronađeno fotografija:', allPhotoContainers.length);
   
   // Prvo očisti sve postojeće grid postavke i zaustavi sve tranzicije
-  console.log('🧹 Čišćenje postojećih stilova...');
-  allPhotoContainers.forEach((container, i) => {
-    console.log(`   Container ${i}: ${container.querySelector('.photo')?.getAttribute('alt')}`);
+  allPhotoContainers.forEach(container => {
     container.style.transition = 'none';
     container.style.display = '';
     container.style.gridColumn = '';
@@ -37,16 +35,8 @@ function initGrid() {
   
   // Stvori novi shuffled array samo ako ne postoji ili ako je nova navigacija
   if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
-    console.log('🎲 Stvaranje novog shuffled arraya', {
-      reason: !window.shuffledPhotos ? 'Prvi put' : 'Nova navigacija',
-      oldPath: window.lastPath,
-      newPath: window.location.pathname
-    });
-    
     window.shuffledPhotos = shuffleArray([...photoContainers]);
     window.lastPath = window.location.pathname;
-  } else {
-    console.log('♻️ Korištenje postojećeg shuffled arraya');
   }
 
   // Responsive grid konfiguracija
@@ -85,12 +75,6 @@ function initGrid() {
   // Funkcija za postavljanje grida
   function setupGrid() {
     const config = getCurrentConfig();
-    console.log('🔧 setupGrid() pokrenut', {
-      config: config,
-      windowWidth: window.innerWidth,
-      shuffledPhotosLength: window.shuffledPhotos.length
-    });
-
     let isLeft = true;
     let currentRow = 1;
     let lastLeftCol = null;
@@ -132,12 +116,9 @@ function initGrid() {
 
   // Postavi grid samo jednom
   if (!window.isSettingUpGrid) {
-    console.log('📐 Postavljanje grida...');
     window.isSettingUpGrid = true;
     setupGrid();
     window.isSettingUpGrid = false;
-  } else {
-    console.log('⚠️ Grid se već postavlja, preskačem...');
   }
 
   // Inicijaliziraj modal PRIJE animacija
@@ -145,7 +126,7 @@ function initGrid() {
     initPhotoModal();
   }
 
-  console.log('🎭 Pokretanje GSAP animacije...');
+  // GSAP animacija za ulazak fotografija
   gsap.fromTo(
     window.shuffledPhotos,
     { opacity: 0, scale: 0.8, y: window.innerHeight / 2 },
@@ -155,9 +136,7 @@ function initGrid() {
       y: 0,
       duration: 0.8,
       ease: "power3.out",
-      stagger: 0.1,
-      onStart: () => console.log('🎬 GSAP animacija započela'),
-      onComplete: () => console.log('✅ GSAP animacija završena')
+      stagger: 0.1
     }
   );
 }

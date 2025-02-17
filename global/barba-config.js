@@ -109,42 +109,25 @@ function initBarba() {
         });
         return gsap.to(data.current.container, { 
           opacity: 0, 
-          duration: 0.3,
-          onComplete: () => console.log('👋 Leave završio')
+          duration: 0.3
         });
       },
       beforeEnter(data) {
-        console.log('🏃 beforeEnter započeo', {
-          from: data.current.namespace,
-          to: data.next.namespace
-        });
+        console.log('🏃 beforeEnter započeo');
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
         initPageSpecificFunctions(data.next.namespace);
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
-        console.log('🎯 Enter započeo', {
-          namespace: data.next.namespace
-        });
+        console.log('🎯 Enter započeo');
         updateNavigationWithHref();
         return gsap.to(data.next.container, { 
           opacity: 1, 
-          duration: 0.3,
-          onComplete: () => console.log('✅ Enter završio')
+          duration: 0.3
         });
       }
-    }],
-    views: [
-      { namespace: 'home' },
-      { namespace: 'work' },
-      { namespace: 'about' },
-      { namespace: 'work-abstract' },
-      { namespace: 'work-nature' },
-      { namespace: 'work-people' },
-      { namespace: 'work-products' },
-      { namespace: 'work-architecture' }
-    ]
+    }]
   });
 }
 
