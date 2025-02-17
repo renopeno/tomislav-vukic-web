@@ -139,3 +139,43 @@ if (document.readyState === 'loading') {
 } else {
   initGrid();
 }
+
+function initializeGrid() {
+  const photoContainers = document.querySelectorAll('.photo-container');
+  const gridColumns = 12;
+  const columnWidth = 2;
+  
+  photoContainers.forEach((container, index) => {
+    // Postavi display na block da se prikaže
+    container.style.display = 'block';
+    
+    // Izračunaj poziciju u gridu
+    const column = (index % 3) * 3 + 2; // Rasporedi u 3 stupca, počevši od 2
+    const row = Math.floor(index / 3) * 4 + 2; // Razmak između redova
+    
+    // Postavi grid poziciju
+    container.style.gridColumn = `${column} / span ${columnWidth}`;
+    container.style.gridRowStart = row;
+    
+    // Dodaj tranziciju za glatko pojavljivanje
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(20px)';
+    
+    // Animiraj pojavljivanje s malim zakašnjenjem za svaku sliku
+    setTimeout(() => {
+      container.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      container.style.opacity = '1';
+      container.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+}
+
+// Pokreni inicijalizaciju grida nakon učitavanja DOM-a
+document.addEventListener('DOMContentLoaded', initializeGrid);
+
+// Ponovno pokreni grid kada se promijeni ruta (za Barba.js)
+if (window.barba) {
+  barba.hooks.after(() => {
+    initializeGrid();
+  });
+}
