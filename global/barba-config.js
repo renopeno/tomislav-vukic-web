@@ -4,7 +4,6 @@ function updateNavigationWithHref() {
 
   navLinks.forEach((link) => {
     const linkHref = link.getAttribute('href');
-
     if (currentHref === linkHref || (currentHref === '/' && linkHref === '/')) {
       link.setAttribute('aria-current', 'page');
       link.classList.add('current', 'w--current');
@@ -16,83 +15,42 @@ function updateNavigationWithHref() {
 }
 
 function destroyPageSpecificFunctions(namespace) {
-  console.log(`🔄 Barba: Starting cleanup for ${namespace}`);
-  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-  
-  const splits = document.querySelectorAll('.split-type');
-  splits.forEach(split => {
-    if (split.splitType) split.splitType.revert();
-  });
-  
-  console.log(`✅ Barba: Cleanup done for ${namespace}`);
+  console.log(`🔄 Barba: Cleanup za ${namespace}`);
+  ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 }
 
 function initGlobalFunctions(data) {
   destroyPageSpecificFunctions?.(data?.current?.namespace);
-  
-  // Prvo resetiraj scroll
+
+  // Reset scrolla
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
 
-  // Zatim inicijaliziraj Lenis
+  // Ponovno pokreni Lenis ako postoji
   if (window.lenis) {
     window.lenis.destroy();
+    initLenis?.();
   }
-  initLenis?.();
 
   // Ostale inicijalizacije
   initLinksHover?.();
   initFooter?.();
 
-  // Na kraju omogući scroll
   document.body.style.overflow = '';
 }
 
 function initPageSpecificFunctions(namespace) {
-  switch (namespace) {
-    case 'home':
-      initHero?.();
-      initHighlights?.();
-      initCategories?.();
-      break;
-    case 'work':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'work-abstract':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'work-nature':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'work-people':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'work-products':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'work-architecture':
-      initGrid?.();
-      initPhotoModal?.();
-      break;
-    case 'about':
-      initAbout?.();
-      break;
+  if (namespace.startsWith('work')) {
+    initGrid?.();
+    initPhotoModal?.();
+  } else if (namespace === 'about') {
+    initAbout?.();
   }
 }
 
-function showContainer(data) {
-  return gsap.to(data.next.container, {
-    opacity: 1,
-    duration: 0.3
-  });
-}
-
 function initBarba() {
+  console.log("🚀 Inicijalizacija Barba.js");
+
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
@@ -101,23 +59,20 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
-        return gsap.to(data.current.container, { 
-          opacity: 0, 
-          duration: 0.3
-        });
+        console.log(`👋 Leave: ${data.current.namespace} ➝ ${data.next.namespace}`);
+        return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
+        console.log("🏃 beforeEnter započeo");
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
         initPageSpecificFunctions(data.next.namespace);
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
+        console.log("🎯 Enter započeo");
         updateNavigationWithHref();
-        return gsap.to(data.next.container, { 
-          opacity: 1, 
-          duration: 0.3
-        });
+        return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
       }
     }],
     views: [

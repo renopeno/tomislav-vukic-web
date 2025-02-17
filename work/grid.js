@@ -1,23 +1,28 @@
 function initGrid() {
+  console.log(`🎯 Pokrećem initGrid() za: ${window.location.pathname}`);
+
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
-  
-  // Prvo očisti sve postojeće grid postavke i zaustavi sve tranzicije
+
+  console.log(`📸 Pronađeno fotografija: ${allPhotoContainers.length}`);
+
+  // Resetiraj sve postavke prije inicijalizacije
   allPhotoContainers.forEach(container => {
-    container.style.transition = 'none'; // Privremeno isključi tranzicije
     container.style.display = '';
     container.style.gridColumn = '';
     container.style.gridColumnStart = '';
     container.style.gridColumnEnd = '';
     container.style.gridRowStart = '';
-    container.style.transform = ''; // Reset transformacija
+    container.style.transform = '';
   });
-  
-  // Force reflow da se primijene promjene prije nastavka
-  document.body.offsetHeight;
-  
+
+  // Očisti potencijalno duple inicijalizacije
+  if (window.isSettingUpGrid) return;
+  window.isSettingUpGrid = true;
+
+  // Ograniči broj prikazanih fotografija
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
-  
+
   // Sakrij ostale fotke
   allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
     container.style.display = 'none';
@@ -25,34 +30,20 @@ function initGrid() {
 
   // Funkcija za miješanje redoslijeda
   const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
-  const shuffledPhotos = shuffleArray([...photoContainers]);
+
+  // Stvori novi shuffled array samo ako ne postoji ili ako se promijenio namespace
+  if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
+    window.shuffledPhotos = shuffleArray([...photoContainers]);
+    window.lastPath = window.location.pathname;
+  }
 
   // Responsive grid konfiguracija
   const gridConfig = {
-    desktop: {
-      columns: 12,
-      left: [2, 3],
-      right: [8, 9],
-      horizontalSpan: 3,
-      verticalSpan: 2
-    },
-    tablet: {
-      columns: 8,
-      left: [2, 3],
-      right: [5, 6],
-      horizontalSpan: 3,
-      verticalSpan: 2
-    },
-    mobile: {
-      columns: 1,
-      left: [1],
-      right: [1],
-      horizontalSpan: 1,
-      verticalSpan: 1
-    }
+    desktop: { columns: 12, left: [2, 3], right: [8, 9], horizontalSpan: 3, verticalSpan: 2 },
+    tablet: { columns: 8, left: [2, 3], right: [5, 6], horizontalSpan: 3, verticalSpan: 2 },
+    mobile: { columns: 1, left: [1], right: [1], horizontalSpan: 1, verticalSpan: 1 }
   };
 
-  // Funkcija koja vraća trenutnu konfiguraciju baziranu na širini ekrana
   function getCurrentConfig() {
     const width = window.innerWidth;
     if (width < 768) return gridConfig.mobile;
@@ -60,7 +51,6 @@ function initGrid() {
     return gridConfig.desktop;
   }
 
-  // Funkcija za postavljanje grida
   function setupGrid() {
     const config = getCurrentConfig();
     let isLeft = true;
@@ -68,17 +58,15 @@ function initGrid() {
     let lastLeftCol = null;
     let lastRightCol = null;
 
-    shuffledPhotos.forEach((container) => {
+    window.shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
       const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
 
       let startCol;
       if (config.columns === 1) {
-        // Mobile layout - jedna kolumna
         startCol = 1;
       } else {
-        // Tablet/Desktop layout
         if (isLeft) {
           do {
             startCol = config.left[Math.floor(Math.random() * config.left.length)];
@@ -92,9 +80,8 @@ function initGrid() {
         }
       }
 
-      const endCol = startCol + colSpan;
       container.style.gridColumnStart = startCol;
-      container.style.gridColumnEnd = endCol;
+      container.style.gridColumnEnd = startCol + colSpan;
       container.style.gridRowStart = currentRow;
 
       isLeft = !isLeft;
@@ -102,55 +89,40 @@ function initGrid() {
     });
   }
 
-  // Postavi grid samo jednom
-  if (!window.isSettingUpGrid) {
-    window.isSettingUpGrid = true;
-    setupGrid();
-    window.isSettingUpGrid = false;
-  }
-
-  // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
-  window.shuffledPhotos = shuffledPhotos;
+  setupGrid();
+  window.isSettingUpGrid = false;
 
   // Inicijaliziraj modal PRIJE animacija
   if (typeof initPhotoModal === "function") {
     initPhotoModal();
   }
 
-  // GSAP animacija za ulazak fotografija
+  // GSAP animacija za ulazak fotografija bez vizualnih skokova
   gsap.fromTo(
-    shuffledPhotos,
-    { opacity: 0, scale: 0.8, y: window.innerHeight / 2 },
-    { 
-      opacity: 1, 
-      scale: 1, 
-      y: 0,
-      duration: 0.8,
-      ease: "power3.out",
-      stagger: 0.1,
-    }
+    window.shuffledPhotos,
+    { opacity: 0, scale: 0.95, y: 20 },
+    { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08 }
   );
+
+  console.log("✅ Grid postavljen.");
 }
 
-// Inicijalizacija
+// Inicijalizacija odmah
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initGrid);
 } else {
   initGrid();
 }
 
-// Dodaj inicijalizaciju za Barba.js s boljim timingom
+// Integracija s Barba.js
 if (window.barba) {
   barba.hooks.beforeEnter(() => {
-    // Resetiraj sve stilove prije tranzicije
-    const containers = document.querySelectorAll(".photo-container");
-    containers.forEach(container => {
+    document.querySelectorAll(".photo-container").forEach(container => {
       container.style.transition = 'none';
     });
   });
-  
+
   barba.hooks.after(() => {
-    // Malo odgodi inicijalizaciju grida da se izbjegnu konflikti s tranzicijom
-    setTimeout(initGrid, 50);
+    initGrid();
   });
 }
