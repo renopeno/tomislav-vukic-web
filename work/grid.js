@@ -1,12 +1,16 @@
 function initGrid() {
-  console.log('🎯 Pokrećem initGrid() za:', window.location.pathname);
+  console.log('🎯 initGrid() pokrenut', {
+    path: window.location.pathname,
+    lastPath: window.lastPath,
+    hasShuffledPhotos: !!window.shuffledPhotos,
+    isSettingUpGrid: window.isSettingUpGrid
+  });
 
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
-
-  console.log(`📸 Pronađeno ${allPhotoContainers.length} fotografija`);
-
-  // Resetiraj sve postavke bez uklanjanja tranzicija
+  console.log('📸 Pronađeno fotografija:', allPhotoContainers.length);
+  
+  // Resetiraj sve postavke
   allPhotoContainers.forEach(container => {
     container.style.display = '';
     container.style.gridColumn = '';
@@ -80,7 +84,6 @@ function initGrid() {
     });
   }
 
-  // Osiguraj da se grid ne postavlja više puta
   if (!window.isSettingUpGrid) {
     window.isSettingUpGrid = true;
     setupGrid();
@@ -92,11 +95,11 @@ function initGrid() {
     initPhotoModal();
   }
 
-  // GSAP animacija za ulazak fotografija bez flickeringa
+  // **VRATILI SMO BLAGU Y TRANZICIJU I FADE-IN**
   gsap.fromTo(
     window.shuffledPhotos,
-    { opacity: 0, scale: 0.9, y: 30 },
-    { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08 }
+    { opacity: 0, y: 30 },
+    { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.1 }
   );
 
   console.log("✅ Grid postavljen.");
