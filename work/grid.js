@@ -3,6 +3,19 @@ function initGrid() {
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
   
+  // Provjeri jesmo li na category pageu
+  const isCategoryPage = document.querySelector('.category-title') !== null;
+  
+  // Funkcija za postavljanje random z-indexa na category pageu
+  function setRandomZIndexes(containers) {
+    if (!isCategoryPage) return;
+    
+    containers.forEach(container => {
+      // 50/50 šansa za z-index -1 ili 1
+      container.style.zIndex = Math.random() < 0.5 ? -1 : 1;
+    });
+  }
+
   // Sakrij ostale fotke iz CMS koje nisu u našem odabranom setu
   allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
     container.style.display = 'none';
@@ -85,6 +98,9 @@ function initGrid() {
       isLeft = !isLeft;
       currentRow++;
     });
+
+    // Postavi random z-indexe nakon što je grid postavljen
+    setRandomZIndexes(shuffledPhotos);
   }
 
   // Inicijalno postavi grid

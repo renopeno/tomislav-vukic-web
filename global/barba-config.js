@@ -103,7 +103,12 @@ function initBarba() {
     views: [
       { namespace: 'home' },
       { namespace: 'work' },
-      { namespace: 'about' }
+      { namespace: 'about' },
+      { namespace: 'work-abstract' },
+      { namespace: 'work-nature' },
+      { namespace: 'work-people' },
+      { namespace: 'work-products' },
+      { namespace: 'work-architecture' }
     ]
   });
 }
