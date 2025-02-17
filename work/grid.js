@@ -102,16 +102,12 @@ function initGrid() {
     });
   }
 
-  // Inicijalno postavi grid
-  setupGrid();
-
-  // Slušaj resize event
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    // Debounce resize event
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(setupGrid, 250);
-  });
+  // Postavi grid samo jednom
+  if (!window.isSettingUpGrid) {
+    window.isSettingUpGrid = true;
+    setupGrid();
+    window.isSettingUpGrid = false;
+  }
 
   // Spremamo redoslijed kako bi modal znao koji je redoslijed na stranici
   window.shuffledPhotos = shuffledPhotos;
