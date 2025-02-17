@@ -85,11 +85,43 @@ function initBarba() {
   barba.init({
     transitions: [
       {
-        name: 'work-transitions',
-        // Ova tranzicija će se aktivirati samo između work i work-category stranica
+        name: 'work-to-category',
+        from: { 
+          namespace: 'work'
+        },
+        to: { 
+          namespace: [
+            'work-abstract',
+            'work-nature',
+            'work-people',
+            'work-products',
+            'work-architecture'
+          ]
+        },
+        leave(data) {
+          return gsap.to(data.current.container, { 
+            opacity: 0, 
+            duration: 0.3
+          });
+        },
+        beforeEnter(data) {
+          window.scrollTo(0, 0);
+          initGlobalFunctions(data);
+          initPageSpecificFunctions(data.next.namespace);
+          gsap.set(data.next.container, { opacity: 0 });
+        },
+        enter(data) {
+          updateNavigationWithHref();
+          return gsap.to(data.next.container, { 
+            opacity: 1, 
+            duration: 0.3
+          });
+        }
+      },
+      {
+        name: 'category-to-category',
         from: { 
           namespace: [
-            'work',
             'work-abstract',
             'work-nature',
             'work-people',
@@ -99,7 +131,6 @@ function initBarba() {
         },
         to: { 
           namespace: [
-            'work',
             'work-abstract',
             'work-nature',
             'work-people',
@@ -129,7 +160,6 @@ function initBarba() {
       },
       {
         name: 'default-transition',
-        // Ovo je default tranzicija za sve ostale slučajeve
         leave(data) {
           return gsap.to(data.current.container, { 
             opacity: 0, 
