@@ -93,6 +93,8 @@ function showContainer(data) {
 }
 
 function initBarba() {
+  console.log('🚀 Inicijalizacija Barba.js');
+  
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
@@ -101,22 +103,35 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
+        console.log('👋 Leave započeo', {
+          from: data.current.namespace,
+          to: data.next.namespace
+        });
         return gsap.to(data.current.container, { 
           opacity: 0, 
-          duration: 0.3
+          duration: 0.3,
+          onComplete: () => console.log('👋 Leave završio')
         });
       },
       beforeEnter(data) {
+        console.log('🏃 beforeEnter započeo', {
+          from: data.current.namespace,
+          to: data.next.namespace
+        });
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
         initPageSpecificFunctions(data.next.namespace);
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
+        console.log('🎯 Enter započeo', {
+          namespace: data.next.namespace
+        });
         updateNavigationWithHref();
         return gsap.to(data.next.container, { 
           opacity: 1, 
-          duration: 0.3
+          duration: 0.3,
+          onComplete: () => console.log('✅ Enter završio')
         });
       }
     }],
