@@ -47,12 +47,21 @@ function initGrid() {
 
   // Funkcija za postavljanje grida
   function setupGrid() {
+    // Resetiramo sve varijable na početne vrijednosti
     const config = getCurrentConfig();
     let isLeft = true;
     let currentRow = 1;
     let lastLeftCol = null;
     let lastRightCol = null;
 
+    // Prvo očistimo sve postojeće grid postavke
+    shuffledPhotos.forEach((container) => {
+      container.style.gridColumnStart = '';
+      container.style.gridColumnEnd = '';
+      container.style.gridRowStart = '';
+    });
+
+    // Zatim postavimo novi grid
     shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
