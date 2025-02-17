@@ -28,8 +28,6 @@ function destroyPageSpecificFunctions(namespace) {
 }
 
 function initGlobalFunctions(data) {
-  destroyPageSpecificFunctions?.(data?.current?.namespace);
-  
   // Prvo resetiraj scroll
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
@@ -94,15 +92,14 @@ function initBarba() {
       },
       beforeEnter(data) {
         console.log(`🔄 BeforeEnter: ${data.next.namespace}`);
+        
+        // Čistimo prethodno stanje samo jednom
+        if (data.current) {
+          destroyPageSpecificFunctions(data.current.namespace);
+        }
+        
         window.scrollTo(0, 0);
-        
-        // Čistimo prethodno stanje
-        destroyPageSpecificFunctions(data.current.namespace);
-        
-        // Inicijaliziramo globalne funkcije
         initGlobalFunctions(data);
-        
-        // Inicijaliziramo page-specific funkcije
         initPageSpecificFunctions(data.next.namespace);
         
         gsap.set(data.next.container, { opacity: 0 });
