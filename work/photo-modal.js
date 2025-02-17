@@ -116,7 +116,7 @@ function initPhotoModal() {
 
         const photo = photoData[currentPhotoIndex];
         const photoElement = photo.element;
-        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar');
+        const gridContent = document.querySelectorAll('.photo, .navigation, .navbar, .work-categories-wrapper, .category-title');
 
         // Sakrivamo UI elemente modala
         gsap.to([modalTitle, modalExif, closeButton, prevButton, nextButton], {
