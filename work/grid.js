@@ -2,10 +2,19 @@ function initGrid() {
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
   
-  // Prvo očisti sve postojeće grid postavke
+  // Prvo očisti sve postojeće grid postavke i zaustavi sve tranzicije
   allPhotoContainers.forEach(container => {
-    container.style.display = ''; // Resetiraj display
+    container.style.transition = 'none'; // Privremeno isključi tranzicije
+    container.style.display = '';
+    container.style.gridColumn = '';
+    container.style.gridColumnStart = '';
+    container.style.gridColumnEnd = '';
+    container.style.gridRowStart = '';
+    container.style.transform = ''; // Reset transformacija
   });
+  
+  // Force reflow da se primijene promjene prije nastavka
+  document.body.offsetHeight;
   
   const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
   
@@ -134,9 +143,18 @@ if (document.readyState === 'loading') {
   initGrid();
 }
 
-// Dodaj inicijalizaciju za Barba.js
+// Dodaj inicijalizaciju za Barba.js s boljim timingom
 if (window.barba) {
+  barba.hooks.beforeEnter(() => {
+    // Resetiraj sve stilove prije tranzicije
+    const containers = document.querySelectorAll(".photo-container");
+    containers.forEach(container => {
+      container.style.transition = 'none';
+    });
+  });
+  
   barba.hooks.after(() => {
-    initGrid();
+    // Malo odgodi inicijalizaciju grida da se izbjegnu konflikti s tranzicijom
+    setTimeout(initGrid, 50);
   });
 }
