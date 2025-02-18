@@ -123,8 +123,8 @@ function initCategoryTitleAnimation() {
     opacity: 0,
     scrollTrigger: {
       trigger: titleWrapper,
-      start: "top -200", // počni 200px nakon što wrapper prođe vrh viewporta
-      end: "top -400",   // završi 400px nakon toga
+      start: "top -100", // počni 200px nakon što wrapper prođe vrh viewporta
+      end: "top -300",   // završi 400px nakon toga
       scrub: 0.5,        // dodaje smooth delay (0.5 sekundi)
       invalidateOnRefresh: true,
     }
