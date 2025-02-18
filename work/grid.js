@@ -112,11 +112,34 @@ function initGrid() {
   console.log("✅ Grid postavljen.");
 }
 
-// Inicijalizacija odmah
+// Dodaj ovo u initGrid() ili kao zasebnu funkciju koja se poziva nakon initGrid()
+function initCategoryTitleAnimation() {
+  const titleWrapper = document.querySelector('.work-categories-title-wrapper');
+  
+  if (!titleWrapper) return;
+
+  gsap.to(titleWrapper, {
+    scale: 0.8,
+    opacity: 0,
+    scrollTrigger: {
+      trigger: titleWrapper,
+      start: "top top", // počni kad vrh wrappera dotakne vrh viewporta
+      end: "+=200", // animiraj kroz 200px scrolla
+      scrub: 0.5, // dodaje smooth delay (0.5 sekundi)
+      invalidateOnRefresh: true, // ponovno kalkuliraj na resize
+    }
+  });
+}
+
+// Pozovi je nakon što se grid postavi
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initGrid);
+  document.addEventListener('DOMContentLoaded', () => {
+    initGrid();
+    initCategoryTitleAnimation();
+  });
 } else {
   initGrid();
+  initCategoryTitleAnimation();
 }
 
 // Integracija s Barba.js
