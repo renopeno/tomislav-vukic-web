@@ -53,6 +53,11 @@ function initCategories() {
         duration: 0.3,
         ease: 'power1.out',
       });
+
+      const titleElement = category.querySelector('.categories-title-wrapper .title-l');
+      if (titleElement) {
+        createShuffleEffect(titleElement);
+      }
     });
 
     category.addEventListener('mouseleave', () => {
