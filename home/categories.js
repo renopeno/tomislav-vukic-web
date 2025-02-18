@@ -1,4 +1,5 @@
 function initCategories() {
+  // Dohvati sve category retke iz DOM-a
   const categories = document.querySelectorAll('.categories-row');
 
   if (!categories.length) {
@@ -6,28 +7,34 @@ function initCategories() {
     return;
   }
 
-  // Prvo ukloni sve event listenere ako postoje
+  // Ukloni sve postojeće event listenere tako da kloniramo i zamijenimo elemente
+  // Ovo je potrebno kako bi se izbjegli dupli event listeneri kod Barba.js tranzicija
   categories.forEach((category) => {
     const newCategory = category.cloneNode(true);
     category.replaceWith(newCategory);
   });
 
+  // Dohvati svježe reference na zamijenjene elemente
   const updatedCategories = document.querySelectorAll('.categories-row');
 
   updatedCategories.forEach((category) => {
+    // Hover IN - Što se događa kad miš uđe u kategoriju
     category.addEventListener('mouseenter', () => {
+      // Smanji opacity svih kategorija osim trenutne
       gsap.to(updatedCategories, {
         opacity: 0.1,
         duration: 0.3,
         ease: 'power2.out',
       });
 
+      // Vrati opacity trenutnoj kategoriji na 1
       gsap.to(category, {
         opacity: 1,
         duration: 0.3,
         ease: 'power1.out',
       });
 
+      // Sakrij slike svih ostalih kategorija
       updatedCategories.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         if (cat !== category) {
@@ -39,6 +46,7 @@ function initCategories() {
         }
       });
 
+      // Prikaži i animiraj sliku trenutne kategorije
       const image = category.querySelector('.categories-photo');
       gsap.to(image, {
         opacity: 1,
@@ -47,6 +55,7 @@ function initCategories() {
         ease: 'power1.out',
       });
 
+      // Prikaži CTA (Call to Action) button
       const cta = category.querySelector('.cta');
       gsap.to(cta, {
         opacity: 1,
@@ -54,6 +63,7 @@ function initCategories() {
         ease: 'power1.out',
       });
 
+      // Pokreni shuffle efekt na tekstu naslova i CTA buttonu
       const titleElement = category.querySelector('.title-l');
       const ctaElement = category.querySelector('.cta');
       
@@ -61,13 +71,16 @@ function initCategories() {
       if (ctaElement) createShuffleEffect(ctaElement, false)();
     });
 
+    // Hover OUT - Što se događa kad miš izađe iz kategorije
     category.addEventListener('mouseleave', () => {
+      // Vrati opacity svim kategorijama na 1
       gsap.to(updatedCategories, {
         opacity: 1,
         duration: 0.3,
         ease: 'power1.out',
       });
 
+      // Sakrij sve slike i resetiraj njihovu visinu
       updatedCategories.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         gsap.to(image, {
@@ -78,6 +91,7 @@ function initCategories() {
         });
       });
 
+      // Sakrij CTA button
       const cta = category.querySelector('.cta');
       gsap.to(cta, {
         opacity: 0,
@@ -90,4 +104,5 @@ function initCategories() {
   console.log(`📑 Categories initialized, scroll position: ${window.scrollY}px`);
 }
 
+// Pokreni inicijalizaciju kategorija
 initCategories();
