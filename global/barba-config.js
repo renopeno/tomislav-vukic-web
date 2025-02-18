@@ -4,7 +4,6 @@ function updateNavigationWithHref() {
 
   navLinks.forEach((link) => {
     const linkHref = link.getAttribute('href');
-
     if (currentHref === linkHref || (currentHref === '/' && linkHref === '/')) {
       link.setAttribute('aria-current', 'page');
       link.classList.add('current', 'w--current');
@@ -16,33 +15,40 @@ function updateNavigationWithHref() {
 }
 
 function destroyPageSpecificFunctions(namespace) {
-  console.log(`🔄 Barba: Starting cleanup for ${namespace}`);
+  console.log(`🔄 Barba: Cleaning up ${namespace}`);
   ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-  
+
   const splits = document.querySelectorAll('.split-type');
   splits.forEach(split => {
     if (split.splitType) split.splitType.revert();
   });
-  
-  console.log(`✅ Barba: Cleanup done for ${namespace}`);
+
+  console.log(`✅ Cleanup complete for ${namespace}`);
 }
 
 function initGlobalFunctions(data) {
-  // Prvo resetiraj scroll
+  destroyPageSpecificFunctions?.(data?.current?.namespace);
+  
+  // Resetiraj scroll
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
 
-  // Zatim inicijaliziraj Lenis
+  // Ponovno inicijaliziraj Lenis i ostale globalne funkcije
   if (window.lenis) {
     window.lenis.destroy();
   }
   initLenis?.();
-
-  // Ostale inicijalizacije
   initLinksHover?.();
   initFooter?.();
 
-  // Na kraju omogući scroll
+  // Očuvaj Dark Mode
+  if (localStorage.getItem("darkMode") === "enabled") {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+
+  // Omogući scroll ponovno nakon inicijalizacije
   document.body.style.overflow = '';
 }
 
@@ -68,20 +74,8 @@ function initPageSpecificFunctions(namespace) {
   }
 }
 
-function showContainer(data) {
-  return gsap.to(data.next.container, {
-    opacity: 1,
-    duration: 0.3
-  });
-}
-
 function initBarba() {
   console.log("📌 Barba.js initialized");
-  window.addEventListener('popstate', () => {
-      console.log("🔄 Popstate event triggered - checking if full reload happens");
-  });
-  console.log("🚀 Inicijalizacija Barba.js");
-
 
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
@@ -91,33 +85,27 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
-        console.log(`🔄 Leave: ${data.current.namespace}`);
-        return gsap.to(data.current.container, { 
-          opacity: 0, 
-          duration: 0.3
-        });
+        console.log(`🔄 Leaving: ${data.current.namespace}`);
+        return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
-        console.log(`🔄 BeforeEnter: ${data.next.namespace}`);
+        console.log(`🔄 Before Entering: ${data.next.namespace}`);
         
-        // Čistimo prethodno stanje samo jednom
+        // Čišćenje prethodnog stanja
         if (data.current) {
           destroyPageSpecificFunctions(data.current.namespace);
         }
-        
+
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
         initPageSpecificFunctions(data.next.namespace);
-        
+
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
-        console.log(`🎯 Enter: ${data.next.namespace}`);
+        console.log(`🎯 Entering: ${data.next.namespace}`);
         updateNavigationWithHref();
-        return gsap.to(data.next.container, { 
-          opacity: 1, 
-          duration: 0.3
-        });
+        return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
       }
     }],
     views: [
@@ -132,11 +120,11 @@ function initBarba() {
     ]
   });
 
-  console.log("✅ Barba.js inicijaliziran");
+  console.log("✅ Barba.js initialized successfully");
 }
 
 window.addEventListener('beforeunload', () => {
-  console.log("🔄 Resetiram scroll prije napuštanja stranice");
+  console.log("🔄 Resetting scroll before leaving the page");
   window.scrollTo(0, 0);
 });
 
