@@ -1,3 +1,80 @@
+function updateNavigationWithHref() {
+  const navLinks = document.querySelectorAll('.nav-link');
+  const currentHref = window.location.pathname;
+
+  navLinks.forEach((link) => {
+    const linkHref = link.getAttribute('href');
+
+    if (currentHref === linkHref || (currentHref === '/' && linkHref === '/')) {
+      link.setAttribute('aria-current', 'page');
+      link.classList.add('current', 'w--current');
+    } else {
+      link.removeAttribute('aria-current');
+      link.classList.remove('current', 'w--current');
+    }
+  });
+}
+
+function destroyPageSpecificFunctions(namespace) {
+  console.log(`🔄 Barba: Starting cleanup for ${namespace}`);
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+  
+  const splits = document.querySelectorAll('.split-type');
+  splits.forEach(split => {
+    if (split.splitType) split.splitType.revert();
+  });
+  
+  console.log(`✅ Barba: Cleanup done for ${namespace}`);
+}
+
+function initGlobalFunctions(data) {
+  // Prvo resetiraj scroll
+  window.scrollTo(0, 0);
+  document.body.style.overflow = 'hidden';
+
+  // Zatim inicijaliziraj Lenis
+  if (window.lenis) {
+    window.lenis.destroy();
+  }
+  initLenis?.();
+
+  // Ostale inicijalizacije
+  initLinksHover?.();
+  initFooter?.();
+
+  // Na kraju omogući scroll
+  document.body.style.overflow = '';
+}
+
+function initPageSpecificFunctions(namespace) {
+  switch (namespace) {
+    case 'home':
+      initHero?.();
+      initHighlights?.();
+      initCategories?.();
+      break;
+    case 'work':
+    case 'work-abstract':
+    case 'work-nature':
+    case 'work-people':
+    case 'work-products':
+    case 'work-architecture':
+      initGrid?.();
+      initPhotoModal?.();
+      break;
+    case 'about':
+      initAbout?.();
+      break;
+  }
+}
+
+function showContainer(data) {
+  return gsap.to(data.next.container, {
+    opacity: 1,
+    duration: 0.3
+  });
+}
+
 function initBarba() {
   console.log("🚀 Inicijalizacija Barba.js");
 
@@ -9,37 +86,33 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
-        console.log(`👋 Leave: ${data.current.namespace} ➝ ${data.next.namespace}`);
-        return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
+        console.log(`🔄 Leave: ${data.current.namespace}`);
+        return gsap.to(data.current.container, { 
+          opacity: 0, 
+          duration: 0.3
+        });
       },
       beforeEnter(data) {
-        console.log("🏃 beforeEnter započeo");
-        window.scrollTo(0, 0);
+        console.log(`🔄 BeforeEnter: ${data.next.namespace}`);
         
-        if (typeof initGlobalFunctions === 'function') {
-          console.log("🔄 Pozivam initGlobalFunctions");
-          initGlobalFunctions(data);
-        } else {
-          console.error("❌ initGlobalFunctions nije definirana");
+        // Čistimo prethodno stanje samo jednom
+        if (data.current) {
+          destroyPageSpecificFunctions(data.current.namespace);
         }
-
-        if (typeof initPageSpecificFunctions === 'function') {
-          console.log("🔄 Pozivam initPageSpecificFunctions");
-          initPageSpecificFunctions(data.next.namespace);
-        } else {
-          console.error("❌ initPageSpecificFunctions nije definirana");
-        }
-
+        
+        window.scrollTo(0, 0);
+        initGlobalFunctions(data);
+        initPageSpecificFunctions(data.next.namespace);
+        
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
-        console.log("🎯 Enter započeo");
-        if (typeof updateNavigationWithHref === 'function') {
-          updateNavigationWithHref();
-        } else {
-          console.error("❌ updateNavigationWithHref nije definirana");
-        }
-        return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
+        console.log(`🎯 Enter: ${data.next.namespace}`);
+        updateNavigationWithHref();
+        return gsap.to(data.next.container, { 
+          opacity: 1, 
+          duration: 0.3
+        });
       }
     }],
     views: [
