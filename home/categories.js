@@ -101,7 +101,6 @@ function initCategories() {
     });
   });
 
-  console.log(`📑 Categories initialized, scroll position: ${window.scrollY}px`);
 }
 
 // Pokreni inicijalizaciju kategorija
