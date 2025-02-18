@@ -15,15 +15,30 @@ function initBarba() {
       beforeEnter(data) {
         console.log("🏃 beforeEnter započeo");
         window.scrollTo(0, 0);
-        console.log("🔄 Pozivam initGlobalFunctions");
-        initGlobalFunctions(data);
-        console.log("🔄 Pozivam initPageSpecificFunctions");
-        initPageSpecificFunctions(data.next.namespace);
+        
+        if (typeof initGlobalFunctions === 'function') {
+          console.log("🔄 Pozivam initGlobalFunctions");
+          initGlobalFunctions(data);
+        } else {
+          console.error("❌ initGlobalFunctions nije definirana");
+        }
+
+        if (typeof initPageSpecificFunctions === 'function') {
+          console.log("🔄 Pozivam initPageSpecificFunctions");
+          initPageSpecificFunctions(data.next.namespace);
+        } else {
+          console.error("❌ initPageSpecificFunctions nije definirana");
+        }
+
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
         console.log("🎯 Enter započeo");
-        updateNavigationWithHref();
+        if (typeof updateNavigationWithHref === 'function') {
+          updateNavigationWithHref();
+        } else {
+          console.error("❌ updateNavigationWithHref nije definirana");
+        }
         return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
       }
     }],
