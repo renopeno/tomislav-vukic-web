@@ -54,7 +54,7 @@ function initCategories() {
         ease: 'power1.out',
       });
 
-      const titleElement = category.querySelector('.title-l');
+      const titleElement = category.querySelectorAll('.title-l, .cta, .categories-row');
       if (titleElement) {
         createShuffleEffect(titleElement);
       }
