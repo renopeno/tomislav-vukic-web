@@ -118,16 +118,18 @@ function initCategoryTitleAnimation() {
   
   if (!titleWrapper) return;
 
-  gsap.to(titleWrapper, {
-    scale: 0.7,
-    opacity: 0,
-    scrollTrigger: {
-      trigger: titleWrapper,
-      start: "top top", // počni kad vrh wrappera dotakne vrh viewporta
-      end: "+=200", // animiraj kroz 200px scrolla
-      scrub: 0.5, // dodaje smooth delay (0.5 sekundi)
-      invalidateOnRefresh: true, // ponovno kalkuliraj na resize
-    }
+  gsap.matchMedia().add("(max-width: 767px)", () => {
+    gsap.to(titleWrapper, {
+      scale: 0.7,
+      opacity: 0,
+      scrollTrigger: {
+        trigger: titleWrapper,
+        start: "top top",
+        end: "+=200",
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+      }
+    });
   });
 }
 
