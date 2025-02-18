@@ -124,7 +124,7 @@ function initCategoryTitleAnimation() {
     scrollTrigger: {
       trigger: titleWrapper,
       start: "top -20", // počni 200px nakon što wrapper prođe vrh viewporta
-      end: "top -100",   // završi 400px nakon toga
+      end: "top -200",   // završi 400px nakon toga
       scrub: 0.5,        // dodaje smooth delay (0.5 sekundi)
       invalidateOnRefresh: true,
     }
