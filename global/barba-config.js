@@ -76,7 +76,12 @@ function showContainer(data) {
 }
 
 function initBarba() {
+  console.log("📌 Barba.js initialized");
+  window.addEventListener('popstate', () => {
+      console.log("🔄 Popstate event triggered - checking if full reload happens");
+  });
   console.log("🚀 Inicijalizacija Barba.js");
+
 
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
