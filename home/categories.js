@@ -57,8 +57,8 @@ function initCategories() {
       const titleElement = category.querySelector('.title-l');
       const ctaElement = category.querySelector('.cta');
       
-      if (titleElement) createShuffleEffect(titleElement);
-      if (ctaElement) createShuffleEffect(ctaElement);
+      if (titleElement) createShuffleEffect(titleElement, false)();
+      if (ctaElement) createShuffleEffect(ctaElement, false)();
     });
 
     category.addEventListener('mouseleave', () => {

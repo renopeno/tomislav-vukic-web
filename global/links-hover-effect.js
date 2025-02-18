@@ -1,5 +1,5 @@
 // Generička funkcija za shuffle efekt
-function createShuffleEffect(element) {
+function createShuffleEffect(element, addListener = true) {
   const originalText = element.textContent;
 
   const shuffleWord = (word) => {
@@ -11,7 +11,7 @@ function createShuffleEffect(element) {
     return letters.join('');
   };
 
-  element.addEventListener('mouseenter', () => {
+  const startEffect = () => {
     let currentText = originalText;
     let counter = 0;
 
@@ -25,13 +25,20 @@ function createShuffleEffect(element) {
         clearInterval(shuffleInterval);
       }
     }, 100);
-  });
+  };
+
+  if (addListener) {
+    element.addEventListener('mouseenter', startEffect);
+  }
+
+  // Vraćamo funkciju za pokretanje efekta
+  return startEffect;
 }
 
 // Inicijalizacija za osnovne elemente
 function initLinksHover() {
   document.querySelectorAll('.link, .cta').forEach(element => {
-    createShuffleEffect(element);
+    createShuffleEffect(element, true);
   });
 }
 
