@@ -54,10 +54,11 @@ function initCategories() {
         ease: 'power1.out',
       });
 
-      const titleElement = category.querySelectorAll('.title-l, .cta, .categories-row');
-      if (titleElement) {
-        createShuffleEffect(titleElement);
-      }
+      const titleElement = category.querySelector('.title-l');
+      const ctaElement = category.querySelector('.cta');
+      
+      if (titleElement) createShuffleEffect(titleElement);
+      if (ctaElement) createShuffleEffect(ctaElement);
     });
 
     category.addEventListener('mouseleave', () => {
