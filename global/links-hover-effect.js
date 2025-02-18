@@ -1,6 +1,6 @@
 function initLinksHover() {
-  // Selektiraj sve linkove i kategorije
-  document.querySelectorAll('.link, .cta, .categories-row').forEach(element => {
+  // Selektiraj sve linkove i naslove kategorija
+  document.querySelectorAll('.link, .cta, .categories-title-wrapper .title-l').forEach(element => {
     const originalText = element.textContent;
 
     const shuffleWord = (word) => {
