@@ -119,14 +119,14 @@ function initCategoryTitleAnimation() {
   if (!titleWrapper) return;
 
   gsap.to(titleWrapper, {
-    scale: 0.8,
+    scale: 0.5,
     opacity: 0,
     scrollTrigger: {
       trigger: titleWrapper,
-      start: "top top", // počni kad vrh wrappera dotakne vrh viewporta
-      end: "+=200", // animiraj kroz 200px scrolla
-      scrub: 0.5, // dodaje smooth delay (0.5 sekundi)
-      invalidateOnRefresh: true, // ponovno kalkuliraj na resize
+      start: "top -200", // počni 200px nakon što wrapper prođe vrh viewporta
+      end: "top -400",   // završi 400px nakon toga
+      scrub: 0.5,        // dodaje smooth delay (0.5 sekundi)
+      invalidateOnRefresh: true,
     }
   });
 }
