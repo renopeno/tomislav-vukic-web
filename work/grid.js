@@ -114,7 +114,7 @@ function initGrid() {
 
 // Dodaj ovo u initGrid() ili kao zasebnu funkciju koja se poziva nakon initGrid()
 function initCategoryTitleAnimation() {
-  const titleWrapper = document.querySelector('.work-categories-title-wrapper');
+  const titleWrapper = document.querySelectorAll('.work-categories-title-wrapper, .work-categories-top-margin');
   
   if (!titleWrapper) return;
 
