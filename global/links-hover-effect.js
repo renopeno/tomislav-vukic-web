@@ -13,6 +13,12 @@ function createShuffleEffect(element, addListener = true) {
   };
 
   const startEffect = () => {
+    // Očisti prethodni interval ako postoji
+    if (currentInterval) {
+      clearInterval(currentInterval);
+      element.textContent = originalText;
+    }
+
     let counter = 0;
 
     currentInterval = setInterval(() => {
@@ -22,12 +28,22 @@ function createShuffleEffect(element, addListener = true) {
       } else {
         element.textContent = originalText;
         clearInterval(currentInterval);
+        currentInterval = null;
       }
     }, 100);
   };
 
+  const stopEffect = () => {
+    if (currentInterval) {
+      clearInterval(currentInterval);
+      currentInterval = null;
+    }
+    element.textContent = originalText;
+  };
+
   if (addListener) {
     element.addEventListener('mouseenter', startEffect);
+    element.addEventListener('mouseleave', stopEffect);
   }
 
   // Vraćamo funkciju za pokretanje efekta
