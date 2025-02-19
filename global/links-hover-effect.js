@@ -1,6 +1,7 @@
 // Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
   const originalText = element.textContent;
+  let currentInterval = null;
 
   const shuffleWord = (word) => {
     const letters = word.split('');
@@ -12,24 +13,15 @@ function createShuffleEffect(element, addListener = true) {
   };
 
   const startEffect = () => {
-    // Očisti prethodni interval ako postoji
-    if (currentInterval) {
-      clearInterval(currentInterval);
-      currentInterval = null;
-      element.textContent = originalText; // Dodana linija - resetiraj tekst
-    }
-
     let counter = 0;
-    const maxShuffles = 3;
 
     currentInterval = setInterval(() => {
-      if (counter < maxShuffles) {
+      if (counter < 3) {
         element.textContent = shuffleWord(originalText);
         counter++;
       } else {
         element.textContent = originalText;
         clearInterval(currentInterval);
-        currentInterval = null;
       }
     }, 100);
   };
