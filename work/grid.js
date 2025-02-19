@@ -53,6 +53,21 @@ function initGrid() {
     firstPhotoId: window.shuffledPhotos?.[0]?.id
   });
 
+  // Prije bilo kakve manipulacije DOM-a:
+  console.log('🔍 Pre-manipulation DOM state:', {
+    containers: document.querySelectorAll('.photo-container').length,
+    visibleContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+    barbaContainer: document.querySelector('[data-barba="container"]')?.dataset.namespace,
+    callStack: new Error().stack
+  });
+
+  // Nakon što se postavi shuffledPhotos array:
+  console.log('🎲 Shuffle result:', {
+    originalLength: allPhotoContainers.length,
+    shuffledLength: window.shuffledPhotos.length,
+    uniqueIds: new Set(window.shuffledPhotos.map(c => c.id)).size
+  });
+
   // Grid konfiguracija po uređajima
   const gridConfig = {
     desktop: { columns: 12, left: [2, 3], right: [8, 9], horizontalSpan: 3, verticalSpan: 2 },

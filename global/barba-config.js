@@ -101,12 +101,14 @@ function initBarba() {
               next: data.next.container?.querySelectorAll('.photo-container').length
             }
           });
-          console.log('🧹 Starting cleanup with state:', {
-            currentNamespace: data.current.namespace,
-            DOM: {
+          console.log('🧹 Pre-destroy state:', {
+            namespace: data.current.namespace,
+            nextNamespace: data.next.namespace,
+            domState: {
               containers: document.querySelectorAll('.photo-container').length,
-              photos: document.querySelectorAll('.photo').length
-            }
+              barbaContainers: document.querySelectorAll('[data-barba="container"]').length
+            },
+            stack: new Error().stack
           });
           console.log('🔄 Transition cleanup state:', {
             currentDOM: document.querySelector(`[data-barba="container"]`)?.innerHTML.length,
@@ -118,6 +120,11 @@ function initBarba() {
             remainingContainers: document.querySelectorAll('.photo-container').length,
             remainingPhotos: document.querySelectorAll('.photo').length,
             activeContainer: document.querySelector(`[data-barba="container"]`)?.dataset.barbaNamespace
+          });
+          console.log('✨ Post-destroy verification:', {
+            containers: document.querySelectorAll('.photo-container').length,
+            activeContainer: document.querySelector('[data-barba="container"]'),
+            gsapInstances: ScrollTrigger.getAll().length
           });
         }
 
