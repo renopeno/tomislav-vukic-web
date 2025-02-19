@@ -141,7 +141,7 @@ function initAbout() {
               scrollTrigger: {
                   trigger: leftParagraph,
                   start: "top 50%",
-                  end: "top 70%",
+                  end: "bottom 50%",
                   scrub: true,
                   markers: true,
               }
