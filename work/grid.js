@@ -2,14 +2,31 @@ let isGridInitializing = false;
 
 function initGrid() {
   if (isGridInitializing || window.isSettingUpGrid) {
+    console.log('🚫 Grid initialization already in progress');
     return;
   }
   
   isGridInitializing = true;
   
   try {
+    console.log('🎯 initGrid() pokrenut', {
+      path: window.location.pathname,
+      lastPath: window.lastPath,
+      hasShuffledPhotos: !!window.shuffledPhotos,
+      isSettingUpGrid: window.isSettingUpGrid
+    });
+
+    console.log('🔄 InitGrid call stack:', new Error().stack);
+
+    console.log('🔍 Grid state:', {
+      containers: document.querySelectorAll(".photo-container").length,
+      shuffled: window.shuffledPhotos?.length || 0,
+      currentNamespace: document.querySelector('[data-barba="container"]')?.dataset.namespace
+    });
+
     const MAX_PHOTOS = 30;
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
+    console.log('📸 Pronađeno fotografija:', allPhotoContainers.length);
     
     // Resetiraj sve postavke
     allPhotoContainers.forEach(container => {
@@ -27,36 +44,39 @@ function initGrid() {
       container.style.display = 'none';
     });
 
+    // Prije shuffle logike:
+    console.log('🎲 Shuffle state:', {
+      needsShuffle: !window.shuffledPhotos || window.location.pathname !== window.lastPath,
+      currentPath: window.location.pathname,
+      lastPath: window.lastPath
+    });
+
     // Ako je nova stranica, promiješaj grid
     if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
       window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
       window.lastPath = window.location.pathname;
     }
 
-    // Dodaj GSAP ScrollTrigger ako nije već registriran
-    if (typeof ScrollTrigger !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger);
-    }
+    // Nakon shuffle logike:
+    console.log('🎲 Shuffle complete:', {
+      totalPhotos: window.shuffledPhotos?.length,
+      firstPhotoId: window.shuffledPhotos?.[0]?.id
+    });
 
-    // Parallax efekt na sve slike unutar grida
-    function initParallaxEffect() {
-      gsap.utils.toArray(".photo-container").forEach(container => {
-        let image = container.querySelector("img");
-        
-        if (!image) return;
+    // Prije bilo kakve manipulacije DOM-a:
+    console.log('🔍 Pre-manipulation DOM state:', {
+      containers: document.querySelectorAll('.photo-container').length,
+      visibleContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+      barbaContainer: document.querySelector('[data-barba="container"]')?.dataset.namespace,
+      callStack: new Error().stack
+    });
 
-        gsap.to(image, {
-          y: () => image.offsetHeight - container.offsetHeight,
-          ease: "none",
-          scrollTrigger: {
-            trigger: container,
-            scrub: true,
-            pin: false,
-            invalidateOnRefresh: true,
-          },
-        });
-      });
-    }
+    // Nakon što se postavi shuffledPhotos array:
+    console.log('🎲 Shuffle result:', {
+      originalLength: allPhotoContainers.length,
+      shuffledLength: window.shuffledPhotos.length,
+      uniqueIds: new Set(window.shuffledPhotos.map(c => c.id)).size
+    });
 
     // Grid konfiguracija po uređajima
     const gridConfig = {
@@ -72,12 +92,24 @@ function initGrid() {
       return gridConfig.desktop;
     }
 
+    console.log('⚙️ Setup grid config:', {
+      width: window.innerWidth,
+      config: getCurrentConfig(),
+      totalPhotos: window.shuffledPhotos?.length || 0
+    });
+
     function setupGrid() {
       const config = getCurrentConfig();
       let isLeft = true;
       let currentRow = 1;
       let lastLeftCol = null;
       let lastRightCol = null;
+
+      console.log('🛠️ Starting grid setup:', {
+        shuffledLength: window.shuffledPhotos?.length,
+        domContainers: document.querySelectorAll('.photo-container').length,
+        activeNamespace: document.querySelector('[data-barba="container"]')?.dataset.barbaNamespace
+      });
 
       window.shuffledPhotos.forEach((container) => {
         const photo = container.querySelector(".photo");
@@ -108,6 +140,17 @@ function initGrid() {
         isLeft = !isLeft;
         currentRow++;
       });
+
+      console.log('📊 Grid containers state:', {
+        visible: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+        hidden: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display === 'none').length,
+        shuffled: window.shuffledPhotos?.length
+      });
+
+      console.log('📐 Grid setup complete:', {
+        visibleContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+        hiddenContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display === 'none').length
+      });
     }
 
     if (!window.isSettingUpGrid) {
@@ -120,9 +163,6 @@ function initGrid() {
     if (typeof initPhotoModal === "function") {
       initPhotoModal();
     }
-
-    // Pozovi parallax efekt nakon postavljanja grida
-    initParallaxEffect();
 
     // Tranzicija za ulazak fotki u view
     gsap.fromTo(
@@ -138,16 +178,11 @@ function initGrid() {
       }
     );
 
-  } catch (error) {
-    window.isSettingUpGrid = false;
+    console.log("✅ Grid postavljen.");
+  } finally {
     isGridInitializing = false;
-    throw error;
   }
-
-  isGridInitializing = false;
 }
-
-window.initGrid = initGrid;
 
 // Dodaj ovo u initGrid() ili kao zasebnu funkciju koja se poziva nakon initGrid()
 function initCategoryTitleAnimation() {
@@ -179,4 +214,15 @@ if (document.readyState === 'loading') {
 } else {
   initGrid();
   initCategoryTitleAnimation();
+}
+// Integracija s Barba.js
+if (window.barba) {
+  barba.hooks.beforeEnter(() => {
+    console.log("🔄 Resetiram grid prije tranzicije");
+  });
+
+  barba.hooks.after(() => {
+    console.log("🔄 Ponovno postavljam grid nakon tranzicije");
+    initGrid();
+  });
 }
