@@ -86,63 +86,23 @@ function initBarba() {
         return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
-        console.log(`🔄 Before Entering: ${data.next.namespace}`);
-        
-        // Čišćenje prethodnog stanja
         if (data.current) {
-          console.log('🔄 Barba transition state:', {
-            from: data.current.namespace,
-            to: data.next.namespace,
-            containers: {
-              current: data.current.container?.querySelectorAll('.photo-container').length,
-              next: data.next.container?.querySelectorAll('.photo-container').length
-            }
-          });
-          console.log('🧹 Pre-destroy state:', {
-            namespace: data.current.namespace,
-            nextNamespace: data.next.namespace,
-            domState: {
-              containers: document.querySelectorAll('.photo-container').length,
-              barbaContainers: document.querySelectorAll('[data-barba="container"]').length
-            },
-            stack: new Error().stack
-          });
-          console.log('🔄 Transition cleanup state:', {
-            currentDOM: document.querySelector(`[data-barba="container"]`)?.innerHTML.length,
-            nextDOM: data.next.container?.innerHTML.length,
-            currentPhotos: document.querySelectorAll('.photo-container').length
-          });
           destroyPageSpecificFunctions(data.current.namespace);
-          console.log('🧹 Post-cleanup state:', {
-            remainingContainers: document.querySelectorAll('.photo-container').length,
-            remainingPhotos: document.querySelectorAll('.photo').length,
-            activeContainer: document.querySelector(`[data-barba="container"]`)?.dataset.barbaNamespace
-          });
-          console.log('✨ Post-destroy verification:', {
-            containers: document.querySelectorAll('.photo-container').length,
-            activeContainer: document.querySelector('[data-barba="container"]'),
-            gsapInstances: ScrollTrigger.getAll().length
-          });
         }
-
+        
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
-        console.log('🔄 Page specific init:', {
-          namespace: data.next.namespace,
-          containers: document.querySelectorAll(".photo-container").length,
-          currentPath: window.location.pathname
-        });
-        initPageSpecificFunctions(data.next.namespace);
-        console.log('✅ Page specific init complete:', {
-          namespace: data.next.namespace,
-          containers: document.querySelectorAll(".photo-container").length
-        });
-
-        gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
         isTransitioning = false;
         console.log(`🎯 Entering: ${data.next.namespace}`);
+        
+        // Samo ovdje inicijaliziramo grid
+        if (data.next.namespace.includes('work-')) {
+          initGrid();
+          initPhotoModal?.();
+        }
+        
         updateNavigationWithHref();
         return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
       }
