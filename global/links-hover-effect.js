@@ -1,5 +1,11 @@
 // Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
+  console.log('🎯 Creating effect for:', {
+    element: element.textContent,
+    addListener,
+    originalText: element.textContent
+  });
+
   const originalText = element.textContent;
 
   const shuffleWord = (word) => {
@@ -12,9 +18,20 @@ function createShuffleEffect(element, addListener = true) {
   };
 
   const startEffect = () => {
-    let counter = 0;
+    console.log('🔄 Starting effect:', {
+      currentText: element.textContent,
+      originalText,
+      addListener
+    });
 
+    let counter = 0;
     const shuffleInterval = setInterval(() => {
+      console.log('📝 Shuffle iteration:', {
+        counter,
+        currentText: element.textContent,
+        originalText
+      });
+
       if (counter < 3) {
         element.textContent = shuffleWord(originalText);
         counter++;
