@@ -126,7 +126,7 @@ function initAbout() {
                   stagger: 0.02,
                   scrollTrigger: {
                       trigger: ".about-reveal-start",
-                      start: "top 20%",
+                      start: "top 40%",
                       end: "bottom 30%",
                       scrub: true,
                       markers: false,
