@@ -20,7 +20,6 @@ function createShuffleEffect(element, addListener = true) {
     }
 
     let counter = 0;
-
     currentInterval = setInterval(() => {
       if (counter < 3) {
         element.textContent = shuffleWord(originalText);
@@ -33,17 +32,8 @@ function createShuffleEffect(element, addListener = true) {
     }, 100);
   };
 
-  const stopEffect = () => {
-    if (currentInterval) {
-      clearInterval(currentInterval);
-      currentInterval = null;
-    }
-    element.textContent = originalText;
-  };
-
   if (addListener) {
     element.addEventListener('mouseenter', startEffect);
-    element.addEventListener('mouseleave', stopEffect);
   }
 
   // Vraćamo funkciju za pokretanje efekta
