@@ -80,6 +80,12 @@ function initGrid() {
     let lastLeftCol = null;
     let lastRightCol = null;
 
+    console.log('🛠️ Starting grid setup:', {
+      shuffledLength: window.shuffledPhotos?.length,
+      domContainers: document.querySelectorAll('.photo-container').length,
+      activeNamespace: document.querySelector('[data-barba="container"]')?.dataset.barbaNamespace
+    });
+
     window.shuffledPhotos.forEach((container) => {
       const photo = container.querySelector(".photo");
       const isHorizontal = photo.naturalWidth > photo.naturalHeight;
@@ -108,6 +114,12 @@ function initGrid() {
 
       isLeft = !isLeft;
       currentRow++;
+    });
+
+    console.log('📊 Grid containers state:', {
+      visible: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+      hidden: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display === 'none').length,
+      shuffled: window.shuffledPhotos?.length
     });
 
     console.log('📐 Grid setup complete:', {

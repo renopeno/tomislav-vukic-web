@@ -108,7 +108,17 @@ function initBarba() {
               photos: document.querySelectorAll('.photo').length
             }
           });
+          console.log('🔄 Transition cleanup state:', {
+            currentDOM: document.querySelector(`[data-barba="container"]`)?.innerHTML.length,
+            nextDOM: data.next.container?.innerHTML.length,
+            currentPhotos: document.querySelectorAll('.photo-container').length
+          });
           destroyPageSpecificFunctions(data.current.namespace);
+          console.log('🧹 Post-cleanup state:', {
+            remainingContainers: document.querySelectorAll('.photo-container').length,
+            remainingPhotos: document.querySelectorAll('.photo').length,
+            activeContainer: document.querySelector(`[data-barba="container"]`)?.dataset.barbaNamespace
+          });
         }
 
         window.scrollTo(0, 0);
