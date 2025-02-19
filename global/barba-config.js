@@ -98,7 +98,16 @@ function initBarba() {
 
         window.scrollTo(0, 0);
         initGlobalFunctions(data);
+        console.log('🔄 Page specific init:', {
+          namespace: data.next.namespace,
+          containers: document.querySelectorAll(".photo-container").length,
+          currentPath: window.location.pathname
+        });
         initPageSpecificFunctions(data.next.namespace);
+        console.log('✅ Page specific init complete:', {
+          namespace: data.next.namespace,
+          containers: document.querySelectorAll(".photo-container").length
+        });
 
         gsap.set(data.next.container, { opacity: 0 });
       },

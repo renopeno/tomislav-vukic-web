@@ -6,6 +6,12 @@ function initGrid() {
     isSettingUpGrid: window.isSettingUpGrid
   });
 
+  console.log('🔍 Grid state:', {
+    containers: document.querySelectorAll(".photo-container").length,
+    shuffled: window.shuffledPhotos?.length || 0,
+    currentNamespace: document.querySelector('[data-barba="container"]')?.dataset.namespace
+  });
+
   const MAX_PHOTOS = 30;
   const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
   console.log('📸 Pronađeno fotografija:', allPhotoContainers.length);
@@ -46,6 +52,12 @@ function initGrid() {
     return gridConfig.desktop;
   }
 
+  console.log('⚙️ Setup grid config:', {
+    width: window.innerWidth,
+    config: getCurrentConfig(),
+    totalPhotos: window.shuffledPhotos?.length || 0
+  });
+
   function setupGrid() {
     const config = getCurrentConfig();
     let isLeft = true;
@@ -81,6 +93,11 @@ function initGrid() {
 
       isLeft = !isLeft;
       currentRow++;
+    });
+
+    console.log('📐 Grid setup complete:', {
+      visibleContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display !== 'none').length,
+      hiddenContainers: Array.from(document.querySelectorAll('.photo-container')).filter(c => c.style.display === 'none').length
     });
   }
 
