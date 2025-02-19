@@ -67,8 +67,8 @@ function initCategories() {
       const titleElement = category.querySelector('.title-l');
       const ctaElement = category.querySelector('.cta');
       
-      if (titleElement) createShuffleEffect(titleElement, false)();
-      if (ctaElement) createShuffleEffect(ctaElement, false)();
+      if (titleElement) createShuffleEffect(titleElement, true);
+      if (ctaElement) createShuffleEffect(ctaElement, true);
     });
 
     // Hover OUT - Što se događa kad miš izađe iz kategorije
