@@ -59,14 +59,14 @@ function initAbout() {
       },
       { 
         opacity: 1, y: 0, duration: 0.5, ease: "power1.out",
-      })
-    .fromTo(aboutBody, 
-      {
-        opacity: 0,
-      }, 
-      { 
-        opacity: 1, ease: "power1.out", duration: 0.3,
-      }, "-=0.45");
+      });
+    // .fromTo(aboutBody, 
+    //   {
+    //     opacity: 0,
+    //   }, 
+    //   { 
+    //     opacity: 1, ease: "power1.out", duration: 0.3,
+    //   }, "-=0.45");
 
 
   // Scroll reveal animacija za title i paragraphove
@@ -81,7 +81,7 @@ function initAbout() {
                   scrollTrigger: {
                       trigger: ".about-reveal-start",
                       endTrigger: ".about-reveal-end",
-                      start: "top 35%",
+                      start: "top 50%",
                       end: "top center",
                       scrub: true,
                       markers: false,
@@ -95,7 +95,7 @@ function initAbout() {
               stagger: 0.02,
               scrollTrigger: {
                   trigger: leftParagraph,
-                  start: "top 35%",
+                  start: "top 60%",
                   end: "top 40%",
                   scrub: true,
                   markers: false,
@@ -108,7 +108,7 @@ function initAbout() {
               stagger: 0.02,
               scrollTrigger: {
                   trigger: rightParagraph,
-                  start: "top 35%",
+                  start: "top 50%",
                   end: "top 40%",
                   scrub: true,
                   markers: false,
@@ -126,8 +126,8 @@ function initAbout() {
                   stagger: 0.02,
                   scrollTrigger: {
                       trigger: ".about-reveal-start",
-                      start: "top 35%",
-                      end: "top 60%",
+                      start: "top 50%",
+                      end: "top center",
                       scrub: true,
                       markers: false,
                   }
@@ -140,8 +140,8 @@ function initAbout() {
               stagger: 0.02,
               scrollTrigger: {
                   trigger: leftParagraph,
-                  start: "top 35%",
-                  end: "bottom 60%",
+                  start: "top 60%",
+                  end: "bottom 40%",
                   scrub: true,
                   markers: false,
               }
