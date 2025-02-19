@@ -71,48 +71,81 @@ function initAbout() {
 
   // Scroll reveal animacija za title i paragraphove
   const scrollAnimations = () => {
+      gsap.matchMedia().add("(min-width: 768px)", () => {
+          gsap.fromTo(titleText.chars, 
+              { opacity: 0.15 },
+              {
+                  opacity: 1,
+                  duration: 0.3,
+                  stagger: 0.02,
+                  scrollTrigger: {
+                      trigger: ".about-reveal-start",
+                      endTrigger: ".about-reveal-end",
+                      start: "top 35%",
+                      end: "top center",
+                      scrub: true,
+                      markers: false,
+                  }
+              }
+          );
 
-      gsap.fromTo(titleText.chars, 
-          { opacity: 0.15 },
-          {
+          gsap.fromTo(leftText.chars, { opacity: 0 }, {
               opacity: 1,
               duration: 0.3,
               stagger: 0.02,
               scrollTrigger: {
-                  trigger: ".about-reveal-start",
-                  endTrigger: ".about-reveal-end",
-                  start: "top 50%",
-                  end: "top center",
+                  trigger: leftParagraph,
+                  start: "top 35%",
+                  end: "top 40%",
                   scrub: true,
                   markers: false,
               }
-          }
-      );
+          });
 
-      gsap.fromTo(leftText.chars, { opacity: 0 }, {
-          opacity: 1,
-          duration: 0.3,
-          stagger: 0.02,
-          scrollTrigger: {
-              trigger: leftParagraph,
-              start: "top 60%",
-              end: "top 40%",
-              scrub: true,
-              markers: false,
-          }
+          gsap.fromTo(rightText.chars, { opacity: 0 }, {
+              opacity: 1,
+              duration: 0.3,
+              stagger: 0.02,
+              scrollTrigger: {
+                  trigger: rightParagraph,
+                  start: "top 35%",
+                  end: "top 40%",
+                  scrub: true,
+                  markers: false,
+              }
+          });
       });
 
-      gsap.fromTo(rightText.chars, { opacity: 0 }, {
-          opacity: 1,
-          duration: 0.3,
-          stagger: 0.02,
-          scrollTrigger: {
-              trigger: rightParagraph,
-              start: "top 50%",
-              end: "top 40%",
-              scrub: true,
-              markers: false,
-          }
+      // Mobile animacije
+      gsap.matchMedia().add("(max-width: 767px)", () => {
+          gsap.fromTo(titleText.chars, 
+              { opacity: 0.15 },
+              {
+                  opacity: 1,
+                  duration: 0.3,
+                  stagger: 0.02,
+                  scrollTrigger: {
+                      trigger: ".about-reveal-start",
+                      start: "top 35%",
+                      end: "top 60%",
+                      scrub: true,
+                      markers: false,
+                  }
+              }
+          );
+
+          gsap.fromTo([leftText.chars, rightText.chars], { opacity: 0 }, {
+              opacity: 1,
+              duration: 0.3,
+              stagger: 0.02,
+              scrollTrigger: {
+                  trigger: leftParagraph,
+                  start: "top 35%",
+                  end: "bottom 60%",
+                  scrub: true,
+                  markers: false,
+              }
+          });
       });
   };
 
