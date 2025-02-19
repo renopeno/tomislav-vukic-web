@@ -140,10 +140,10 @@ function initAbout() {
               stagger: 0.02,
               scrollTrigger: {
                   trigger: leftParagraph,
-                  start: "top 20%",
+                  start: "top 40%",
                   end: "bottom 30%",
                   scrub: true,
-                  markers: false,
+                  markers: true,
               }
           });
       });
