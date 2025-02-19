@@ -3,7 +3,7 @@ function initAbout() {
   gsap.registerPlugin(ScrollTrigger);
 
   const aboutTitle = document.querySelector('.about-title');
-  const aboutBody = document.querySelector('.about-small-title');
+//   const aboutBody = document.querySelector('.about-small-title');
 
   const title = document.querySelector('.reveal-type');
   const titleText = new SplitType(title, { 
@@ -139,9 +139,9 @@ function initAbout() {
               duration: 0.3,
               stagger: 0.02,
               scrollTrigger: {
-                  trigger: leftParagraph,
-                  start: "top 40%",
-                  end: "bottom 30%",
+                  trigger: ".about-reveal-start",
+                  start: "top 1%",
+                  end: "bottom 1%",
                   scrub: true,
                   markers: true,
               }
