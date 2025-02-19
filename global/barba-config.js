@@ -93,6 +93,21 @@ function initBarba() {
         
         // Čišćenje prethodnog stanja
         if (data.current) {
+          console.log('🔄 Barba transition state:', {
+            from: data.current.namespace,
+            to: data.next.namespace,
+            containers: {
+              current: data.current.container?.querySelectorAll('.photo-container').length,
+              next: data.next.container?.querySelectorAll('.photo-container').length
+            }
+          });
+          console.log('🧹 Starting cleanup with state:', {
+            currentNamespace: data.current.namespace,
+            DOM: {
+              containers: document.querySelectorAll('.photo-container').length,
+              photos: document.querySelectorAll('.photo').length
+            }
+          });
           destroyPageSpecificFunctions(data.current.namespace);
         }
 

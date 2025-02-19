@@ -6,6 +6,8 @@ function initGrid() {
     isSettingUpGrid: window.isSettingUpGrid
   });
 
+  console.log('🔄 InitGrid call stack:', new Error().stack);
+
   console.log('🔍 Grid state:', {
     containers: document.querySelectorAll(".photo-container").length,
     shuffled: window.shuffledPhotos?.length || 0,
@@ -32,11 +34,24 @@ function initGrid() {
     container.style.display = 'none';
   });
 
+  // Prije shuffle logike:
+  console.log('🎲 Shuffle state:', {
+    needsShuffle: !window.shuffledPhotos || window.location.pathname !== window.lastPath,
+    currentPath: window.location.pathname,
+    lastPath: window.lastPath
+  });
+
   // Ako je nova stranica, promiješaj grid
   if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
     window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
     window.lastPath = window.location.pathname;
   }
+
+  // Nakon shuffle logike:
+  console.log('🎲 Shuffle complete:', {
+    totalPhotos: window.shuffledPhotos?.length,
+    firstPhotoId: window.shuffledPhotos?.[0]?.id
+  });
 
   // Grid konfiguracija po uređajima
   const gridConfig = {
