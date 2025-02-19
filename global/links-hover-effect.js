@@ -1,6 +1,7 @@
 // Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
   const originalText = element.textContent;
+  let currentInterval = null;
 
   const shuffleWord = (word) => {
     const letters = word.split('');
@@ -12,23 +13,30 @@ function createShuffleEffect(element, addListener = true) {
   };
 
   const startEffect = () => {
-    let currentText = originalText;
     let counter = 0;
-
-    const shuffleInterval = setInterval(() => {
+    currentInterval = setInterval(() => {
       if (counter < 3) {
-        currentText = shuffleWord(originalText);
-        element.textContent = currentText;
+        element.textContent = shuffleWord(originalText);
         counter++;
       } else {
         element.textContent = originalText;
-        clearInterval(shuffleInterval);
+        clearInterval(currentInterval);
+        currentInterval = null;
       }
     }, 100);
   };
 
+  const stopEffect = () => {
+    if (currentInterval) {
+      clearInterval(currentInterval);
+      currentInterval = null;
+    }
+    element.textContent = originalText;
+  };
+
   if (addListener) {
     element.addEventListener('mouseenter', startEffect);
+    element.addEventListener('mouseleave', stopEffect);
   }
 
   // Vraćamo funkciju za pokretanje efekta
