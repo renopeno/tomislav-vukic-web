@@ -27,28 +27,22 @@ function destroyPageSpecificFunctions(namespace) {
 }
 
 function initGlobalFunctions(data) {
-  destroyPageSpecificFunctions?.(data?.current?.namespace);
-  
-  // Resetiraj scroll
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
-
-  // Ponovno inicijaliziraj Lenis i ostale globalne funkcije
+  
   if (window.lenis) {
     window.lenis.destroy();
   }
   initLenis?.();
   initLinksHover?.();
   initFooter?.();
-
-  // Očuvaj Dark Mode
+  
   if (localStorage.getItem("darkMode") === "enabled") {
     document.body.classList.add("dark-mode");
   } else {
     document.body.classList.remove("dark-mode");
   }
-
-  // Omogući scroll ponovno nakon inicijalizacije
+  
   document.body.style.overflow = '';
 }
 
@@ -74,6 +68,8 @@ function initPageSpecificFunctions(namespace) {
   }
 }
 
+let isTransitioning = false;
+
 function initBarba() {
   console.log("📌 Barba.js initialized");
 
@@ -85,6 +81,7 @@ function initBarba() {
     transitions: [{
       name: 'fade',
       leave(data) {
+        isTransitioning = true;
         console.log(`🔄 Leaving: ${data.current.namespace}`);
         return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
@@ -144,6 +141,7 @@ function initBarba() {
         gsap.set(data.next.container, { opacity: 0 });
       },
       enter(data) {
+        isTransitioning = false;
         console.log(`🎯 Entering: ${data.next.namespace}`);
         updateNavigationWithHref();
         return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
@@ -168,5 +166,14 @@ window.addEventListener('beforeunload', () => {
   console.log("🔄 Resetting scroll before leaving the page");
   window.scrollTo(0, 0);
 });
+
+function initGrid() {
+  if (window.isSettingUpGrid || isTransitioning) {
+    console.log('🚫 Grid setup already in progress or transition active');
+    return;
+  }
+  
+  // Ostatak koda...
+}
 
 initBarba();
