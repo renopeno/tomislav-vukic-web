@@ -1,18 +1,14 @@
 // Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
-  console.log('🎯 Creating effect for:', {
-    element: element.textContent,
-    addListener,
-    originalText: element.textContent
-  });
-
   // Spremi originalni tekst u data atribut ako već nije spremljen
+  // Ovo osigurava da uvijek imamo pristup originalnom tekstu, čak i nakon više shuffleanja
   if (!element.dataset.originalText) {
     element.dataset.originalText = element.textContent;
   }
   
   const originalText = element.dataset.originalText;
 
+  // Helper funkcija koja miješa slova u riječi koristeći Fisher-Yates shuffle algoritam
   const shuffleWord = (word) => {
     const letters = word.split('');
     for (let i = letters.length - 1; i > 0; i--) {
@@ -22,36 +18,28 @@ function createShuffleEffect(element, addListener = true) {
     return letters.join('');
   };
 
+  // Glavna funkcija koja pokreće shuffle animaciju
   const startEffect = () => {
-    console.log('🔄 Starting effect:', {
-      currentText: element.textContent,
-      originalText,
-      addListener
-    });
-
     let counter = 0;
     const shuffleInterval = setInterval(() => {
-      console.log('📝 Shuffle iteration:', {
-        counter,
-        currentText: element.textContent,
-        originalText
-      });
-
-      if (counter < 3) {
+      if (counter < 3) { // Izvrši shuffle 3 puta
         element.textContent = shuffleWord(originalText);
         counter++;
       } else {
-        element.textContent = originalText;
+        element.textContent = originalText; // Vrati na originalni tekst
         clearInterval(shuffleInterval);
       }
-    }, 100);
+    }, 100); // Interval između svakog shufflea (100ms)
   };
 
+  // Ako je addListener true, dodaj mouseenter event listener
+  // Ovo se koristi za obične linkove, dok se za category-row linkove poziva direktno
   if (addListener) {
     element.addEventListener('mouseenter', startEffect);
   }
 
   // Vraćamo funkciju za pokretanje efekta
+  // Ovo omogućava da se efekt može pokrenuti i programski
   return startEffect;
 }
 
