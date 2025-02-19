@@ -140,8 +140,8 @@ function initAbout() {
               stagger: 0.02,
               scrollTrigger: {
                   trigger: leftParagraph,
-                  start: "top 30%",
-                  end: "bottom 20%",
+                  start: "top 40%",
+                  end: "top 20%",
                   scrub: true,
                   markers: true,
               }
