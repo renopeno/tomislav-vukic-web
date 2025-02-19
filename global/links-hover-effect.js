@@ -12,17 +12,24 @@ function createShuffleEffect(element, addListener = true) {
   };
 
   const startEffect = () => {
-    let currentText = originalText;
-    let counter = 0;
+    // Očisti prethodni interval ako postoji
+    if (currentInterval) {
+      clearInterval(currentInterval);
+      currentInterval = null;
+      element.textContent = originalText; // Dodana linija - resetiraj tekst
+    }
 
-    const shuffleInterval = setInterval(() => {
-      if (counter < 3) {
-        currentText = shuffleWord(originalText);
-        element.textContent = currentText;
+    let counter = 0;
+    const maxShuffles = 3;
+
+    currentInterval = setInterval(() => {
+      if (counter < maxShuffles) {
+        element.textContent = shuffleWord(originalText);
         counter++;
       } else {
         element.textContent = originalText;
-        clearInterval(shuffleInterval);
+        clearInterval(currentInterval);
+        currentInterval = null;
       }
     }, 100);
   };
