@@ -6,7 +6,12 @@ function createShuffleEffect(element, addListener = true) {
     originalText: element.textContent
   });
 
-  const originalText = element.textContent;
+  // Spremi originalni tekst u data atribut ako već nije spremljen
+  if (!element.dataset.originalText) {
+    element.dataset.originalText = element.textContent;
+  }
+  
+  const originalText = element.dataset.originalText;
 
   const shuffleWord = (word) => {
     const letters = word.split('');
