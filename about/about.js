@@ -143,7 +143,7 @@ function initAbout() {
                   start: "top 40%",
                   end: "top 20%",
                   scrub: true,
-                  markers: true,
+                  markers: false,
               }
           });
       });
