@@ -139,9 +139,9 @@ function initAbout() {
               duration: 0.3,
               stagger: 0.02,
               scrollTrigger: {
-                  trigger: ".about-reveal-start",
-                  start: "top 1%",
-                  end: "bottom 1%",
+                  trigger: leftParagraph,
+                  start: "top 50%",
+                  end: "top 70%",
                   scrub: true,
                   markers: true,
               }
