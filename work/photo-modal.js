@@ -369,4 +369,9 @@ function initPhotoModal() {
     });
 }
 
-// initPhotoModal(); // Ovo mi ne treba trenutno jer ga inicijaliziram u grid.js
+// Inicijalizacija modala
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPhotoModal);
+} else {
+  initPhotoModal();
+}
