@@ -2,11 +2,6 @@ function initHighlights() {
   const highlightsSection = document.querySelector('.section.highlights');
   const highlightsWrapper = document.querySelector('.highlights-wrapper');
 
-  if (!highlightsSection || !highlightsWrapper) {
-    console.warn('Highlights elements not found.');
-    return;
-  }
-
   // Uništi sve prethodne ScrollTrigger instance
   ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
@@ -25,8 +20,6 @@ function initHighlights() {
       pin: true,
     },
   });
-
-  console.log(`✨ Highlights initialized, scroll position: ${window.scrollY}px`);
 }
 
 initHighlights();
