@@ -63,8 +63,8 @@ function initAbout() {
                   scrollTrigger: {
                       trigger: ".about-reveal-start",
                       endTrigger: ".about-reveal-end",
-                      start: "top 50%",
-                      end: "top center",
+                      start: "top top",
+                      end: "top top",
                       scrub: true,
                       markers: true,
                   }
