@@ -84,7 +84,7 @@ function initAbout() {
                       start: "top 50%",
                       end: "top center",
                       scrub: true,
-                      markers: false,
+                      markers: true,
                   }
               }
           );
@@ -98,7 +98,7 @@ function initAbout() {
                   start: "top 60%",
                   end: "top 40%",
                   scrub: true,
-                  markers: false,
+                  markers: true,
               }
           });
 
