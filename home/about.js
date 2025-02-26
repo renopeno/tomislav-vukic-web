@@ -20,24 +20,13 @@ function initAbout() {
       word.style.whiteSpace = 'nowrap';
   });
 
-  const leftParagraph = document.querySelector('[data-about-paragraph="left"]');
-  const leftText = new SplitType(leftParagraph, { 
+  const aboutParagraph = document.querySelector('.about-paragraph');
+  const paragraphText = new SplitType(aboutParagraph, { 
       types: ['words', 'chars'],
       tagName: 'span'
   });
 
-  leftText.words.forEach(word => {
-      word.style.display = 'inline-block';
-      word.style.whiteSpace = 'nowrap';
-  });
-
-  const rightParagraph = document.querySelector('[data-about-paragraph="right"]');
-  const rightText = new SplitType(rightParagraph, { 
-      types: ['words', 'chars'],
-      tagName: 'span'
-  });
-
-  rightText.words.forEach(word => {
+  paragraphText.words.forEach(word => {
       word.style.display = 'inline-block';
       word.style.whiteSpace = 'nowrap';
   });
@@ -60,13 +49,6 @@ function initAbout() {
       { 
         opacity: 1, y: 0, duration: 0.5, ease: "power1.out",
       });
-    // .fromTo(aboutBody, 
-    //   {
-    //     opacity: 0,
-    //   }, 
-    //   { 
-    //     opacity: 1, ease: "power1.out", duration: 0.3,
-    //   }, "-=0.45");
 
 
   // Scroll reveal animacija za title i paragraphove
@@ -89,32 +71,18 @@ function initAbout() {
               }
           );
 
-          gsap.fromTo(leftText.chars, { opacity: 0 }, {
+          gsap.fromTo(paragraphText.chars, { opacity: 0 }, {
               opacity: 1,
               duration: 0.3,
               stagger: 0.02,
               scrollTrigger: {
-                  trigger: leftParagraph,
+                  trigger: aboutParagraph,
                   start: "top 60%",
                   end: "top 40%",
                   scrub: true,
                   markers: true,
               }
           });
-
-          gsap.fromTo(rightText.chars, { opacity: 0 }, {
-              opacity: 1,
-              duration: 0.3,
-              stagger: 0.02,
-              scrollTrigger: {
-                  trigger: rightParagraph,
-                  start: "top 50%",
-                  end: "top 40%",
-                  scrub: true,
-                  markers: false,
-              }
-          });
-      });
 
       // Mobile animacije
       gsap.matchMedia().add("(max-width: 767px)", () => {
@@ -134,12 +102,12 @@ function initAbout() {
               }
           );
 
-          gsap.fromTo([leftText.chars, rightText.chars], { opacity: 0 }, {
+          gsap.fromTo([paragraphText.chars], { opacity: 0 }, {
               opacity: 1,
               duration: 0.3,
               stagger: 0.02,
               scrollTrigger: {
-                  trigger: leftParagraph,
+                  trigger: aboutParagraph,
                   start: "top 40%",
                   end: "top 20%",
                   scrub: true,
