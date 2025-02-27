@@ -93,7 +93,7 @@ function initAboutSection() {
   // Animiraj naslov
   titleTl.to(titleChars, {
     opacity: 1,
-    stagger: 0.02,
+    stagger: 0.015,
     ease: "power2.out"
   });
   
