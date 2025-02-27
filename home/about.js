@@ -1,124 +1,157 @@
-function initAbout() {
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOMContentLoaded event pokrenut");
+  
+  // Pričekaj malo da se sve skripte učitaju
+  setTimeout(function() {
+    initAboutSection();
+  }, 500);
+});
 
-  gsap.registerPlugin(ScrollTrigger);
-
-  const aboutTitle = document.querySelector('.about-title');
-//   const aboutBody = document.querySelector('.about-small-title');
-
-  const title = document.querySelector('.reveal-type');
-  const titleText = new SplitType(title, { 
-      types: ['words', 'chars'],
-      tagName: 'span'
-  });
-
-  if (titleText.chars && titleText.chars[0]) {
-      titleText.chars[0].style.marginLeft = '12vw';
+function initAboutSection() {
+  console.log("initAboutSection pokrenut");
+  
+  // Provjeri je li GSAP dostupan
+  if (typeof gsap === 'undefined') {
+    console.error("GSAP nije dostupan!");
+    return;
   }
-
-  titleText.words.forEach(word => {
-      word.style.display = 'inline-block';
-      word.style.whiteSpace = 'nowrap';
-  });
-
+  
+  // Provjeri je li ScrollTrigger dostupan
+  if (typeof ScrollTrigger === 'undefined') {
+    console.error("ScrollTrigger nije dostupan!");
+    return;
+  }
+  
+  console.log("GSAP i ScrollTrigger su dostupni");
+  
+  // Dohvati elemente
+  const aboutTitle = document.querySelector('.about-title');
   const aboutParagraph = document.querySelector('.about-paragraph');
-  const paragraphText = new SplitType(aboutParagraph, { 
-      types: ['words', 'chars'],
-      tagName: 'span'
-  });
-
-  paragraphText.words.forEach(word => {
-      word.style.display = 'inline-block';
-      word.style.whiteSpace = 'nowrap';
-  });
-
-
-  const timeline = gsap.timeline({
-      onComplete: () => {
-          console.log('✅ About: All reveal animations complete');
-          ScrollTrigger.refresh();
+  const aboutScroll = document.querySelector('.about-scroll');
+  
+  if (!aboutTitle || !aboutParagraph || !aboutScroll) {
+    console.error("Neki od elemenata nisu pronađeni!");
+    return;
+  }
+  
+  // Umjesto SplitType, koristit ćemo vlastitu funkciju za omotavanje slova
+  function wrapCharsInSpans(element) {
+    const text = element.textContent;
+    let html = '';
+    
+    // Omotaj svaki znak u span, ali zadrži razmake kao obične znakove
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === ' ') {
+        html += ' ';
+      } else if (text[i] === '\n') {
+        html += '<br>';
+      } else {
+        html += `<span class="char" style="opacity: 0;">${text[i]}</span>`;
       }
+    }
+    
+    element.innerHTML = html;
+    return element.querySelectorAll('.char');
+  }
+  
+  // Posebna funkcija za scroll tekst koja zadržava razmake
+  function wrapCharsInSpansWithSpaces(element) {
+    const text = element.textContent;
+    let html = '';
+    
+    // Omotaj svaki znak u span, uključujući razmake
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === ' ') {
+        html += '<span class="char space" style="opacity: 0;">&nbsp;</span>';
+      } else if (text[i] === '\n') {
+        html += '<br>';
+      } else {
+        html += `<span class="char" style="opacity: 0;">${text[i]}</span>`;
+      }
+    }
+    
+    element.innerHTML = html;
+    return element.querySelectorAll('.char');
+  }
+  
+  // Omotaj znakove u spanove
+  const titleChars = wrapCharsInSpans(aboutTitle);
+  const paragraphChars = wrapCharsInSpans(aboutParagraph);
+  const scrollChars = wrapCharsInSpansWithSpaces(aboutScroll);
+  
+  // Kreiraj timeline za naslov
+  const titleTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.about-reveal-start',
+      endTrigger: '.about-reveal-end',
+      start: "top 70%",
+      end: "top bottom",
+      scrub: 0.5
+    }
   });
-
-
-  // Intro fade in animacija za title i /about label
-  timeline
-    .fromTo(aboutTitle, 
-      {
-        opacity: 0, y: window.innerHeight / 5,
-      },
-      { 
-        opacity: 1, y: 0, duration: 0.5, ease: "power1.out",
-      });
-
-
-  // Scroll reveal animacija za title i paragraphove
-  const scrollAnimations = () => {
-      gsap.matchMedia().add("(min-width: 768px)", () => {
-          gsap.fromTo(titleText.chars, 
-              { opacity: 0.15 },
-              {
-                  opacity: 1,
-                  duration: 0.3,
-                  stagger: 0.02,
-                  scrollTrigger: {
-                      trigger: ".about-reveal-start",
-                      endTrigger: ".about-reveal-end",
-                      start: "top top",
-                      end: "top top",
-                      scrub: true,
-                      markers: true,
-                  }
-              }
-          );
-
-          gsap.fromTo(paragraphText.chars, { opacity: 0 }, {
-              opacity: 1,
-              duration: 0.3,
-              stagger: 0.02,
-              scrollTrigger: {
-                  trigger: aboutParagraph,
-                  start: "top 60%",
-                  end: "top 40%",
-                  scrub: true,
-                  markers: true,
-              }
-          });
-
-      // Mobile animacije
-      gsap.matchMedia().add("(max-width: 767px)", () => {
-          gsap.fromTo(titleText.chars, 
-              { opacity: 0.15 },
-              {
-                  opacity: 1,
-                  duration: 0.3,
-                  stagger: 0.02,
-                  scrollTrigger: {
-                      trigger: ".about-reveal-start",
-                      start: "top 40%",
-                      end: "bottom 30%",
-                      scrub: true,
-                      markers: false,
-                  }
-              }
-          );
-
-          gsap.fromTo([paragraphText.chars], { opacity: 0 }, {
-              opacity: 1,
-              duration: 0.3,
-              stagger: 0.02,
-              scrollTrigger: {
-                  trigger: aboutParagraph,
-                  start: "top 40%",
-                  end: "top 20%",
-                  scrub: true,
-                  markers: false,
-              }
-          });
-      });
-  };
-
-  scrollAnimations();
-
-  console.log(`ℹ️ About initialized, scroll position: ${window.scrollY}px`);
+  
+  // Animiraj naslov
+  titleTl.to(titleChars, {
+    opacity: 1,
+    stagger: 0.02,
+    ease: "power2.out"
+  });
+  
+  // Kreiraj timeline za paragraf
+  const paragraphTl = gsap.timeline({
+    scrollTrigger: {
+        trigger: '.about-title',
+        endTrigger: '.about-reveal-end',
+        start: "center 60%",
+        end: "top 40%",
+        scrub: 0.5,
+        markers: false
+    }
+  });
+  
+  // Animiraj paragraf
+  paragraphTl.to(paragraphChars, {
+    opacity: 1,
+    stagger: 0.01,
+    ease: "power2.out"
+  });
+  
+  // Kreiraj timeline za scroll tekst
+  const scrollTl = gsap.timeline({
+    scrollTrigger: {
+        trigger: '.about-paragraph',
+        endTrigger: '.about-reveal-end',
+        start: "center 70%",
+        end: "top 40%",
+        scrub: 0.5,
+        markers: false
+    }
+  });
+  
+  // Animiraj scroll tekst
+  scrollTl.to(scrollChars, {
+    opacity: 1,
+    stagger: 0.015,
+    ease: "power2.out"
+  });
+  
+  console.log("ScrollTriggeri kreirani za About sekciju");
 }
-initAbout();
+
+// Dodatno osvježi ScrollTrigger nakon učitavanja stranice
+window.addEventListener('load', function() {
+  console.log("Window load event");
+  setTimeout(function() {
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.refresh();
+      console.log("ScrollTrigger osvježen nakon učitavanja stranice");
+    }
+  }, 1000);
+});
+
+// Inicijaliziraj sekciju nakon učitavanja DOM-a
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAboutSection);
+} else {
+  initAboutSection();
+}
