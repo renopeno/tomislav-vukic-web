@@ -123,7 +123,7 @@ function initHero() {
 
   // Parallax stack photos - poboljšana verzija
   window.addEventListener("mousemove", (event) => {
-      const parallaxFactor = 20; // Smanjeno s 32 na 20 za suptilniji efekt
+      const parallaxFactor = 24; // Smanjeno s 32 na 20 za suptilniji efekt
 
       const { clientX, clientY } = event;
       const centerX = window.innerWidth / 2;
@@ -135,7 +135,7 @@ function initHero() {
       heroImage.forEach((image, index) => {
           // Povećava fleksibilnost za 20% sa svakom fotografijom (smanjeno s 40%)
           const baseDepth = 1;
-          const depthMultiplier = 1 + index * 0.2;
+          const depthMultiplier = 1 + index * 0.3;
           const depth = baseDepth * depthMultiplier;
 
           // Koristi originalnu poziciju iz lepeze kao bazu
