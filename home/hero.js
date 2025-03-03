@@ -1,11 +1,9 @@
 function initHero() {
   let imagesLoaded = 0;
 
-  const heroImage = document.querySelectorAll(".hero-images-container > *");
   const heroTitle = document.querySelector(".hero-title");
   const navbarItems = document.querySelectorAll(".grid-navbar > *");
   const heroFooters = document.querySelectorAll(".hero-footer");
-  const preloader = document.querySelector(".preloader");
   const heroImageContainer = document.querySelector(".hero-images-container");
   let heroImages = Array.from(document.querySelectorAll(".hero-image"));
 
@@ -14,19 +12,26 @@ function initHero() {
       gsap.set(navbarItems, { y: -20, opacity: 0 });
   }
 
-  heroImages.forEach((img) => {
-      heroImageContainer.appendChild(img);
-  });
-
-  heroImages = Array.from(document.querySelectorAll(".hero-image"));
-
   function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [array[i], array[j]] = [array[j], array[i]];
       }
   }
+  
+  // Prvo shufflaj array
   shuffleArray(heroImages);
+  
+  // Zatim očisti container
+  heroImageContainer.innerHTML = '';
+  
+  // Dodaj shufflane slike u container
+  heroImages.forEach((img) => {
+      heroImageContainer.appendChild(img);
+  });
+  
+  // Ponovno dohvati slike nakon što su dodane u DOM
+  const heroImage = document.querySelectorAll(".hero-images-container > *");
 
   heroImage.forEach((img) => {
       const imgElement = new Image();
@@ -115,7 +120,6 @@ function initHero() {
         });
     });
   
-  console.log(`🦸‍♂️ Hero initialized, scroll position: ${window.scrollY}px`);
 }
 
 initHero();
