@@ -57,7 +57,13 @@ function initHero() {
 
   const characters = heroTitle ? heroTitle.querySelectorAll("span") : [];
 
-  gsap.set(heroImage, { y: window.innerHeight, scale: 0, rotation: 0 });
+  // Postavi početne pozicije za lepezu
+  gsap.set(heroImage, { 
+      x: -100, // Sve slike počinju lijevo
+      y: window.innerHeight, 
+      scale: 0, 
+      rotation: -30 // Početna rotacija za lepezu
+  });
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 500 });
 
@@ -84,13 +90,25 @@ function initHero() {
           .to(
               heroImage,
               {
-                  x: () => Math.random() * 150 - 75,
+                  x: (index, target) => {
+                      // Rasporedi slike u lepezu s lijeva na desno
+                      const totalImages = heroImage.length;
+                      const spread = window.innerWidth * 0.6; // Širina lepeze
+                      const position = (index / (totalImages - 1)) * spread - spread/2;
+                      return position;
+                  },
                   y: 0,
-                  rotation: () => Math.random() * 40 - 20,
+                  rotation: (index) => {
+                      // Rotacija za efekt lepeze
+                      const totalImages = heroImage.length;
+                      const startAngle = -30;
+                      const endAngle = 30;
+                      return startAngle + (index / (totalImages - 1)) * (endAngle - startAngle);
+                  },
                   scale: 1,
-                  duration: 0.8,
+                  duration: 1.2,
                   ease: "power2.out",
-                  stagger: 0.2,
+                  stagger: 0.1,
               },
               "-=0.5"
           );
@@ -116,7 +134,7 @@ function initHero() {
             const moveX = offsetX * parallaxFactor * depth;
             const moveY = offsetY * parallaxFactor * depth;
 
-            gsap.to(image, { x: moveX, y: moveY, duration: 0.4, ease: "power1.out" });
+            gsap.to(image, { x: moveX + image._gsap.x, y: moveY, duration: 0.4, ease: "power1.out" });
         });
     });
   
