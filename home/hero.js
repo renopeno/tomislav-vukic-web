@@ -67,6 +67,9 @@ function initHero() {
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 500 });
 
+  // Pohrani originalne pozicije slika za parallax
+  const imagePositions = [];
+
   function startAnimation() {
       const timeline = gsap.timeline();
 
@@ -93,16 +96,20 @@ function initHero() {
                   x: (index, target) => {
                       // Rasporedi slike u lepezu s lijeva na desno
                       const totalImages = heroImage.length;
-                      const spread = window.innerWidth * 0.6; // Širina lepeze
+                      const spread = window.innerWidth * 0.5; // Širina lepeze
                       const position = (index / (totalImages - 1)) * spread - spread/2;
+                      
+                      // Pohrani originalnu poziciju za parallax
+                      imagePositions[index] = position;
+                      
                       return position;
                   },
                   y: 0,
                   rotation: (index) => {
-                      // Rotacija za efekt lepeze
+                      // Rotacija za efekt lepeze - manja rotacija za ljepši efekt
                       const totalImages = heroImage.length;
-                      const startAngle = -30;
-                      const endAngle = 30;
+                      const startAngle = -15; // Smanjeno s -30 na -15
+                      const endAngle = 15;   // Smanjeno s 30 na 15
                       return startAngle + (index / (totalImages - 1)) * (endAngle - startAngle);
                   },
                   scale: 1,
@@ -114,30 +121,38 @@ function initHero() {
           );
   }
 
-    // Parallax stack photos
-    window.addEventListener("mousemove", (event) => {
-        const parallaxFactor = 32;
+  // Parallax stack photos - poboljšana verzija
+  window.addEventListener("mousemove", (event) => {
+      const parallaxFactor = 20; // Smanjeno s 32 na 20 za suptilniji efekt
 
-        const { clientX, clientY } = event;
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
+      const { clientX, clientY } = event;
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
 
-        const offsetX = (clientX - centerX) / centerX;
-        const offsetY = (clientY - centerY) / centerY;
+      const offsetX = (clientX - centerX) / centerX;
+      const offsetY = (clientY - centerY) / centerY;
 
-        heroImage.forEach((image, index) => {
-            // Povećava fleksibilnost za 40% sa svakom fotografijom
-            const baseDepth = 1; // Najdonja fotografija
-            const depthMultiplier = 1 + index * 0.4; // Svaka sljedeća fotografija povećava fleksibilnost za 30%
-            const depth = baseDepth + index * depthMultiplier;
+      heroImage.forEach((image, index) => {
+          // Povećava fleksibilnost za 20% sa svakom fotografijom (smanjeno s 40%)
+          const baseDepth = 1;
+          const depthMultiplier = 1 + index * 0.2;
+          const depth = baseDepth * depthMultiplier;
 
-            const moveX = offsetX * parallaxFactor * depth;
-            const moveY = offsetY * parallaxFactor * depth;
+          // Koristi originalnu poziciju iz lepeze kao bazu
+          const baseX = imagePositions[index] || 0;
+          
+          // Dodaj parallax efekt na originalnu poziciju
+          const moveX = offsetX * parallaxFactor * depth;
+          const moveY = offsetY * parallaxFactor * depth;
 
-            gsap.to(image, { x: moveX + image._gsap.x, y: moveY, duration: 0.4, ease: "power1.out" });
-        });
-    });
-  
+          gsap.to(image, { 
+              x: baseX + moveX, 
+              y: moveY, 
+              duration: 0.4, 
+              ease: "power1.out" 
+          });
+      });
+  });
 }
 
 initHero();
