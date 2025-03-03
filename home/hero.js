@@ -94,9 +94,9 @@ function initHero() {
               heroImage,
               {
                   x: (index, target) => {
-                      // Rasporedi slike u lepezu s lijeva na desno
+                      // Rasporedi slike u užu lepezu s lijeva na desno
                       const totalImages = heroImage.length;
-                      const spread = window.innerWidth * 0.5; // Širina lepeze
+                      const spread = window.innerWidth * 0.25; // Smanjena širina lepeze (bila 0.5)
                       const position = (index / (totalImages - 1)) * spread - spread/2;
                       
                       // Pohrani originalnu poziciju za parallax
@@ -104,12 +104,21 @@ function initHero() {
                       
                       return position;
                   },
-                  y: 0,
+                  y: (index) => {
+                      // Dodaj luk - slike u sredini su više podignute
+                      const totalImages = heroImage.length;
+                      const normalizedIndex = index / (totalImages - 1); // 0 do 1
+                      const arcHeight = -30; // Visina luka (negativna vrijednost za podizanje)
+                      
+                      // Parabola za luk: y = a * (x - 0.5)^2 + b
+                      // Gdje je a = 4 * arcHeight, b = arcHeight
+                      return 4 * arcHeight * Math.pow(normalizedIndex - 0.5, 2) + arcHeight;
+                  },
                   rotation: (index) => {
                       // Rotacija za efekt lepeze - manja rotacija za ljepši efekt
                       const totalImages = heroImage.length;
-                      const startAngle = -15; // Smanjeno s -30 na -15
-                      const endAngle = 15;   // Smanjeno s 30 na 15
+                      const startAngle = -25; // Povećano za bolji efekt lepeze
+                      const endAngle = 25;   // Povećano za bolji efekt lepeze
                       return startAngle + (index / (totalImages - 1)) * (endAngle - startAngle);
                   },
                   scale: 1,
