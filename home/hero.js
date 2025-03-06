@@ -354,16 +354,6 @@ function initHero() {
   `;
   document.head.appendChild(style);
 
-  // Dodaj emergency button za reset scroll
-  setTimeout(() => {
-    // Samo za dev/debug
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'RESET SCROLL';
-    resetButton.style = 'position:fixed;z-index:9999;bottom:10px;right:10px;padding:10px;';
-    resetButton.onclick = window.resetScrollState;
-    document.body.appendChild(resetButton);
-  }, 2000);
-
   // Parallax stack photos - poboljšana verzija
   window.addEventListener("mousemove", (event) => {
     // Provjeri je li animacija završena prije nego što primijeniš parallax
@@ -408,7 +398,7 @@ window.addEventListener('load', () => {
       console.warn('⚠️ Forcing scroll enable');
       enableScroll();
     }
-  }, 5000); // 5 sekundi timeout kao sigurnosna mreža
+  }, 3000); // 5 sekundi timeout kao sigurnosna mreža
 });
 
 console.log('⚡ Script loaded, initializing hero');
