@@ -1,22 +1,4 @@
-// Globalni state
-window.scrollEnabled = true;
-
-// Jednostavni preventDefault
-const preventDefault = (e) => {
-  if (!window.scrollEnabled) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }
-};
-
-// Dodaj globalnu zastavicu za loader stanje
-window.loaderActive = false;
-
 function initHero() {
-  console.log('🚀 initHero started');
-  
-  let imagesLoaded = 0;
 
   const heroTitle = document.querySelector(".hero-title");
   const navbarItems = document.querySelectorAll(".grid-navbar > *");
@@ -34,17 +16,14 @@ function initHero() {
     navigationType: window.performance?.getEntriesByType('navigation')[0]?.type 
   });
 
+
   // Jednostavni scroll prevention
   if (shouldShowLoader) {
-    console.log('🔒 Disabling scroll');
-    window.scrollEnabled = false;
-    
+
+    document.body.classList.add('loader-active');
     document.documentElement.classList.add('loader-active');
-    
-    // Dodaj event listenere na ključne scroll događaje
-    ['wheel', 'touchmove'].forEach(event => {
-      window.addEventListener(event, preventDefault, { passive: false });
-    });
+    document.body.classList.remove('loader-inactive');
+    document.documentElement.classList.remove('loader-inactive');
 
     // Zaustavi Lenis ako postoji
     if (window.lenis) window.lenis.stop();
@@ -78,7 +57,7 @@ function initHero() {
   gsap.set(heroImageContainer, {
     position: "relative",
     width: "100%",
-    height: "100vh", // Koristi viewport height za punu visinu
+    height: "100%", // Koristi viewport height za punu visinu
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -134,7 +113,6 @@ function initHero() {
       objectFit: computedStyle.objectFit,
       maxWidth: computedStyle.maxWidth,
       maxHeight: computedStyle.maxHeight,
-      // Ne spremamo left i top jer ih ne želimo koristiti
       transform: computedStyle.transform
     });
   });
@@ -291,17 +269,15 @@ function initHero() {
     console.log('🔓 Enabling scroll');
     
     // 1. Postavi varijablu za kontrolu
-    window.scrollEnabled = true;
+    // window.scrollEnabled = true;
     
     // 2. Makni CSS klasu
+    document.body.classList.remove('loader-active');
     document.documentElement.classList.remove('loader-active');
+    document.body.classList.add('loader-inactive');
+    document.documentElement.classList.add('loader-inactive');
     
-    // 3. Makni event listenere
-    ['wheel', 'touchmove'].forEach(event => {
-      window.removeEventListener(event, preventDefault, { passive: false });
-    });
-    
-    // 4. Pokreni Lenis - ali ne diramo mu inicijalizaciju
+    // 3. Pokreni Lenis
     if (window.lenis) {
       try {
         window.lenis.start();
@@ -310,49 +286,10 @@ function initHero() {
       }
     }
     
-    // 5. Spremi u session
+    // 4. Spremi u session
     sessionStorage.setItem("loaderShown", "true");
   }
 
-  // Dodaj hack za direktno resetiranje
-  window.resetScrollState = function() {
-    document.body.style.overflow = '';
-    document.body.style.height = '';
-    document.body.style.position = '';
-    document.documentElement.style.overflow = '';
-    document.documentElement.style.height = '';
-    document.documentElement.style.position = '';
-    window.scrollEnabled = true;
-    
-    if (window.lenis) {
-      try {
-        window.lenis.start();
-      } catch (e) {
-        console.error("Lenis error:", e);
-      }
-    }
-    
-    // Makni sve event listenere
-    ['scroll', 'wheel', 'touchmove'].forEach(event => {
-      window.removeEventListener(event, preventDefault, { passive: false });
-      document.removeEventListener(event, preventDefault, { passive: false });
-    });
-    
-    console.log("🛠️ Scroll state manually reset");
-  };
-
-  // Pojednostavljeni CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    html.loader-active {
-      overflow: hidden;
-    }
-    
-    html.loader-active body {
-      overflow: hidden;
-    }
-  `;
-  document.head.appendChild(style);
 
   // Parallax stack photos - poboljšana verzija
   window.addEventListener("mousemove", (event) => {
@@ -391,15 +328,4 @@ function initHero() {
   });
 }
 
-// Dodaj cleanup funkciju
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if (!window.scrollEnabled) {
-      console.warn('⚠️ Forcing scroll enable');
-      enableScroll();
-    }
-  }, 3000); // 5 sekundi timeout kao sigurnosna mreža
-});
-
-console.log('⚡ Script loaded, initializing hero');
 initHero();

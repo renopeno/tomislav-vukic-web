@@ -1,0 +1,9 @@
+.loader-active {
+    overflow: hidden;
+    height: 100%;
+}
+
+.loader-inactive {
+    overflow: auto;
+    height: auto;
+}
