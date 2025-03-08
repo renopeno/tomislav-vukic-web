@@ -6,64 +6,50 @@ document.addEventListener('DOMContentLoaded', function() {
     const aboutParagraph = document.querySelector('.about-paragraph');
     const aboutScroll = document.querySelector('.about-scroll');
     
-    // Umjesto SplitType, koristit ćemo vlastitu funkciju za omotavanje slova
-    function wrapCharsInSpans(element) {
-      const text = element.textContent;
-      let html = '';
-      
-      // Omotaj svaki znak u span, ali zadrži razmake kao obične znakove
-      for (let i = 0; i < text.length; i++) {
-        if (text[i] === ' ') {
-          html += ' ';
-        } else if (text[i] === '\n') {
-          html += '<br>';
-        } else {
-          html += `<span class="char" style="opacity: 0;">${text[i]}</span>`;
-        }
-      }
-      
-      element.innerHTML = html;
-      return element.querySelectorAll('.char');
-    }
+    // Koristi SplitType za podjelu teksta na riječi, s tagName: 'span' opcijom
+    const titleSplit = new SplitType(aboutTitle, { 
+      types: 'words',
+      tagName: 'span'  // Koristi span umjesto div
+    });
     
-    // Posebna funkcija za scroll tekst koja zadržava razmake
-    function wrapCharsInSpansWithSpaces(element) {
-      const text = element.textContent;
-      let html = '';
-      
-      // Omotaj svaki znak u span, uključujući razmake
-      for (let i = 0; i < text.length; i++) {
-        if (text[i] === ' ') {
-          html += '<span class="char space" style="opacity: 0;">&nbsp;</span>';
-        } else if (text[i] === '\n') {
-          html += '<br>';
-        } else {
-          html += `<span class="char" style="opacity: 0;">${text[i]}</span>`;
-        }
-      }
-      
-      element.innerHTML = html;
-      return element.querySelectorAll('.char');
-    }
+    const paragraphSplit = new SplitType(aboutParagraph, { 
+      types: 'words',
+      tagName: 'span'  // Koristi span umjesto div
+    });
     
-    // Omotaj znakove u spanove
-    const titleChars = wrapCharsInSpans(aboutTitle);
-    const paragraphChars = wrapCharsInSpans(aboutParagraph);
-    const scrollChars = wrapCharsInSpansWithSpaces(aboutScroll);
+    const scrollSplit = new SplitType(aboutScroll, { 
+      types: 'words',
+      tagName: 'span'  // Koristi span umjesto div
+    });
+    
+    // Dodaj CSS koji postavlja riječi kao inline elemente
+    const style = document.createElement('style');
+    style.textContent = `
+      .word {
+        display: inline !important;
+        position: relative;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Postavi početnu vidljivost riječi na 0
+    gsap.set(titleSplit.words, { opacity: 0 });
+    gsap.set(paragraphSplit.words, { opacity: 0 });
+    gsap.set(scrollSplit.words, { opacity: 0 });
     
     // Kreiraj timeline za naslov
     const titleTl = gsap.timeline({
       scrollTrigger: {
         trigger: '.about-reveal-start',
         endTrigger: '.about-reveal-end',
-        start: "top 70%",
-        end: "top bottom",
+        start: "top 100%",
+        end: "top 20%",
         scrub: 0.5
       }
     });
     
     // Animiraj naslov
-    titleTl.to(titleChars, {
+    titleTl.to(titleSplit.words, {
       opacity: 1,
       stagger: 0.015,
       ease: "power2.out"
@@ -72,17 +58,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kreiraj timeline za paragraf
     const paragraphTl = gsap.timeline({
       scrollTrigger: {
-          trigger: '.about-title',
-          endTrigger: '.about-reveal-end',
-          start: "center 60%",
-          end: "top 40%",
+          trigger: '.about-paragraph',
+          endTrigger: '.about-paragraph',
+          start: "top 70%",
+          end: "top 30%",
           scrub: 0.5,
           markers: false
       }
     });
     
     // Animiraj paragraf
-    paragraphTl.to(paragraphChars, {
+    paragraphTl.to(paragraphSplit.words, {
       opacity: 1,
       stagger: 0.01,
       ease: "power2.out"
@@ -101,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Animiraj scroll tekst
-    scrollTl.to(scrollChars, {
+    scrollTl.to(scrollSplit.words, {
       opacity: 1,
       stagger: 0.015,
       ease: "power2.out"
