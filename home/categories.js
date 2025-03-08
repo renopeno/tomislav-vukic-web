@@ -1,22 +1,12 @@
 function initCategories() {
-  // Dohvati sve category retke iz DOM-a
-  const categories = document.querySelectorAll('.categories-row');
 
-  // Ukloni sve postojeće event listenere tako da kloniramo i zamijenimo elemente
-  // Ovo je potrebno kako bi se izbjegli dupli event listeneri kod Barba.js tranzicija
-  // categories.forEach((category) => {
-  //   const newCategory = category.cloneNode(true);
-  //   category.replaceWith(newCategory);
-  // });
+  const categoriesRow = document.querySelectorAll('.categories-row');
 
-  // Dohvati svježe reference na zamijenjene elemente
-  const updatedCategories = document.querySelectorAll('.categories-row');
-
-  updatedCategories.forEach((category) => {
+  categoriesRow.forEach((category) => {
     // Hover IN - Što se događa kad miš uđe u kategoriju
     category.addEventListener('mouseenter', () => {
       // Smanji opacity svih kategorija osim trenutne
-      gsap.to(updatedCategories, {
+      gsap.to(categoriesRow, {
         opacity: 0.1,
         duration: 0.3,
         ease: 'power2.out',
@@ -30,7 +20,7 @@ function initCategories() {
       });
 
       // Sakrij slike svih ostalih kategorija
-      updatedCategories.forEach((cat) => {
+      categoriesRow.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         if (cat !== category) {
           gsap.to(image, {
@@ -66,17 +56,16 @@ function initCategories() {
       if (ctaElement) createShuffleEffect(ctaElement, false)();
     });
 
-    // Hover OUT - Što se događa kad miš izađe iz kategorije
+    // Mouse leave
     category.addEventListener('mouseleave', () => {
-      // Vrati opacity svim kategorijama na 1
-      gsap.to(updatedCategories, {
+      gsap.to(categoriesRow, {
         opacity: 1,
         duration: 0.3,
         ease: 'power1.out',
       });
 
       // Sakrij sve slike i resetiraj njihovu visinu
-      updatedCategories.forEach((cat) => {
+      categoriesRow.forEach((cat) => {
         const image = cat.querySelector('.categories-photo');
         gsap.to(image, {
           opacity: 0,
@@ -98,5 +87,4 @@ function initCategories() {
 
 }
 
-// Pokreni inicijalizaciju kategorija
 initCategories();
