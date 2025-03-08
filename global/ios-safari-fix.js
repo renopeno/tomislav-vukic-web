@@ -11,6 +11,19 @@ function isIosSafari() {
 function removeHoverIosSafari() {
   if (!isIosSafari()) return;
   
+  // Tap effect za linkove i gumbe
+    document.body.addEventListener("click", function (event) {
+        const target = event.target.closest("a, button"); // Ciljamo linkove i gumbe
+        if (target) {
+            target.style.transition = "opacity 0.2s ease-out";
+            target.style.opacity = "0.5";
+            
+            setTimeout(() => {
+                target.style.opacity = "1";
+            }, 300); // Vraća opacity nakon 300ms
+        }
+    });
+
   // Tagovi od interesa: Obrađuj samo određene interaktivne elemente
   function shouldPrevent(target) {
     var tagName = target.tagName.toLowerCase();
