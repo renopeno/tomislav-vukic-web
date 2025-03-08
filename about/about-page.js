@@ -5,12 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Dohvati elemente koje želimo animirati
   const title = document.querySelector('.about-page-title');
   const paragraph = document.querySelector('.about-page-paragraph');
+  const mobileImage = document.querySelector('.about-page-mobile-img');
   
   // Provjeri postoje li elementi na stranici
   if (!title && !paragraph) return;
   
   // Postavi početno stanje - sakrij elemente
-  gsap.set([title, paragraph], { 
+  gsap.set([mobileImage, title, paragraph], { 
     opacity: 0,
     y: 50,
     scale: 0.9
@@ -27,6 +28,15 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Dodaj animacije u timeline
+  if (mobileImage) {
+  tl.to(mobileImage, {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    duration: 0.8,
+      ease: "power2.out",
+    })
+  }
   tl.to(title, {
     opacity: 1,
     y: 0,
