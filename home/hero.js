@@ -82,7 +82,7 @@ function initHero() {
   const imagePositions = [];
   
   // Postavi slike direktno bez wrappera
-  heroImage.forEach((img, index) => {
+  heroImage.forEach((img) => {
     // Postavi stil direktno na sliku
     img.style.position = 'absolute';
     img.style.objectFit = 'cover';
@@ -98,7 +98,7 @@ function initHero() {
   });
   
   gsap.set(heroFooters, { y: 20, opacity: 0 });
-  gsap.set(characters, { y: 50, opacity: 0 });
+  gsap.set(characters, { y: 200, opacity: 0 });
 
   // Zastavica za praćenje stanja animacije
   let animationComplete = false;
@@ -140,8 +140,8 @@ function initHero() {
     mainTimeline.to(characters, {
       y: 0,
       opacity: 1,
-      duration: 0.5,
-      stagger: 0.03,
+      duration: 0.3,
+      stagger: 0.05,
       ease: "power3.out"
     }, "-=0.6"); // Počni ranije
 
