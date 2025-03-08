@@ -53,3 +53,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+function initAboutPage() {
+  // Dohvati about sekciju
+  const aboutSection = document.querySelector('.section.about');
+  
+  // Provjeri postoji li sekcija
+  if (!aboutSection) return;
+  
+  // Kreiraj pin za about sekciju
+  ScrollTrigger.create({
+    trigger: aboutSection,
+    start: "top top", // počni kad vrh sekcije dotakne vrh viewporta
+    end: "bottom bottom", // završi kad dno sekcije dotakne dno viewporta
+    pin: true,
+    pinSpacing: true, // zadržava prostor u layoutu
+    anticipatePin: 1, // poboljšava performanse
+    markers: false, // postavi na true za debug
+    id: "about-section-pin"
+  });
+  
+  // Osvježi ScrollTrigger kada se prozor promijeni
+  window.addEventListener('resize', () => {
+    ScrollTrigger.refresh();
+  });
+}
+
+// Pokreni inicijalizaciju kada je DOM učitan
+document.addEventListener('DOMContentLoaded', initAboutPage);
