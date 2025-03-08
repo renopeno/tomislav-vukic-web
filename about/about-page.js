@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     duration: 0.8,
     ease: "power2.out",
     stagger: 0.1
-  })
+  }, "-=0.8")
   .to(paragraph, {
     opacity: 1,
     y: 0,
