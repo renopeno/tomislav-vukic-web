@@ -17,7 +17,7 @@ function initHighlights() {
       start: "top top",
       end: `+=${totalWidth}`,
       scrub: true,
-      pin: false,
+      pin: true,
     },
   });
 }
