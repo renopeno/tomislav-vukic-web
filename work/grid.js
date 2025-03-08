@@ -89,12 +89,12 @@ function initGrid() {
       window.isSettingUpGrid = false;
     }
 
-    // // Inicijaliziraj modal PRIJE GSAP animacija
-    // if (typeof initPhotoModal === "function") {
-    //   initPhotoModal();
-    // }
+    // Inicijaliziraj modal PRIJE GSAP animacija
+    if (typeof initPhotoModal === "function") {
+      initPhotoModal();
+    }
 
-    // Tranzicija za ulazak fotki u view
+    // Tranzicija za ulazak fotki u view (ne blokira interaktivnost)
     gsap.fromTo(
       window.shuffledPhotos,
       { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
