@@ -89,10 +89,10 @@ function initGrid() {
       window.isSettingUpGrid = false;
     }
 
-    // // Inicijaliziraj modal PRIJE GSAP animacija
-    // if (typeof initPhotoModal === "function") {
-    //   initPhotoModal();
-    // }
+    // Inicijaliziraj modal NAKON što je grid postavljen
+    if (typeof initPhotoModal === "function") {
+      initPhotoModal();
+    }
 
     // Tranzicija za ulazak fotki u view
     gsap.fromTo(

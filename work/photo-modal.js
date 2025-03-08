@@ -1,4 +1,11 @@
 function initPhotoModal() {
+    // Ako nema shuffledPhotos, izađi i pokušaj kasnije
+    if (!window.shuffledPhotos || window.shuffledPhotos.length === 0) {
+        console.log("Photo modal: čekam da se grid inicijalizira...");
+        setTimeout(initPhotoModal, 100); // Pokušaj ponovno za 100ms
+        return;
+    }
+
     const modal = document.querySelector(".modal-photo");
     const modalImageContainer = modal.querySelector(".modal-photo-container");
     const modalTitle = modal.querySelector(".modal-title");
@@ -27,6 +34,8 @@ function initPhotoModal() {
     gridPhotos.forEach((photo, index) => {
         // Pronađi pripadajući container iz shuffledPhotos array-a
         const container = window.shuffledPhotos.find(container => container.querySelector('.photo') === photo);
+        if (!container) return; // Preskoči ako ne možemo naći container
+        
         const actualIndex = window.shuffledPhotos.indexOf(container);
 
         // Spremi referencu na originalni container direktno u DOM elementu
