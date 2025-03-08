@@ -55,6 +55,11 @@ function createShuffleEffect(element, addListener = true) {
 
   // Glavna funkcija koja pokreće shuffle animaciju
   const startEffect = () => {
+    // Ne pokreći animaciju na dodirnim uređajima
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      return;
+    }
+    
     // Ako je animacija već u tijeku, ne pokreći novu
     if (isAnimating) return;
     
@@ -81,8 +86,13 @@ function createShuffleEffect(element, addListener = true) {
 
   // Dodaj event listenere
   if (addListener) {
-    // Mouseenter za pokretanje efekta
-    element.addEventListener('mouseenter', startEffect);
+    // Provjeri je li uređaj dodirni
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (!isTouchDevice) {
+      // Mouseenter za pokretanje efekta samo na ne-dodirnim uređajima
+      element.addEventListener('mouseenter', startEffect);
+    }
     
     // Click za zaustavljanje animacije i osiguravanje da link radi
     element.addEventListener('click', function(e) {
@@ -90,17 +100,7 @@ function createShuffleEffect(element, addListener = true) {
       stopAnimation();
       
       // Ne sprječavaj defaultnu akciju - link će raditi normalno
-      // Dodaj mali timeout da se osigura da je animacija zaustavljena prije klika
-      setTimeout(() => {
-        // Ništa ne radimo ovdje, samo osiguravamo da je animacija zaustavljena
-      }, 10);
     });
-    
-    // Touchstart za mobilne uređaje
-    element.addEventListener('touchstart', function(e) {
-      // Zaustavi animaciju ako je u tijeku
-      stopAnimation();
-    }, { passive: true });
   }
 
   // Vraćamo funkciju za pokretanje efekta
