@@ -2,17 +2,12 @@ function initCategories() {
   // Dohvati sve category retke iz DOM-a
   const categories = document.querySelectorAll('.categories-row');
 
-  if (!categories.length) {
-    console.warn('Categories elements not found.');
-    return;
-  }
-
   // Ukloni sve postojeće event listenere tako da kloniramo i zamijenimo elemente
   // Ovo je potrebno kako bi se izbjegli dupli event listeneri kod Barba.js tranzicija
-  categories.forEach((category) => {
-    const newCategory = category.cloneNode(true);
-    category.replaceWith(newCategory);
-  });
+  // categories.forEach((category) => {
+  //   const newCategory = category.cloneNode(true);
+  //   category.replaceWith(newCategory);
+  // });
 
   // Dohvati svježe reference na zamijenjene elemente
   const updatedCategories = document.querySelectorAll('.categories-row');
