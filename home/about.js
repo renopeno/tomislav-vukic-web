@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   
-  function initAboutSection() {      
+  function initAboutSection() {
     // Dohvati elemente
     const aboutTitle = document.querySelector('.about-title');
     const aboutParagraph = document.querySelector('.about-paragraph');
@@ -107,6 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
       ease: "power2.out"
     });
   }
+  
+  initAboutSection();
 }
 // // Dodatno osvježi ScrollTrigger nakon učitavanja stranice
 // window.addEventListener('load', function() {
@@ -124,4 +126,3 @@ document.addEventListener('DOMContentLoaded', function() {
 //   initAboutSection();
 // }
 
-initAboutSection();
