@@ -3,7 +3,7 @@ function initCategories() {
   const categoriesRow = document.querySelectorAll('.categories-row');
 
   categoriesRow.forEach((category) => {
-    // Hover IN - Što se događa kad miš uđe u kategoriju
+    // Mouse enter
     category.addEventListener('mouseenter', () => {
       // Smanji opacity svih kategorija osim trenutne
       gsap.to(categoriesRow, {
