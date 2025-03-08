@@ -107,9 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
       ease: "power2.out"
     });
   }
-  
+
   initAboutSection();
-}
+})
 // // Dodatno osvježi ScrollTrigger nakon učitavanja stranice
 // window.addEventListener('load', function() {
 //   setTimeout(function() {
