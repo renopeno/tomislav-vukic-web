@@ -1,7 +1,7 @@
 function initHero() {
 
   const heroTitle = document.querySelector(".hero-title");
-  const navbarItems = document.querySelectorAll(".grid-navbar > *");
+  // const navbarItems = document.querySelectorAll(".grid-navbar > *");
   const heroFooters = document.querySelectorAll(".hero-footer");
   const heroImageContainer = document.querySelector(".hero-images-container");
   let heroImages = Array.from(document.querySelectorAll(".hero-image"));
@@ -30,7 +30,7 @@ function initHero() {
   }
 
   // Uklanjamo navAnimation check jer se navbar uvijek animira nakon loadera
-  gsap.set(navbarItems, { y: -20, opacity: 0 });
+  // gsap.set(navbarItems, { y: -20, opacity: 0 });
 
   function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -150,7 +150,7 @@ function initHero() {
   
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 50, opacity: 0 });
-  gsap.set(navbarItems, { y: -20, opacity: 0 });
+  // gsap.set(navbarItems, { y: -20, opacity: 0 });
 
   // Zastavica za praćenje stanja animacije
   let animationComplete = false;
@@ -256,13 +256,14 @@ function initHero() {
       ease: "power3.out"
     }, "-=0.8"); // Počni u isto vrijeme kad i tekst
 
-    mainTimeline.to(navbarItems, {
-      y: 0,
-      opacity: 1,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: "power3.out"
-    }, "-=0.8");
+    // Za sada ne želimo animirati navbar
+    // mainTimeline.to(navbarItems, {
+    //   y: 0,
+    //   opacity: 1,
+    //   duration: 0.4,
+    //   stagger: 0.1,
+    //   ease: "power3.out"
+    // }, "-=0.8");
   }
 
   function enableScroll() { 
