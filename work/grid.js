@@ -5,8 +5,16 @@ function initGrid() {
   
   try {
     const MAX_PHOTOS = 30;
-    const INITIAL_PHOTOS = 7; // Inicijalno prikazujemo samo 7 fotografija
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
+    
+    // Dodaj lazy loading atribute svim fotografijama
+    allPhotoContainers.forEach(container => {
+      const photo = container.querySelector(".photo");
+      if (photo) {
+        photo.setAttribute("loading", "lazy");
+        photo.setAttribute("decoding", "async");
+      }
+    });
     
     // Resetiraj sve postavke
     allPhotoContainers.forEach(container => {
@@ -30,6 +38,7 @@ function initGrid() {
       window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
       window.lastPath = window.location.pathname;
     }
+
 
     // Grid konfiguracija po uređajima
     const gridConfig = {
@@ -89,21 +98,9 @@ function initGrid() {
       window.isSettingUpGrid = false;
     }
 
-    // Inicijaliziraj modal PRIJE GSAP animacija
-    if (typeof initPhotoModal === "function") {
-      initPhotoModal();
-    }
-
-    // Sakrij sve osim prvih INITIAL_PHOTOS fotografija
-    window.shuffledPhotos.forEach((container, index) => {
-      if (index >= INITIAL_PHOTOS) {
-        container.style.display = 'none';
-      }
-    });
-
     // Tranzicija za ulazak fotki u view
     gsap.fromTo(
-      window.shuffledPhotos.slice(0, INITIAL_PHOTOS),
+      window.shuffledPhotos,
       { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
       { 
         opacity: 1, 
@@ -114,18 +111,6 @@ function initGrid() {
         stagger: 0.1,
       }
     );
-
-    // Dodaj jednostavan event listener za scroll
-    window.addEventListener('scroll', function() {
-      // Prikaži sve fotografije kad korisnik scrolla dovoljno
-      if (window.scrollY > 300) {
-        window.shuffledPhotos.forEach(container => {
-          container.style.display = '';
-        });
-        // Ukloni event listener nakon što su sve fotografije prikazane
-        window.removeEventListener('scroll', arguments.callee);
-      }
-    });
 
     console.log("✅ Grid postavljen.");
   } finally {
