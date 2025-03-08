@@ -53,22 +53,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-
-function initAboutPin() {
-  const section = document.querySelector('.section.about');
-  const footer = document.querySelector('.section.footer');
-  
-  if (!section || !footer) return;
-
-  ScrollTrigger.create({
-    trigger: section,
-    start: "top top",
-    endTrigger: footer,
-    end: "bottom bottom",
-    pin: true,
-  });
-  
-}
-
-initAboutPin();
