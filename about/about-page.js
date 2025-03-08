@@ -55,29 +55,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initAboutPage() {
-  // Dohvati about sekciju
+  // Dohvati about sekciju i footer
   const aboutSection = document.querySelector('.section.about');
+  const footer = document.querySelector('footer') || document.querySelector('.footer');
   
-  // Provjeri postoji li sekcija
-  if (!aboutSection) return;
+  // Provjeri postoje li potrebni elementi
+  if (!aboutSection || !footer) return;
   
   // Kreiraj pin za about sekciju
   ScrollTrigger.create({
     trigger: aboutSection,
     start: "top top", // počni kad vrh sekcije dotakne vrh viewporta
-    end: "bottom bottom", // završi kad dno sekcije dotakne dno viewporta
+    endTrigger: footer, // koristi footer kao trigger za kraj
+    end: "top bottom", // završi kad vrh footera dotakne dno viewporta
     pin: true,
-    pinSpacing: true, // zadržava prostor u layoutu
-    anticipatePin: 1, // poboljšava performanse
+    pinSpacing: false, // ključno za efekt "prelaska preko"
+    anticipatePin: 1,
     markers: false, // postavi na true za debug
     id: "about-section-pin"
   });
   
-  // Osvježi ScrollTrigger kada se prozor promijeni
-  window.addEventListener('resize', () => {
-    ScrollTrigger.refresh();
-  });
+//   // Osvježi ScrollTrigger kada se prozor promijeni
+//   window.addEventListener('resize', () => {
+//     ScrollTrigger.refresh();
+//   });
 }
 
-// Pokreni inicijalizaciju kada je DOM učitan
-document.addEventListener('DOMContentLoaded', initAboutPage);
+initAboutPage();
