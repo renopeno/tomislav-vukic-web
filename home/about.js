@@ -110,19 +110,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
   initAboutSection();
 })
-// // Dodatno osvježi ScrollTrigger nakon učitavanja stranice
-// window.addEventListener('load', function() {
-//   setTimeout(function() {
-//     if (typeof ScrollTrigger !== 'undefined') {
-//       ScrollTrigger.refresh();
-//     }
-//   }, 1000);
-// });
-
-// // Inicijaliziraj sekciju nakon učitavanja DOM-a
-// if (document.readyState === 'loading') {
-//   document.addEventListener('DOMContentLoaded', initAboutSection);
-// } else {
-//   initAboutSection();
-// }
 
