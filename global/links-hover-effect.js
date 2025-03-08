@@ -1,19 +1,22 @@
 // Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
   // Spremi originalni tekst u data atribut ako već nije spremljen
-  // Ovo osigurava da uvijek imamo pristup originalnom tekstu, čak i nakon više shuffleanja
   if (!element.dataset.originalText) {
     element.dataset.originalText = element.textContent;
   }
   
   const originalText = element.dataset.originalText;
   
-  // Kreiraj span element koji će sadržavati tekst koji se animira
-  // Ovo će omogućiti da link ostane klikabilan tijekom animacije
-  let textSpan;
+  // Osiguraj da link ima visoki z-index i da je klikabilan
+  element.style.position = 'relative';
+  element.style.zIndex = '100000';
   
-  // Provjeri je li već kreiran span za animaciju
-  if (!element.querySelector('.shuffle-text')) {
+  // Ako već postoji span za shuffle, koristi ga, inače kreiraj novi
+  let textSpan;
+  if (element.querySelector('.shuffle-text')) {
+    textSpan = element.querySelector('.shuffle-text');
+  } else {
+    // Kreiraj span element koji će sadržavati tekst koji se animira
     textSpan = document.createElement('span');
     textSpan.className = 'shuffle-text';
     textSpan.textContent = originalText;
@@ -21,11 +24,16 @@ function createShuffleEffect(element, addListener = true) {
     // Sačuvaj originalni sadržaj i zamijeni ga sa span elementom
     element.textContent = '';
     element.appendChild(textSpan);
-  } else {
-    textSpan = element.querySelector('.shuffle-text');
   }
+  
+  // Osiguraj da span ne blokira klikove
+  textSpan.style.pointerEvents = 'none';
+  
+  // Varijabla za praćenje stanja animacije
+  let isAnimating = false;
+  let shuffleInterval;
 
-  // Helper funkcija koja miješa slova u riječi koristeći Fisher-Yates shuffle algoritam
+  // Helper funkcija koja miješa slova u riječi
   const shuffleWord = (word) => {
     const letters = word.split('');
     for (let i = letters.length - 1; i > 0; i--) {
@@ -35,30 +43,67 @@ function createShuffleEffect(element, addListener = true) {
     return letters.join('');
   };
 
+  // Funkcija za zaustavljanje animacije
+  const stopAnimation = () => {
+    if (shuffleInterval) {
+      clearInterval(shuffleInterval);
+      shuffleInterval = null;
+    }
+    textSpan.textContent = originalText;
+    isAnimating = false;
+  };
+
   // Glavna funkcija koja pokreće shuffle animaciju
   const startEffect = () => {
+    // Ako je animacija već u tijeku, ne pokreći novu
+    if (isAnimating) return;
+    
+    isAnimating = true;
     let counter = 0;
-    const shuffleInterval = setInterval(() => {
+    
+    // Zaustavi prethodnu animaciju ako postoji
+    if (shuffleInterval) {
+      clearInterval(shuffleInterval);
+    }
+    
+    shuffleInterval = setInterval(() => {
       if (counter < 3) { // Izvrši shuffle 3 puta
-        // Mijenjaj samo sadržaj span elementa, ne cijelog linka
         textSpan.textContent = shuffleWord(originalText);
         counter++;
       } else {
-        // Vrati na originalni tekst
-        textSpan.textContent = originalText;
+        textSpan.textContent = originalText; // Vrati na originalni tekst
         clearInterval(shuffleInterval);
+        shuffleInterval = null;
+        isAnimating = false;
       }
     }, 100); // Interval između svakog shufflea (100ms)
   };
 
-  // Ako je addListener true, dodaj mouseenter event listener
-  // Ovo se koristi za obične linkove, dok se za category-row linkove poziva direktno
+  // Dodaj event listenere
   if (addListener) {
+    // Mouseenter za pokretanje efekta
     element.addEventListener('mouseenter', startEffect);
+    
+    // Click za zaustavljanje animacije i osiguravanje da link radi
+    element.addEventListener('click', function(e) {
+      // Zaustavi animaciju ako je u tijeku
+      stopAnimation();
+      
+      // Ne sprječavaj defaultnu akciju - link će raditi normalno
+      // Dodaj mali timeout da se osigura da je animacija zaustavljena prije klika
+      setTimeout(() => {
+        // Ništa ne radimo ovdje, samo osiguravamo da je animacija zaustavljena
+      }, 10);
+    });
+    
+    // Touchstart za mobilne uređaje
+    element.addEventListener('touchstart', function(e) {
+      // Zaustavi animaciju ako je u tijeku
+      stopAnimation();
+    }, { passive: true });
   }
 
   // Vraćamo funkciju za pokretanje efekta
-  // Ovo omogućava da se efekt može pokrenuti i programski
   return startEffect;
 }
 
@@ -72,4 +117,5 @@ function initLinksHover() {
 // Exportaj funkciju da je možeš koristiti u drugim fileovima
 window.createShuffleEffect = createShuffleEffect;
 
+// Inicijaliziraj efekt na linkovima
 initLinksHover();

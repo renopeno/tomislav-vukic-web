@@ -72,3 +72,24 @@
   display: inline-block;
   pointer-events: none; /* Osigurava da klikovi prolaze kroz span do linka */
 }
+
+/* Poboljšana klikabilnost za sve linkove */
+.link, .nav-link {
+  position: relative;
+  z-index: 100000;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+}
+
+/* Posebno za mobilne uređaje */
+@media (hover: none) and (pointer: coarse) {
+  .link, .nav-link {
+    /* Veći padding za lakše klikanje na mobilnim uređajima */
+    padding: 8px 4px;
+  }
+  
+  .shuffle-text {
+    /* Dodatno osiguranje da span ne blokira klikove */
+    pointer-events: none !important;
+  }
+}
