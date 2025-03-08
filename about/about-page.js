@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initAboutPin() {
   const section = document.querySelector('.section.about');
-  const footer = document.querySelector('footer') || document.querySelector('.footer');
+  const footer = document.querySelector('.section.footer');
   
   if (!section || !footer) return;
 
@@ -65,7 +65,7 @@ function initAboutPin() {
     trigger: section,
     start: "top top",
     endTrigger: footer,
-    end: "top bottom",
+    end: "bottom bottom",
     pin: true,
   });
   
