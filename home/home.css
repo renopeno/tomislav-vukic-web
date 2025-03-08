@@ -1,13 +1,3 @@
-.loader-active {
-    overflow: hidden;
-    height: 100%;
-}
-
-.loader-inactive {
-    overflow: auto;
-    height: auto;
-}
-
 /* Safari-specifični stilovi za blend mode */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   .navbar {

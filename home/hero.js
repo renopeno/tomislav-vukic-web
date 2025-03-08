@@ -1,36 +1,8 @@
 function initHero() {
-
   const heroTitle = document.querySelector(".hero-title");
-  // const navbarItems = document.querySelectorAll(".grid-navbar > *");
   const heroFooters = document.querySelectorAll(".hero-footer");
   const heroImageContainer = document.querySelector(".hero-images-container");
   let heroImages = Array.from(document.querySelectorAll(".hero-image"));
-
-  // Provjeri trebamo li prikazati loader
-  const shouldShowLoader = !sessionStorage.getItem("loaderShown") || 
-    (window.performance && window.performance.getEntriesByType('navigation')[0]?.type === 'reload');
-  
-  console.log('📊 Loader status:', { 
-    shouldShowLoader, 
-    sessionStorage: sessionStorage.getItem("loaderShown"),
-    navigationType: window.performance?.getEntriesByType('navigation')[0]?.type 
-  });
-
-
-  // Jednostavni scroll prevention
-  if (shouldShowLoader) {
-
-    document.body.classList.add('loader-active');
-    document.documentElement.classList.add('loader-active');
-    document.body.classList.remove('loader-inactive');
-    document.documentElement.classList.remove('loader-inactive');
-
-    // Zaustavi Lenis ako postoji
-    if (window.lenis) window.lenis.stop();
-  }
-
-  // Uklanjamo navAnimation check jer se navbar uvijek animira nakon loadera
-  // gsap.set(navbarItems, { y: -20, opacity: 0 });
 
   function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -57,33 +29,20 @@ function initHero() {
   gsap.set(heroImageContainer, {
     position: "relative",
     width: "100%",
-    height: "100%", // Koristi viewport height za punu visinu
+    height: "100%", 
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     overflow: "visible"
   });
 
-  // Učitaj slike i pokreni animaciju
-  let loadedCount = 0;
-  console.log('🖼️ Starting to load images, total:', heroImage.length);
   
   heroImage.forEach((img) => {
     const imgElement = new Image();
     imgElement.src = img.src;
     imgElement.onload = () => {
       loadedCount++;
-      console.log(`📥 Image loaded (${loadedCount}/${heroImage.length})`);
       if (loadedCount === heroImage.length) {
-        console.log('✅ All images loaded, starting animation');
-        startAnimation();
-      }
-    };
-    imgElement.onerror = () => {
-      loadedCount++;
-      console.error(`❌ Image failed to load (${loadedCount}/${heroImage.length})`);
-      if (loadedCount === heroImage.length) {
-        console.log('⚠️ All images attempted, starting animation despite errors');
         startAnimation();
       }
     };
@@ -117,126 +76,62 @@ function initHero() {
     });
   });
 
-  // Kreiraj wrapper za svaku sliku za efekt maske
-  const heroImageWrappers = [];
+  // Pohrani pozicije slika za parallax
+  const imagePositions = [];
   
+  // Postavi slike direktno bez wrappera
   heroImage.forEach((img, index) => {
-    // Kreiraj wrapper div
-    const wrapper = document.createElement('div');
-    wrapper.style.width = '120px';
-    wrapper.style.height = '120px';
-    wrapper.style.position = 'absolute';
-    wrapper.style.overflow = 'hidden';
-    wrapper.style.left = '50%';
-    wrapper.style.top = '50%';
-    wrapper.style.transform = 'translate(-50%, -50%)';
-    
-    // Zamijeni originalnu sliku s wrapperom
-    const parent = img.parentNode;
-    parent.replaceChild(wrapper, img);
-    wrapper.appendChild(img);
-    
+    // Postavi stil direktno na sliku
     img.style.position = 'absolute';
-    img.style.width = '100%';
-    img.style.height = '100%';
     img.style.objectFit = 'cover';
-    img.style.left = '0'; // Resetiramo left na 0
-    img.style.top = '0';  // Resetiramo top na 0
     img.style.opacity = '1';
-    img.style.transform = 'translateY(100%)'; // Sakrij sliku ispod
     
-    heroImageWrappers.push(wrapper);
+    // Postavi početnu poziciju za animaciju
+    gsap.set(img, {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1
+    });
   });
   
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 50, opacity: 0 });
-  // gsap.set(navbarItems, { y: -20, opacity: 0 });
 
   // Zastavica za praćenje stanja animacije
   let animationComplete = false;
-  
-  // Pohrani pozicije slika za parallax
-  const imagePositions = [];
 
   function startAnimation() {
-    console.log('🎬 Starting animation sequence');
-    
     const mainTimeline = gsap.timeline({
       onComplete: function() {
-        console.log('✨ Animation complete');
         animationComplete = true;
-        if (shouldShowLoader) {
-          enableScroll();
-        }
       }
     });
     
-    // Loader animacija
-    if (shouldShowLoader) {
-      console.log('🎭 Starting loader animation');
-      mainTimeline.to(heroImage, {
-        y: 0,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: "power4.inOut",
-        onStart: () => console.log('📸 Image reveal animation started'),
-        onComplete: () => console.log('📸 Image reveal animation complete')
-      });
-    } else {
-      console.log('⏭️ Skipping loader animation');
-      gsap.set(heroImage, { y: 0 });
-    }
-    
-    // 2. Transformacija u lepezu
-    const lepezaAnim = mainTimeline.to(heroImageWrappers, {
-      width: function(index) { return originalStyles[index].width; },
-      height: function(index) { return originalStyles[index].height; },
-      scale: 1,
+    // Transformacija slika u lepezu
+    mainTimeline.to(heroImage, {
       x: (index) => {
-        const totalImages = heroImageWrappers.length;
+        const totalImages = heroImage.length;
         const spread = window.innerWidth * 0.35;
         const position = (index / (totalImages - 1)) * spread - spread/2;
         imagePositions[index] = position;
         return position;
       },
       y: (index) => {
-        const totalImages = heroImageWrappers.length;
+        const totalImages = heroImage.length;
         const normalizedIndex = index / (totalImages - 1);
         const arcHeight = -10;
         return 4 * arcHeight * Math.pow(normalizedIndex - 0.5, 2) + arcHeight;
       },
       rotation: (index) => {
-        const totalImages = heroImageWrappers.length;
+        const totalImages = heroImage.length;
         const startAngle = -25;
         const endAngle = 25;
         return startAngle + (index / (totalImages - 1)) * (endAngle - startAngle);
       },
       duration: 1,
       stagger: 0.05,
-      ease: "power3.inOut",
-      onStart: function() {
-        // Ukloni overflow: hidden s wrappera za glatku transformaciju
-        heroImageWrappers.forEach((wrapper, i) => {
-          // Postepeno povećavaj wrapper za glatku tranziciju
-          gsap.to(wrapper, {
-            overflow: 'visible',
-            duration: 0.1,
-            onComplete: function() {
-              // Resetiraj stil slika za transformaciju
-              const img = heroImage[i];
-              if (img) {
-                // Koristi originalne CSS vrijednosti, ALI NE left i top
-                img.style.position = originalStyles[i].position;
-                img.style.transform = originalStyles[i].transform;
-                img.style.objectFit = originalStyles[i].objectFit;
-                img.style.maxWidth = originalStyles[i].maxWidth;
-                img.style.maxHeight = originalStyles[i].maxHeight;
-                // Ne postavljamo left i top jer ih ne želimo koristiti
-              }
-            }
-          });
-        });
-      }
+      ease: "power3.inOut"
     });
 
     // Započni animaciju teksta na 60% lepeza animacije
@@ -255,38 +150,7 @@ function initHero() {
       stagger: 0.1,
       ease: "power3.out"
     }, "-=0.8"); // Počni u isto vrijeme kad i tekst
-
-    // Za sada ne želimo animirati navbar
-    // mainTimeline.to(navbarItems, {
-    //   y: 0,
-    //   opacity: 1,
-    //   duration: 0.4,
-    //   stagger: 0.1,
-    //   ease: "power3.out"
-    // }, "-=0.8");
   }
-
-  function enableScroll() { 
-    
-    // Makni CSS klasu za omogucavanje scrolla
-    document.body.classList.remove('loader-active');
-    document.documentElement.classList.remove('loader-active');
-    document.body.classList.add('loader-inactive');
-    document.documentElement.classList.add('loader-inactive');
-    
-    // 3. Pokreni Lenis
-    if (window.lenis) {
-      try {
-        window.lenis.start();
-      } catch (e) {
-        console.error('Lenis error:', e);
-      }
-    }
-    
-    // 4. Spremi u session
-    sessionStorage.setItem("loaderShown", "true");
-  }
-
 
   // Parallax stack photos - poboljšana verzija
   window.addEventListener("mousemove", (event) => {
@@ -302,7 +166,7 @@ function initHero() {
     const offsetX = (clientX - centerX) / centerX;
     const offsetY = (clientY - centerY) / centerY;
 
-    heroImageWrappers.forEach((wrapper, index) => {
+    heroImage.forEach((img, index) => {
       // Povećava fleksibilnost za 30% sa svakom fotografijom
       const baseDepth = 1;
       const depthMultiplier = 1 + index * 0.3;
@@ -315,7 +179,7 @@ function initHero() {
       const moveX = offsetX * parallaxFactor * depth;
       const moveY = offsetY * parallaxFactor * depth;
 
-      gsap.to(wrapper, { 
+      gsap.to(img, { 
         x: baseX + moveX, 
         y: moveY, 
         duration: 0.4, 
