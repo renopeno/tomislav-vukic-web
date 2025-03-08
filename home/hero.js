@@ -36,6 +36,8 @@ function initHero() {
     overflow: "visible"
   });
 
+  // Dodaj varijablu za praćenje učitanih slika
+  let loadedCount = 0;
   
   heroImage.forEach((img) => {
     const imgElement = new Image();
