@@ -5,6 +5,7 @@ function initGrid() {
   
   try {
     const MAX_PHOTOS = 30;
+    const INITIAL_PHOTOS = 7; // Inicijalno prikazujemo samo 7 fotografija
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
     
     // Resetiraj sve postavke
@@ -30,6 +31,12 @@ function initGrid() {
       window.lastPath = window.location.pathname;
     }
 
+    // Inicijalno prikaži samo prvih INITIAL_PHOTOS fotografija
+    window.shuffledPhotos.forEach((container, index) => {
+      if (index >= INITIAL_PHOTOS) {
+        container.style.display = 'none';
+      }
+    });
 
     // Grid konfiguracija po uređajima
     const gridConfig = {
@@ -94,9 +101,10 @@ function initGrid() {
       initPhotoModal();
     }
 
-    // Tranzicija za ulazak fotki u view (ne blokira interaktivnost)
+    // Tranzicija za ulazak fotki u view - samo za inicijalno prikazane fotke
+    const initialPhotos = window.shuffledPhotos.slice(0, INITIAL_PHOTOS);
     gsap.fromTo(
-      window.shuffledPhotos,
+      initialPhotos,
       { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
       { 
         opacity: 1, 
@@ -108,9 +116,64 @@ function initGrid() {
       }
     );
 
-    console.log("✅ Grid postavljen.");
+    // Postavi event listener za scroll
+    window.addEventListener('scroll', loadMoreOnScroll);
+    
+    // Provjeri odmah nakon inicijalizacije (za slučaj da je ekran velik)
+    setTimeout(loadMoreOnScroll, 500);
+
+    console.log("✅ Grid postavljen s inicijalnih " + INITIAL_PHOTOS + " fotografija.");
   } finally {
     isGridInitializing = false;
+  }
+}
+
+// Funkcija za učitavanje dodatnih fotografija na scroll
+function loadMoreOnScroll() {
+  if (isGridInitializing) return;
+  
+  const BATCH_SIZE = 5; // Broj fotografija koje učitavamo odjednom
+  const currentlyLoaded = Array.from(document.querySelectorAll(".photo-container:not([style*='display: none'])")).length;
+  
+  if (currentlyLoaded >= window.shuffledPhotos.length) {
+    window.removeEventListener('scroll', loadMoreOnScroll);
+    return;
+  }
+  
+  // Provjeri je li korisnik došao do dna stranice
+  const scrollPosition = window.scrollY + window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  const threshold = 300; // Učitaj nove fotografije 300px prije dna
+  
+  if (scrollPosition > documentHeight - threshold) {
+    // Učitaj sljedeću grupu fotografija
+    const nextBatch = window.shuffledPhotos.slice(
+      currentlyLoaded, 
+      Math.min(currentlyLoaded + BATCH_SIZE, window.shuffledPhotos.length)
+    );
+    
+    if (nextBatch.length === 0) return;
+    
+    // Prikaži fotografije
+    nextBatch.forEach(container => {
+      container.style.display = '';
+    });
+    
+    // Animiraj nove fotografije
+    gsap.fromTo(
+      nextBatch,
+      { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.1,
+      }
+    );
+    
+    console.log("🔄 Učitano dodatnih " + nextBatch.length + " fotografija.");
   }
 }
 
