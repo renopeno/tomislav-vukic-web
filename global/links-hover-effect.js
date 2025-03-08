@@ -7,6 +7,23 @@ function createShuffleEffect(element, addListener = true) {
   }
   
   const originalText = element.dataset.originalText;
+  
+  // Kreiraj span element koji će sadržavati tekst koji se animira
+  // Ovo će omogućiti da link ostane klikabilan tijekom animacije
+  let textSpan;
+  
+  // Provjeri je li već kreiran span za animaciju
+  if (!element.querySelector('.shuffle-text')) {
+    textSpan = document.createElement('span');
+    textSpan.className = 'shuffle-text';
+    textSpan.textContent = originalText;
+    
+    // Sačuvaj originalni sadržaj i zamijeni ga sa span elementom
+    element.textContent = '';
+    element.appendChild(textSpan);
+  } else {
+    textSpan = element.querySelector('.shuffle-text');
+  }
 
   // Helper funkcija koja miješa slova u riječi koristeći Fisher-Yates shuffle algoritam
   const shuffleWord = (word) => {
@@ -23,10 +40,12 @@ function createShuffleEffect(element, addListener = true) {
     let counter = 0;
     const shuffleInterval = setInterval(() => {
       if (counter < 3) { // Izvrši shuffle 3 puta
-        element.textContent = shuffleWord(originalText);
+        // Mijenjaj samo sadržaj span elementa, ne cijelog linka
+        textSpan.textContent = shuffleWord(originalText);
         counter++;
       } else {
-        element.textContent = originalText; // Vrati na originalni tekst
+        // Vrati na originalni tekst
+        textSpan.textContent = originalText;
         clearInterval(shuffleInterval);
       }
     }, 100); // Interval između svakog shufflea (100ms)

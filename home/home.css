@@ -66,3 +66,9 @@
   position: relative;
   z-index: 100000;
 }
+
+/* Stilovi za shuffle efekt */
+.shuffle-text {
+  display: inline-block;
+  pointer-events: none; /* Osigurava da klikovi prolaze kroz span do linka */
+}
