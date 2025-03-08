@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   gsap.registerPlugin(ScrollTrigger);
   
   // Dohvati elemente koje želimo animirati
+  const section = document.querySelector('.section.about');
   const title = document.querySelector('.about-page-title');
   const paragraph = document.querySelector('.about-page-paragraph');
   const mobileImage = document.querySelector('.about-page-mobile-img');
@@ -62,4 +63,16 @@ document.addEventListener('DOMContentLoaded', function() {
       trigger.start = "top 90%"; // Promijeni trigger točku za mobilne
     });
   }
+  
+  // Sticky efekt za about section
+  ScrollTrigger.create({
+    trigger: section,
+    start: "bottom bottom",
+    endTrigger: ".footer",
+    end: "bottom bottom",
+    pinSpacing: false, // Potrebno da se footer preklapa preko about sectiona
+    pin: true,
+    markers: false
+  });
 });
+

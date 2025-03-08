@@ -2,12 +2,12 @@ function initDarkMode() {
   const body = document.body;
   const themeSwitcher = document.querySelector('.nav-theme-switcher');
 
-  // ✅ Primijeni Dark Mode odmah na početku
+  //  Primijeni Dark Mode odmah na početku
   if (localStorage.getItem('dark-mode') === 'enabled') {
     body.classList.add('ui-dark-mode');
   }
 
-  // ✅ Osiguraj da se Dark Mode pravilno prebacuje pri kliku na switcher
+  //  Osiguraj da se Dark Mode pravilno prebacuje pri kliku na switcher
   if (themeSwitcher) {
     themeSwitcher.addEventListener('click', () => {
       if (body.classList.contains('ui-dark-mode')) {
@@ -22,7 +22,7 @@ function initDarkMode() {
     });
   }
 
-  // ✅ Osiguraj primjenu pri svakoj Barba.js tranziciji
+  //  Osiguraj primjenu pri svakoj Barba.js tranziciji
   if (window.barba) {
     barba.hooks.beforeEnter(() => {
       if (localStorage.getItem('dark-mode') === 'enabled') {
@@ -34,5 +34,4 @@ function initDarkMode() {
   }
 }
 
-// ✅ Pokreni odmah, ne čekaj `DOMContentLoaded`
 initDarkMode();
