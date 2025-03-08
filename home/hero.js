@@ -265,13 +265,9 @@ function initHero() {
     }, "-=0.8");
   }
 
-  function enableScroll() {
-    console.log('🔓 Enabling scroll');
+  function enableScroll() { 
     
-    // 1. Postavi varijablu za kontrolu
-    // window.scrollEnabled = true;
-    
-    // 2. Makni CSS klasu
+    // Makni CSS klasu za omogucavanje scrolla
     document.body.classList.remove('loader-active');
     document.documentElement.classList.remove('loader-active');
     document.body.classList.add('loader-inactive');

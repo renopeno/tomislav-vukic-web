@@ -68,7 +68,30 @@ function initPageSpecificFunctions(namespace) {
   }
 }
 
-let isTransitioning = false;
+// Globalna varijabla za praćenje stanja tranzicije
+window.isTransitioning = false;
+
+// Funkcija za popravak Safari blend mode problema
+function fixSafariBlendMode() {
+  // Detektiraj Safari i iOS
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  
+  if (isSafari || isIOS) {
+    console.log("Safari/iOS detektiran - primjenjujem popravak za blend mode");
+    
+    // Dodaj mali timeout da se osigura da se blend mode primijeni nakon rendera
+    setTimeout(() => {
+      // Poboljšaj klikabilnost linkova u navigaciji
+      const navLinks = document.querySelectorAll('.nav-link, .link');
+      navLinks.forEach(link => {
+        // Dodaj mali z-index boost za Safari
+        link.style.zIndex = "100000";
+        link.style.position = "relative";
+      });
+    }, 100);
+  }
+}
 
 function initBarba() {
   console.log("📌 Barba.js initialized");
@@ -76,13 +99,23 @@ function initBarba() {
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
+  
+  // Pozovi popravak za Safari prije inicijalizacije Barba.js
+  fixSafariBlendMode();
 
   barba.init({
     transitions: [{
       name: 'fade',
       leave(data) {
-        isTransitioning = true;
+        window.isTransitioning = true;
         console.log(`🔄 Leaving: ${data.current.namespace}`);
+        
+        // Osiguraj da su svi linkovi klikabilni tijekom tranzicije
+        const navLinks = document.querySelectorAll('.nav-link, .link');
+        navLinks.forEach(link => {
+          link.style.pointerEvents = 'auto';
+        });
+        
         return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
@@ -94,7 +127,6 @@ function initBarba() {
         initGlobalFunctions(data);
       },
       enter(data) {
-        isTransitioning = false;
         console.log(`🎯 Entering: ${data.next.namespace}`);
         
         // Samo ovdje inicijaliziramo grid
@@ -104,7 +136,18 @@ function initBarba() {
         }
         
         updateNavigationWithHref();
-        return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
+        
+        // Primijeni popravak za Safari blend mode nakon tranzicije
+        fixSafariBlendMode();
+        
+        // Postavi tranziciju na false nakon što je animacija završila
+        return gsap.to(data.next.container, { 
+          opacity: 1, 
+          duration: 0.3,
+          onComplete: () => {
+            window.isTransitioning = false;
+          }
+        });
       }
     }],
     views: [
@@ -116,7 +159,9 @@ function initBarba() {
       { namespace: 'work-people' },
       { namespace: 'work-products' },
       { namespace: 'work-architecture' }
-    ]
+    ],
+    // Dodaj preventCheck za poboljšanje pouzdanosti
+    preventRunning: true
   });
 
   console.log("✅ Barba.js initialized successfully");
@@ -128,12 +173,15 @@ window.addEventListener('beforeunload', () => {
 });
 
 function initGrid() {
-  if (window.isSettingUpGrid || isTransitioning) {
+  if (window.isSettingUpGrid || window.isTransitioning) {
     console.log('🚫 Grid setup already in progress or transition active');
     return;
   }
   
   // Ostatak koda...
 }
+
+// Pozovi funkciju za popravak blend mode-a nakon učitavanja stranice
+document.addEventListener('DOMContentLoaded', fixSafariBlendMode);
 
 initBarba();
