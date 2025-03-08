@@ -170,6 +170,20 @@ function loadMoreOnScroll() {
         duration: 0.8,
         ease: "power3.out",
         stagger: 0.1,
+        onComplete: function() {
+          // Ažuriraj originalParent za sve nove fotografije
+          nextBatch.forEach(container => {
+            const photo = container.querySelector('.photo');
+            if (photo) {
+              photo.originalParent = photo.parentElement;
+            }
+          });
+          
+          // Ponovno inicijaliziraj modal za nove fotografije
+          if (typeof initPhotoModal === "function") {
+            initPhotoModal();
+          }
+        }
       }
     );
     
