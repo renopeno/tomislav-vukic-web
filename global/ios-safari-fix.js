@@ -98,12 +98,8 @@ function removeHoverIosSafari() {
 
 // Inicijaliziraj fix za iOS Safari
 function initIosSafariFix() {
-  console.log("Checking for iOS Safari...");
   if (isIosSafari()) {
-    console.log("iOS Safari detected, applying click fix");
     removeHoverIosSafari();
-  } else {
-    console.log("Not iOS Safari, no fix needed");
   }
 }
 
