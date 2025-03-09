@@ -103,5 +103,4 @@ function initIosSafariFix() {
   }
 }
 
-// Pokreni fix odmah
 initIosSafariFix(); 
