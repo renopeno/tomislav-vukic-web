@@ -1,0 +1,26 @@
+{
+  "name": "tomislavvukic.com",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "vercel-build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renopeno/tomislav-vukic-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/renopeno/tomislav-vukic-web/issues"
+  },
+  "homepage": "https://github.com/renopeno/tomislav-vukic-web#readme",
+  "description": "",
+  "devDependencies": {
+    "vite": "^6.2.1"
+  }
+}
