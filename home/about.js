@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
   
   function initAboutSection() {
-    // Dohvati elemente
+    // Dodajemo provjeru za sekciju i potrebne elemente
+    const aboutSection = document.querySelector('.section.about');
+    if (!aboutSection) return;
+    
     const aboutTitle = document.querySelector('.about-title');
     const aboutParagraph = document.querySelector('.about-paragraph');
     const aboutScroll = document.querySelector('.about-scroll');
