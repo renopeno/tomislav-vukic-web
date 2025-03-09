@@ -3,8 +3,8 @@ function initHighlights() {
   const highlightsWrapper = document.querySelector('.highlights-wrapper');
 
   // Dodajemo provjeru postojanja potrebnih elemenata
-  if (!highlightsSection || !highlightsWrapper) return;
-  
+  if (!highlightsSection && !highlightsWrapper) return;
+
   // Uništi sve prethodne ScrollTrigger instance
   ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
