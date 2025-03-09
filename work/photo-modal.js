@@ -1,10 +1,5 @@
 function initPhotoModal() {
     
-    // Ako je funkcija već inicijalizirana, ne inicijaliziraj ponovno
-    if (window.photoModalInitialized) return;
-    window.photoModalInitialized = true;
-    const modal = document.querySelector(".modal-photo");
-    
     // Dodajemo provjeru postojanja modal elementa
     if (!modal) return;
     
