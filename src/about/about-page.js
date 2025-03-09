@@ -11,44 +11,43 @@ document.addEventListener('DOMContentLoaded', function() {
   // Provjeri postoje li elementi na stranici
   if (!title && !paragraph) return;
   
-  // Postavi početno stanje - sakrij elemente
-  gsap.set([mobileImage, title, paragraph], { 
-    opacity: 0,
-    y: 100,
-    scale: 0.5,
-    willChange: "opacity, transform"
-  });
-
-  
   // Kreiraj timeline za animaciju
   const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: "top 80%",
+      toggleActions: "play none none none",
+      markers: false
+    }
   });
   
-  // Dodaj animacije u timeline
-  if (mobileImage) {
-  tl.to(mobileImage, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    duration: 0.8,
-      ease: "power2.out",
-    })
-  }
-  tl.to(title, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    duration: 0.7,
-    ease: "power2.out",
-    stagger: 0.1
-  }, "-=0.8")
-  .to(paragraph, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    duration: 0.7,
-    ease: "power2.out"
-  }, "-=0.7"); // Započni malo prije nego završi prethodna animacija
+  // Elementi koje animiramo
+  const elements = [mobileImage, title, paragraph].filter(Boolean);
+  
+  // Koristi fromTo animaciju koja je konzistentna s grid.js
+  elements.forEach((element, index) => {
+    gsap.fromTo(
+      element,
+      { 
+        opacity: 0, 
+        scale: 0.8, 
+        y: window.innerHeight / 5
+      },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: index * 0.1, // Simulira stagger efekt
+        scrollTrigger: {
+          trigger: section,
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  });
   
   // Dodatna provjera za mobilne uređaje
   const isMobile = window.innerWidth <= 767;
@@ -56,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (isMobile) {
     // Prilagodbe za mobilne uređaje
     ScrollTrigger.getAll().forEach(trigger => {
-      trigger.start = "top 90%"; // Promijeni trigger točku za mobilne
+      trigger.start = "top 90%";
     });
   }
   
@@ -66,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     start: "bottom bottom",
     endTrigger: ".footer",
     end: "bottom bottom",
-    pinSpacing: false, // Potrebno da se footer preklapa preko about sectiona
+    pinSpacing: false,
     pin: true,
     markers: false
   });
