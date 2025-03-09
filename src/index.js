@@ -1,4 +1,5 @@
 // Globalne skripte
+import './global/barba-config.js';
 import './global/lenis-config.js';
 import './global/dark-mode.js';
 import './global/footer-gsap.js';
