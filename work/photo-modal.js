@@ -1,5 +1,9 @@
 function initPhotoModal() {
     const modal = document.querySelector(".modal-photo");
+    
+    // Dodajemo provjeru postojanja modal elementa
+    if (!modal) return;
+    
     const modalImageContainer = modal.querySelector(".modal-photo-container");
     const modalTitle = modal.querySelector(".modal-title");
     const modalExif = modal.querySelector(".modal-exif");
