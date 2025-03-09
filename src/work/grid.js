@@ -1,14 +1,12 @@
-// Provjerava postoji li već varijabla prije ponovne deklaracije
-if (typeof isGridInitializing === 'undefined') {
-  let isGridInitializing = false;
-}
+let isGridInitializing = false;
 
 function initGrid() {
+  if (isGridInitializing) return; // Sprečava višestruko pokretanje
+  isGridInitializing = true;
+  
   // Provjera da znamo da smo na pageu koji ima grid
   const photoContainers = document.querySelectorAll('.photo-container');
   if (!photoContainers.length) return;
-  
-  isGridInitializing = true;
   
   try {
     const MAX_PHOTOS = 30;
