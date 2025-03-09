@@ -2,10 +2,6 @@ function initDarkMode() {
   const body = document.body;
   const themeSwitcher = document.querySelector('.nav-theme-switcher');
 
-  // Prikaz u konzoli koji mode je trenutno učitan
-  const currentMode = localStorage.getItem('dark-mode') === 'enabled' ? 'Dark Mode' : 'Light Mode';
-  console.log(`Initial mode: ${currentMode}`);
-
   //  Primijeni Dark Mode odmah na početku
   if (localStorage.getItem('dark-mode') === 'enabled') {
     body.classList.add('ui-dark-mode');
@@ -16,15 +12,26 @@ function initDarkMode() {
     themeSwitcher.addEventListener('click', () => {
       if (body.classList.contains('ui-dark-mode')) {
         body.classList.remove('ui-dark-mode');
+        console.log("Removed .ui-dark-mode from body");
         localStorage.setItem('dark-mode', 'disabled');
-        console.log("Switched to Light Mode");
       } else {
         body.classList.add('ui-dark-mode');
+        console.log("Added .ui-dark-mode to body");
         localStorage.setItem('dark-mode', 'enabled');
-        console.log("Switched to Dark Mode");
       }
     });
   }
+
+  //  Osiguraj primjenu pri svakoj Barba.js tranziciji
+  // if (window.barba) {
+  //   barba.hooks.beforeEnter(() => {
+  //     if (localStorage.getItem('dark-mode') === 'enabled') {
+  //       document.body.classList.add('ui-dark-mode');
+  //     } else {
+  //       document.body.classList.remove('ui-dark-mode');
+  //     }
+  //   });
+  // }
 }
 
 initDarkMode();
