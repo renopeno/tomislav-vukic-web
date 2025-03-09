@@ -1,6 +1,10 @@
 let isGridInitializing = false;
 
 function initGrid() {
+  // Provjera da znamo da smo na pageu koji ima grid
+  const photoContainers = document.querySelectorAll('.photo-container');
+  if (!photoContainers.length) return;
+  
   isGridInitializing = true;
   
   try {
