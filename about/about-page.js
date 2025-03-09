@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Postavi početno stanje - sakrij elemente
   gsap.set([mobileImage, title, paragraph], { 
-    opacity: 0,
+    opacity: 0.01,
     y: 50,
     scale: 0.9,
     willChange: "opacity, transform"
