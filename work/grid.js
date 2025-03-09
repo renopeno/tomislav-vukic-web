@@ -1,4 +1,7 @@
-let isGridInitializing = false;
+// Provjerava postoji li već varijabla prije ponovne deklaracije
+if (typeof isGridInitializing === 'undefined') {
+  let isGridInitializing = false;
+}
 
 function initGrid() {
   // Provjera da znamo da smo na pageu koji ima grid
