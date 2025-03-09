@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   gsap.registerPlugin(ScrollTrigger);
   
   // Dohvati elemente koje želimo animirati
-  const section = document.querySelector('.section.about');
+  const section = document.querySelector('.section.about-page');
   const title = document.querySelector('.about-page-title');
   const paragraph = document.querySelector('.about-page-paragraph');
   const mobileImage = document.querySelector('.about-page-mobile-img');
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   gsap.set([mobileImage, title, paragraph], { 
     opacity: 0,
     y: 50,
-    // scale: 1,
+    // scale: 1, (treba biti 0.9)
     willChange: "opacity, transform"
   });
 
