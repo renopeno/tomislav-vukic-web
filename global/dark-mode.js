@@ -23,15 +23,15 @@ function initDarkMode() {
   }
 
   // ✅ Osiguraj primjenu pri svakoj Barba.js tranziciji
-  if (window.barba) {
-    barba.hooks.beforeEnter(() => {
-      if (localStorage.getItem('dark-mode') === 'enabled') {
-        document.body.classList.add('ui-dark-mode');
-      } else {
-        document.body.classList.remove('ui-dark-mode');
-      }
-    });
-  }
+  // if (window.barba) {
+  //   barba.hooks.beforeEnter(() => {
+  //     if (localStorage.getItem('dark-mode') === 'enabled') {
+  //       document.body.classList.add('ui-dark-mode');
+  //     } else {
+  //       document.body.classList.remove('ui-dark-mode');
+  //     }
+  //   });
+  // }
 }
 
 // ✅ Pokreni odmah, ne čekaj `DOMContentLoaded`
