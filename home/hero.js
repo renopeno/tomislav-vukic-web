@@ -2,6 +2,10 @@ function initHero() {
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
   const heroImageContainer = document.querySelector(".hero-images-container");
+  
+  // Dodajemo provjeru postojanja potrebnih elemenata
+  if (!heroImageContainer) return;
+  
   let heroImages = Array.from(document.querySelectorAll(".hero-image"));
 
   function shuffleArray(array) {
