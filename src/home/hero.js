@@ -95,10 +95,19 @@ function initHero() {
     // Postavi početnu poziciju za animaciju
     gsap.set(img, {
       x: 0,
-      y: 0,
+      y: 200,
       rotation: 0,
-      scale: 1
+      scale: 0,
+      opacity: 1
     });
+  });
+  
+  gsap.to(heroImage, {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    duration: 0.8,
+    ease: "power1.inOut"
   });
   
   gsap.set(heroFooters, { y: 20, opacity: 0 });

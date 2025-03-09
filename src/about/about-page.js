@@ -14,19 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Postavi početno stanje - sakrij elemente
   gsap.set([mobileImage, title, paragraph], { 
     opacity: 0,
-    y: 50,
-    // scale: 1, (treba biti 0.9)
+    y: 100,
+    scale: 0.5,
     willChange: "opacity, transform"
   });
 
   
   // Kreiraj timeline za animaciju
   const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: title,
-      start: "top 80%",
-      toggleActions: "play none none none"
-    }
   });
   
   // Dodaj animacije u timeline
@@ -43,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     opacity: 1,
     y: 0,
     scale: 1,
-    duration: 0.8,
+    duration: 0.7,
     ease: "power2.out",
     stagger: 0.1
   }, "-=0.8")
@@ -51,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     opacity: 1,
     y: 0,
     scale: 1,
-    duration: 0.8,
+    duration: 0.7,
     ease: "power2.out"
-  }, "-=0.8"); // Započni malo prije nego završi prethodna animacija
+  }, "-=0.7"); // Započni malo prije nego završi prethodna animacija
   
   // Dodatna provjera za mobilne uređaje
   const isMobile = window.innerWidth <= 767;
