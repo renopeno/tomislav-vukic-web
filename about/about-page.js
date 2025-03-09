@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
   gsap.set([mobileImage, title, paragraph], { 
     opacity: 0,
     y: 50,
-    scale: 0.9
+    scale: 0.9,
+    willChange: "opacity, transform"
   });
 
   
