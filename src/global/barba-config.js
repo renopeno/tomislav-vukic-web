@@ -44,11 +44,15 @@ export default function initBarba() {
 
   barba.hooks.afterEnter(() => {
     console.log("✅ Reinitializing JavaScript after page transition...");
-    const pageChangeEvent = new CustomEvent('barbaPageChanged', {
-      detail: { namespace: barba.history.current.namespace }
+    document.querySelectorAll('nav a').forEach(function(link) {
+      const href = link.getAttribute('href');
+      const curUrl = location.pathname;
+      if (href === curUrl || (curUrl.startsWith('/work/') && href === '/work') || (curUrl.startsWith('/about') && href === '/about')) {
+        link.classList.add('w--current');
+      } else {
+        link.classList.remove('w--current');
+      }
     });
-    document.dispatchEvent(pageChangeEvent);
-    console.log("✅ Page-specific functions reloaded.");
   });
 
   window.barbaInitialized = true;
