@@ -1,63 +1,49 @@
-// Inicijalizacija Barba.js
+// let isTransitioning = false;
+
+// // Koristimo globalnu varijablu na window objektu koja će se zadržati između učitavanja skripti
+// if (typeof window.barbaInitialized === 'undefined') {
+//   window.barbaInitialized = false;
+// }
+
 export default function initBarba() {
-  if (typeof window.barbaInitialized === 'undefined') {
-    window.barbaInitialized = false;
-  }
-
-  if (window.barbaInitialized) {
-    console.log("⚠️ Barba.js već inicijalizirana, preskačem...");
-    return;
-  }
-
+    if (window.barbaInitialized) {
+        console.log("⚠️ Barba.js već inicijalizirana, preskačem...");
+        return;
+    }
+  
   console.log("📌 Barba.js initialized");
 
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
 
-  barba.init({
-    transitions: [{
-      name: 'fade',
-      leave(data) {
-        // Uništavanje skripti prije nego što stranica napusti prikaz
-        destroyPageSpecificFunctions(data.current.namespace);
-        return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
-      },
-      enter(data) {
-        // Inicijalizacija skripti nakon što nova stranica uđe u prikaz
-        initPageSpecificFunctions(data.next.namespace);
-        console.log(`🎯 Entering: ${data.next.namespace}`);
-        updateNavigationWithHref();
-      }
-    }],
-    views: [
-      { namespace: 'home' },
-      { namespace: 'work' },
-      { namespace: 'about' },
-      { namespace: 'work-abstract' },
-      { namespace: 'work-nature' },
-      { namespace: 'work-people' },
-      { namespace: 'work-products' },
-      { namespace: 'work-architecture' }
-    ]
-  });
-
-  barba.hooks.afterEnter(() => {
-    console.log("✅ Reinitializing JavaScript after page transition...");
-    document.querySelectorAll('nav a').forEach(function(link) {
-      const href = link.getAttribute('href');
-      const curUrl = location.pathname;
-      if (href === curUrl || (curUrl.startsWith('/work/') && href === '/work') || (curUrl.startsWith('/about') && href === '/about')) {
-        link.classList.add('w--current');
-      } else {
-        link.classList.remove('w--current');
-      }
+    barba.init({
+        transitions: [{
+            name: 'fade',
+            leave(data) {
+                // Uništavanje skripti prije nego što stranica napusti prikaz
+                destroyPageSpecificFunctions(data.current.namespace);
+                return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
+            },
+            enter(data) {
+                // Inicijalizacija skripti nakon što nova stranica uđe u prikaz
+                initPageSpecificFunctions(data.next.namespace);
+                isTransitioning = false;
+                console.log(`🎯 Entering: ${data.next.namespace}`);
+                updateNavigationWithHref();
+            }
+        }],
+        views: [
+            { namespace: 'home' },
+            { namespace: 'work' },
+            { namespace: 'about' },
+            { namespace: 'work-abstract' },
+            { namespace: 'work-nature' },
+            { namespace: 'work-people' },
+            { namespace: 'work-products' },
+            { namespace: 'work-architecture' }
+        ]
     });
-  });
-
-  window.barbaInitialized = true;
-  console.log("✅ Barba.js initialized successfully");
-}
 
 // Funkcija za inicijalizaciju skripti specifičnih za stranicu
 function initPageSpecificFunctions(namespace) {
@@ -72,26 +58,7 @@ function initPageSpecificFunctions(namespace) {
     window.initGrid();
     window.initPhotoModal();
   }
-  // Dodajte ostale stranice prema potrebi
 }
 
-// Funkcija za uništavanje skripti specifičnih za stranicu
-function destroyPageSpecificFunctions(namespace) {
-  // Implementirajte logiku za uništavanje skripti ako je potrebno
-}
-
-// Funkcija za ažuriranje navigacije
-function updateNavigationWithHref() {
-  const curUrl = location.pathname;
-  document.querySelectorAll('nav a').forEach(link => {
-    const href = link.getAttribute('href');
-    if (href === curUrl || (curUrl.startsWith('/work/') && href === '/work') || (curUrl.startsWith('/about') && href === '/about')) {
-      link.classList.add('w--current');
-    } else {
-      link.classList.remove('w--current');
-    }
-  });
-}
-
-// Inicijaliziramo Barba.js samo jednom
+// // Inicijaliziramo Barba.js samo jednom
 initBarba();
