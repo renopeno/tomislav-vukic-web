@@ -1,4 +1,6 @@
- function initAboutSection() {
+document.addEventListener('DOMContentLoaded', function() {
+  
+  function initAboutSection() {
     // Dodajemo provjeru za sekciju i potrebne elemente
     const aboutSection = document.querySelector('.section.about');
     if (!aboutSection) return;
@@ -96,4 +98,5 @@
   }
 
   initAboutSection();
+})
 
