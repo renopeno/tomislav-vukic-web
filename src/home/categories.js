@@ -1,4 +1,4 @@
-export default function initCategories() {
+function initCategories() {
 
   const categoriesRow = document.querySelectorAll('.categories-row');
 

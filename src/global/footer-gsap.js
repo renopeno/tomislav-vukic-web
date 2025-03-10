@@ -1,4 +1,4 @@
-export default function initFooter() {
+function initFooter() {
   const footer = document.querySelector('.section.footer');
   const previousSection = footer?.previousElementSibling;
 

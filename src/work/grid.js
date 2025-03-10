@@ -1,9 +1,9 @@
 let isGridInitializing = false;
 
-export default function initGrid() {
+function initGrid() {
   if (isGridInitializing) return; // Sprečava višestruko pokretanje
   isGridInitializing = true;
-
+  
   // Provjera da znamo da smo na pageu koji ima grid
   const photoContainers = document.querySelectorAll('.photo-container');
   if (!photoContainers.length) return;

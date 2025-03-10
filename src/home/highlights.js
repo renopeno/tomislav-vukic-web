@@ -1,4 +1,4 @@
-export default function initHighlights() {
+function initHighlights() {
   const highlightsSection = document.querySelector('.section.highlights');
   const highlightsWrapper = document.querySelector('.highlights-wrapper');
 
@@ -52,5 +52,7 @@ export default function initHighlights() {
     });
   });
 }
+
+
 
 initHighlights();

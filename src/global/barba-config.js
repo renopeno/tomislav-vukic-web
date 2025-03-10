@@ -1,64 +1,62 @@
-// let isTransitioning = false;
+let isTransitioning = false;
 
-// if (typeof window.barbaInitialized === 'undefined') {
-//   window.barbaInitialized = false;
-// }
-
-export default function initBarba() {
-    if (window.barbaInitialized) {
-        console.log("⚠️ Barba.js već inicijalizirana, preskačem...");
-        return;
-    }
-  
+function initBarba() {
   console.log("📌 Barba.js initialized");
 
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
 
-    barba.init({
-        transitions: [{
-            name: 'fade',
-            leave(data) {
-                // Uništavanje skripti prije nego što stranica napusti prikaz
-                destroyPageSpecificFunctions(data.current.namespace);
-                return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
-            },
-            enter(data) {
-                // Inicijalizacija skripti nakon što nova stranica uđe u prikaz
-                initPageSpecificFunctions(data.next.namespace);
-                isTransitioning = false;
-                console.log(`🎯 Entering: ${data.next.namespace}`);
-                updateNavigationWithHref();
-            }
-        }],
-        views: [
-            { namespace: 'home' },
-            { namespace: 'work' },
-            { namespace: 'about' },
-            { namespace: 'work-abstract' },
-            { namespace: 'work-nature' },
-            { namespace: 'work-people' },
-            { namespace: 'work-products' },
-            { namespace: 'work-architecture' }
-        ]
-    });
+  barba.init({
+    transitions: [{
+      name: 'fade',
+      leave(data) {
+        isTransitioning = true;
+        console.log(`🔄 Leaving: ${data.current.namespace}`);
+        return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
+      },
+      beforeEnter(data) {
+        window.scrollTo(0, 0);
+      },
+      enter(data) {
+        isTransitioning = false;
+        console.log(`🎯 Entering: ${data.next.namespace}`);
+        updateNavigationWithHref();
+        return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
+      }
+    }],
+    views: [
+      { namespace: 'home' },
+      { namespace: 'work' },
+      { namespace: 'about' },
+      { namespace: 'work-abstract' },
+      { namespace: 'work-nature' },
+      { namespace: 'work-people' },
+      { namespace: 'work-products' },
+      { namespace: 'work-architecture' }
+    ]
+  });
 
-// Funkcija za inicijalizaciju skripti specifičnih za stranicu
-function initPageSpecificFunctions(namespace) {
-  if (namespace === 'home') {
-    window.initHero();
-    window.initAboutSection();
-    window.initHighlights();
-    window.initCategories();
-  } else if (namespace === 'about') {
-    window.initAbout();
-  } else if (namespace === 'work') {
-    window.initGrid();
-    window.initPhotoModal();
-  }
-}
+  // 🔹 Ovdje ubacujemo afterEnter hook
+  barba.hooks.afterEnter(() => {
+    console.log("✅ Reinitializing JavaScript after page transition...");
+
+    // Ponovno učitaj main.js
+    import('/dist/main.js')
+        .then(() => {
+            console.log("✅ main.js reloaded.");
+            // reloadGlobalFunctions();
+            // reloadPageSpecificFunctions(barba.history.current.namespace);
+        })
+        .catch(err => console.error("❌ Error loading main.js:", err));
+  });
+
+  console.log("✅ Barba.js initialized successfully");
 }
 
-// // Inicijaliziramo Barba.js samo jednom
+window.addEventListener('beforeunload', () => {
+  console.log("🔄 Resetting scroll before leaving the page");
+  window.scrollTo(0, 0);
+});
+
 initBarba();

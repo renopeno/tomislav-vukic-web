@@ -1,4 +1,4 @@
-export default function initLenis() {
+function initLenis() {
   
   const lenis = new Lenis({
     lerp: 0.08,

@@ -1,4 +1,4 @@
-export default function initAbout() {
+function initAbout() {
   document.addEventListener('DOMContentLoaded', function() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);

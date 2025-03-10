@@ -1,4 +1,4 @@
-export default function initAboutSection() {
+ function initAboutSection() {
     // Dodajemo provjeru za sekciju i potrebne elemente
     const aboutSection = document.querySelector('.section.about');
     if (!aboutSection) return;
