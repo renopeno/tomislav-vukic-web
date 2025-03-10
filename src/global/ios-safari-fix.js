@@ -97,7 +97,7 @@ function removeHoverIosSafari() {
 }
 
 // Inicijaliziraj fix za iOS Safari
-function initIosSafariFix() {
+export default function initIosSafariFix() {
   if (isIosSafari()) {
     removeHoverIosSafari();
   }

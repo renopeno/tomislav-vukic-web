@@ -1,4 +1,4 @@
-function initPhotoModal() {
+export default function initPhotoModal() {
 
     const modal = document.querySelector(".modal-photo");
     

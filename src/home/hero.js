@@ -1,4 +1,4 @@
-function initHero() {
+export default function initHero() {
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
   const heroImageContainer = document.querySelector(".hero-images-container");

@@ -1,4 +1,3 @@
-// Generička funkcija za shuffle efekt
 function createShuffleEffect(element, addListener = true) {
   // Spremi originalni tekst u data atribut ako već nije spremljen
   if (!element.dataset.originalText) {
@@ -108,7 +107,7 @@ function createShuffleEffect(element, addListener = true) {
 }
 
 // Inicijalizacija za osnovne elemente
-function initLinksHover() {
+export default function initLinksHover() {
   document.querySelectorAll('.link, .cta').forEach(element => {
     createShuffleEffect(element, true);
   });
