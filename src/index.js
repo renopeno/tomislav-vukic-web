@@ -8,7 +8,7 @@ import './global/ios-safari-fix.js';
 
 // Home page skripte
 import './home/hero.js';
-import './home/about-section.js';
+import './home/about.js';
 import './home/highlights.js';
 import './home/categories.js';
 
