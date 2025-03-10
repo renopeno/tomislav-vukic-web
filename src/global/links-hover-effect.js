@@ -107,7 +107,7 @@ function createShuffleEffect(element, addListener = true) {
 }
 
 // Inicijalizacija za osnovne elemente
-export default function initLinksHover() {
+function initLinksHover() {
   document.querySelectorAll('.link, .cta').forEach(element => {
     createShuffleEffect(element, true);
   });
