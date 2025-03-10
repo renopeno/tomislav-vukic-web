@@ -5,7 +5,6 @@ import './global/dark-mode.js';
 import './global/footer-gsap.js';
 import './global/links-hover-effect.js';
 import './global/ios-safari-fix.js';
-import './global/navigation-cms-page-fix.js';
 
 // Home page skripte
 import './home/hero.js';
