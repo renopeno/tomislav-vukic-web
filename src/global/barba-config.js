@@ -1,6 +1,5 @@
 // let isTransitioning = false;
 
-// // Koristimo globalnu varijablu na window objektu koja će se zadržati između učitavanja skripti
 // if (typeof window.barbaInitialized === 'undefined') {
 //   window.barbaInitialized = false;
 // }
@@ -58,6 +57,7 @@ function initPageSpecificFunctions(namespace) {
     window.initGrid();
     window.initPhotoModal();
   }
+}
 }
 
 // // Inicijaliziramo Barba.js samo jednom
