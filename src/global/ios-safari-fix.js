@@ -103,4 +103,5 @@ function initIosSafariFix() {
   }
 }
 
+window.initIosSafariFix = initIosSafariFix;
 initIosSafariFix(); 

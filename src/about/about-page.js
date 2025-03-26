@@ -73,4 +73,5 @@ function initAbout() {
   });
 }
 
+window.initAbout = initAbout;
 initAbout();

@@ -29,4 +29,5 @@ function initFooter() {
     gsap.set(previousSection, { zIndex: 1 });
 }
 
+window.initFooter = initFooter;
 initFooter();

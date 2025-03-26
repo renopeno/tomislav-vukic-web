@@ -374,9 +374,6 @@ function initPhotoModal() {
     });
 }
 
-// Inicijalizacija modala
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initPhotoModal);
-} else {
-  initPhotoModal();
-}
+
+window.initPhotoModal = initPhotoModal;
+initPhotoModal();

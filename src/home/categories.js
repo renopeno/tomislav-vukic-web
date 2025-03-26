@@ -87,4 +87,5 @@ function initCategories() {
 
 }
 
+window.initCategories = initCategories;
 initCategories();

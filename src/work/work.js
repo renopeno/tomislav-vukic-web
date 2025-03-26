@@ -1,8 +1,8 @@
-let isGridInitializing = false;
+let isWorkInitializing = false;
 
-function initGrid() {
-  if (isGridInitializing) return; // Sprečava višestruko pokretanje
-  isGridInitializing = true;
+function initWork() {
+  if (isWorkInitializing) return; // Sprečava višestruko pokretanje
+  isWorkInitializing = true;
   
   // Provjera da znamo da smo na pageu koji ima grid
   const photoContainers = document.querySelectorAll('.photo-container');
@@ -119,11 +119,11 @@ function initGrid() {
 
     console.log("✅ Grid postavljen.");
   } finally {
-    isGridInitializing = false;
+    isWorkInitializing = false;
   }
 }
 
-// Dodaj ovo u initGrid() ili kao zasebnu funkciju koja se poziva nakon initGrid()
+// Dodaj ovo u initWork() ili kao zasebnu funkciju koja se poziva nakon initWork()
 function initCategoryTitleAnimation() {
   const titleWrapper = document.querySelectorAll('.work-categories-title-wrapper, .work-categories-top-margin');
   
@@ -144,13 +144,8 @@ function initCategoryTitleAnimation() {
   });
 }
 
-// Pozovi je nakon što se grid postavi
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initGrid();
-    initCategoryTitleAnimation();
-  });
-} else {
-  initGrid();
-  initCategoryTitleAnimation();
-}
+window.initWork = initWork;
+initWork();
+
+window.initCategoryTitleAnimation = initCategoryTitleAnimation;
+initCategoryTitleAnimation();
