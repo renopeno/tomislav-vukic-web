@@ -5,10 +5,14 @@ function initCategories() {
   
   // Funkcija koja provjerava visinu viewporta i postavlja stil
   function checkViewportHeight() {
-    if (window.innerHeight < 1144) {
+    // Provjera je li uređaj mobilni (npr. manji od 768px širine)
+    const isMobile = window.innerWidth < 768;
+    
+    // Samo ako NIJE mobilni uređaj i visina viewporta je manja od 1144px
+    if (!isMobile && window.innerHeight < 1144) {
       categoriesSection.style.position = 'relative';
     } else {
-      categoriesSection.style.position = 'sticky'; // eksplicitno postavljamo na sticky umjesto praznog
+      categoriesSection.style.position = 'sticky';
     }
   }
   
