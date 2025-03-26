@@ -6,9 +6,11 @@ function initCategories() {
   // Funkcija koja provjerava visinu viewporta i postavlja stil
   function checkViewportHeight() {
     if (window.innerHeight < 1144) {
+      console.log('Visina viewporta je manja od 1144px, postavljam position: relative');
       categoriesSection.style.position = 'relative';
     } else {
-      categoriesSection.style.position = ''; // vraća na defaultnu vrijednost
+      console.log('Visina viewporta je veća od 1144px, postavljam position: sticky');
+      categoriesSection.style.position = 'sticky'; // eksplicitno postavljamo na sticky umjesto praznog
     }
   }
   
