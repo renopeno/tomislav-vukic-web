@@ -3,6 +3,12 @@ function initCategories() {
   const categoriesRow = document.querySelectorAll('.categories-row');
   const categoriesSection = document.querySelector('.section.categories');
   
+  // Provjeri postoji li categoriesSection element
+  if (!categoriesSection) {
+    console.warn('Element .section.categories nije pronađen na stranici');
+    return; // Prekini izvršavanje funkcije ako element ne postoji
+  }
+  
   // Funkcija koja provjerava visinu viewporta i postavlja stil
   function checkViewportHeight() {
     // Provjera je li uređaj mobilni (npr. manji od 768px širine)
