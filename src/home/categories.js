@@ -1,6 +1,22 @@
 function initCategories() {
 
   const categoriesRow = document.querySelectorAll('.categories-row');
+  const categoriesSection = document.querySelector('.section.categories');
+  
+  // Funkcija koja provjerava visinu viewporta i postavlja stil
+  function checkViewportHeight() {
+    if (window.innerHeight < 1144) {
+      categoriesSection.style.position = 'relative';
+    } else {
+      categoriesSection.style.position = ''; // vraća na defaultnu vrijednost
+    }
+  }
+  
+  // Početna provjera
+  checkViewportHeight();
+  
+  // Slušaj resize događaj za ažuriranje stila
+  window.addEventListener('resize', checkViewportHeight);
 
   categoriesRow.forEach((category) => {
     // Mouse enter
