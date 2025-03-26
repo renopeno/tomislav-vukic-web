@@ -11,8 +11,10 @@ function initCategories() {
     // Samo ako NIJE mobilni uređaj i visina viewporta je manja od 1144px
     if (!isMobile && window.innerHeight < 1144) {
       categoriesSection.style.position = 'relative';
+      categoriesSection.style.height = 'auto'; // Postavlja visinu na auto kada je position relative
     } else {
       categoriesSection.style.position = 'sticky';
+      categoriesSection.style.height = ''; // Vraća na defaultnu visinu
     }
   }
   
