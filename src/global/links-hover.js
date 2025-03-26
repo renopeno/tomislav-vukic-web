@@ -116,5 +116,6 @@ function initLinksHover() {
 // Exportaj funkciju da je možeš koristiti u drugim fileovima
 window.createShuffleEffect = createShuffleEffect;
 
-// Inicijaliziraj efekt na linkovima
+
+window.initLinksHover = initLinksHover;
 initLinksHover();

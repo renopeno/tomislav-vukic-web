@@ -53,6 +53,5 @@ function initHighlights() {
   });
 }
 
-
-
+window.initHighlights = initHighlights;
 initHighlights();

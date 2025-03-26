@@ -34,5 +34,5 @@ function initDarkMode() {
   // }
 }
 
-// ✅ Pokreni odmah, ne čekaj `DOMContentLoaded`
+window.initDarkMode = initDarkMode;
 initDarkMode();

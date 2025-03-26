@@ -13,4 +13,5 @@ function initLenis() {
   requestAnimationFrame(raf);
 }
 
+window.initLenis = initLenis;
 initLenis();

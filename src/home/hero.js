@@ -204,4 +204,5 @@ function initHero() {
   });
 }
 
+window.initHero = initHero;
 initHero();
