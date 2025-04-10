@@ -29,7 +29,7 @@ function initCategories() {
   // checkViewportHeight();
   
   // Slušaj resize događaj za ažuriranje stila
-  window.addEventListener('resize', checkViewportHeight);
+  // window.addEventListener('resize', checkViewportHeight);
 
   categoriesRow.forEach((category) => {
     // Mouse enter
