@@ -26,7 +26,7 @@ function initCategories() {
   // }
   
   // Početna provjera
-  checkViewportHeight();
+  // checkViewportHeight();
   
   // Slušaj resize događaj za ažuriranje stila
   window.addEventListener('resize', checkViewportHeight);
