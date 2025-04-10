@@ -10,19 +10,20 @@ function initCategories() {
   }
   
   // Funkcija koja provjerava visinu viewporta i postavlja stil
-  function checkViewportHeight() {
-    // Provjera je li uređaj mobilni (npr. manji od 768px širine)
-    const isMobile = window.innerWidth < 768;
+  // Ovo nam ne treba otkad imamo samo 4 kategorije
+  // function checkViewportHeight() {
+  //   // Provjera je li uređaj mobilni (npr. manji od 768px širine)
+  //   const isMobile = window.innerWidth < 768;
     
-    // Samo ako NIJE mobilni uređaj i visina viewporta je manja od 1144px
-    if (!isMobile && window.innerHeight < 1144) {
-      categoriesSection.style.position = 'relative';
-      categoriesSection.style.height = 'auto'; // Postavlja visinu na auto kada je position relative
-    } else {
-      categoriesSection.style.position = 'sticky';
-      categoriesSection.style.height = ''; // Vraća na defaultnu visinu
-    }
-  }
+  //   // Samo ako NIJE mobilni uređaj i visina viewporta je manja od 1144px
+  //   if (!isMobile && window.innerHeight < 1144) {
+  //     categoriesSection.style.position = 'relative';
+  //     categoriesSection.style.height = 'auto'; // Postavlja visinu na auto kada je position relative
+  //   } else {
+  //     categoriesSection.style.position = 'sticky';
+  //     categoriesSection.style.height = ''; // Vraća na defaultnu visinu
+  //   }
+  // }
   
   // Početna provjera
   checkViewportHeight();
