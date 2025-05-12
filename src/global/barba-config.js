@@ -10,12 +10,16 @@
 // }
 
 function updateNavigationWithHref() {
+  console.log('📍 Ažuriranje navigacije s trenutačnim href-om');
   const navLinks = document.querySelectorAll('.nav-link');
   const currentHref = window.location.pathname;
 
+  console.log(`🔍 Trenutni URL path: ${currentHref}`);
   navLinks.forEach((link) => {
     const linkHref = link.getAttribute('href');
+    console.log(`📌 Provjeravam link: ${linkHref}`);
     if (currentHref === linkHref || (currentHref === '/' && linkHref === '/')) {
+      console.log(`✅ Link postavljen kao aktivan: ${linkHref}`);
       link.setAttribute('aria-current', 'page');
       link.classList.add('current', 'w--current');
     } else {
@@ -23,122 +27,165 @@ function updateNavigationWithHref() {
       link.classList.remove('current', 'w--current');
     }
   });
+  console.log('✅ Navigacija uspješno ažurirana');
 }
 
 function destroyPageSpecificFunctions(namespace) {
-  console.log(`🔄 Barba: Cleaning up ${namespace}`);
-  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-
-  const splits = document.querySelectorAll('.split-type');
-  splits.forEach(split => {
-    if (split.splitType) split.splitType.revert();
+  console.log(`🧹 Započinjem čišćenje za namespace: ${namespace}`);
+  
+  console.log('🔄 Uklanjam ScrollTrigger instance');
+  ScrollTrigger.getAll().forEach((trigger) => {
+    console.log(`  - Uklanjam trigger: ${trigger.vars.id || 'bez ID-a'}`);
+    trigger.kill();
   });
 
-  console.log(`✅ Cleanup complete for ${namespace}`);
+  console.log('🔄 Vraćam SplitType instance u početno stanje');
+  const splits = document.querySelectorAll('.split-type');
+  console.log(`  - Pronađeno ${splits.length} SplitType elemenata`);
+  splits.forEach(split => {
+    if (split.splitType) {
+      console.log(`  - Vraćam SplitType u početno stanje za: ${split.className}`);
+      split.splitType.revert();
+    }
+  });
+
+  console.log(`✅ Čišćenje za ${namespace} uspješno završeno`);
 }
 
 function initGlobalFunctions(data) {
+  console.log('🚀 Inicijalizacija globalnih funkcija');
+  console.log('🔄 Premještanje skrola na vrh stranice');
   window.scrollTo(0, 0);
+  
+  console.log('🔒 Postavljanje overflow:hidden na body');
   document.body.style.overflow = 'hidden';
   
   if (window.lenis) {
+    console.log('🛑 Uništavam postojeću Lenis instancu');
     window.lenis.destroy();
   }
+  
+  console.log('🌓 Inicijalizacija Dark Mode-a');
   initDarkMode?.();
+  
+  console.log('🔄 Inicijalizacija Lenis smooth scroll-a');
   initLenis?.();
+  
+  console.log('🔗 Inicijalizacija hover efekta na linkovima');
   initLinksHover?.();
+  
+  console.log('👣 Inicijalizacija footera');
   initFooter?.();
+  
+  console.log('📱 Inicijalizacija iOS Safari popravka');
   initIosSafariFix?.();
+  
+  console.log('🔄 Ponovno inicijalizacija Lenis-a (duplikacija?)');
   initLenis?.();
   
-  
+  console.log('🌓 Primjena Dark Mode postavki iz localStorage-a');
   if (localStorage.getItem("darkMode") === "enabled") {
+    console.log('  - Dark Mode aktivan');
     document.body.classList.add("dark-mode");
   } else {
+    console.log('  - Dark Mode neaktivan');
     document.body.classList.remove("dark-mode");
   }
   
+  console.log('🔓 Vraćanje normalnog overflow svojstva na body');
   document.body.style.overflow = '';
+  
+  console.log('✅ Globalne funkcije uspješno inicijalizirane');
 }
 
 function initPageSpecificFunctions(namespace) {
+  console.log(`🏗️ Inicijalizacija specifičnih funkcija za stranicu: ${namespace}`);
+  
   switch (namespace) {
     case 'home':
+      console.log('🏠 Učitavanje HOME komponenti:');
+      console.log('  - Inicijalizacija Hero sekcije');
       initHero?.();
+      console.log('  - Inicijalizacija About sekcije');
       initAboutSection?.();
+      console.log('  - Inicijalizacija Highlights sekcije');
       initHighlights?.();
+      console.log('  - Inicijalizacija Categories sekcije');
       initCategories?.();
       break;
-    case 'work' || 'work-abstract' || 'work-nature' || 'work-people' || 'work-products' || 'work-architecture':
+    case 'work':
+    case 'work-abstract':
+    case 'work-nature': 
+    case 'work-people': 
+    case 'work-products': 
+    case 'work-architecture':
+      console.log('💼 Učitavanje WORK komponenti:');
+      console.log('  - Inicijalizacija Work sekcije');
       initWork?.();
+      console.log('  - Inicijalizacija animacije naslova kategorije');
       initCategoryTitleAnimation?.();
+      console.log('  - Inicijalizacija Photo modala');
       initPhotoModal?.();
       break;
     case 'about':
+      console.log('👤 Učitavanje ABOUT komponenti:');
+      console.log('  - Inicijalizacija About sekcije');
       initAbout?.();
       break;
+    default:
+      console.log(`⚠️ Nepoznati namespace: ${namespace}, ne inicijaliziram specifične funkcije`);
   }
+  
+  console.log(`✅ Inicijalizacija stranice ${namespace} završena`);
 }
 
 // let isTransitioning = false;
 
 function initBarba() {
-  console.log("📌 Barba.js initialized");
+  console.log("🔄 Započinjem inicijalizaciju Barba.js");
+  console.log("📋 Postavljam history.scrollRestoration na 'manual'");
 
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
 
+  console.log("⚙️ Konfiguriram Barba.js tranzicije i namespace-ove");
   barba.init({
     transitions: [{
       name: 'fade',
       leave(data) {
-        // isTransitioning = true;
-        console.log(`🔄 Leaving: ${data.current.namespace}`);
+        console.log(`🚪 LEAVE: Napuštam stranicu ${data.current.namespace}`);
+        console.log(`  - URL: ${data.current.url.path}`);
+        console.log(`  - Primjenjujem izlaznu animaciju (opacity: 0)`);
         return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
-        // if (data.current) {
-        //   destroyPageSpecificFunctions(data.current.namespace);
-        // }
-          // Start or resume the Lenis smooth scrolling functionality.
-          lenis.start()
-          if (lenis) {
-            // scroll to the top using Lenis immediately (no smooth scrolling).
-            lenis.scrollTo(0, { immediate: true });
-          } else {
-            // If 'lenis' is not defined, fall back to the default browser scroll behavior.
-            window.scrollTo(0, 0)
+        console.log(`🔑 BEFORE ENTER: Pripremam ulazak na stranicu ${data.next.namespace}`);
+        console.log(`  - URL: ${data.next.url.path}`);
+        
+        console.log('  - Pokrećem Lenis');
+        lenis.start();
+        
+        if (lenis) {
+          console.log('  - Postavljam scroll na vrh bez animacije (immediate: true)');
+          lenis.scrollTo(0, { immediate: true });
+        } else {
+          console.log('  - Lenis nije definiran, koristim standardni window.scrollTo');
+          window.scrollTo(0, 0);
         }
       },
       enter(data) {
-        isTransitioning = false;
-        console.log(`🎯 Entering: ${data.next.namespace}`);
-        
-        // Samo ovdje inicijaliziramo grid
-        // if (data.next.namespace.includes('work-')) {
-        //   initGrid();
-        //   initPhotoModal?.();
-        // }
-
-      },
-      enter(data) {
-        // isTransitioning = false;
-        console.log(`🎯 Entering: ${data.next.namespace}`);
-        
-        // Samo ovdje inicijaliziramo grid
-        // if (data.next.namespace.includes('work-')) {
-        //   initGrid();
-        //   initPhotoModal?.();
-        // }
-
-        // Osiguraj pokretanje specifičnih funkcija stranice nakon tranzicije
-        // setTimeout(() => {
-        //   initPageSpecificFunctions(data.next.namespace);
-        // }, 100);
-
-        // updateNavigationWithHref();
+        console.log(`🚪 ENTER: Ulazim na stranicu ${data.next.namespace}`);
+        console.log(`  - URL: ${data.next.url.path}`);
+        console.log(`  - Primjenjujem ulaznu animaciju (opacity: 1)`);
         return gsap.to(data.next.container, { opacity: 1, duration: 0.3 });
+      },
+      after(data) {
+        console.log(`🎭 AFTER: Tranzicija na ${data.next.namespace} završena`);
+        console.log(`  - Pozivam inicijalizaciju specifičnih funkcija za ${data.next.namespace}`);
+        initPageSpecificFunctions(data.next.namespace);
+        console.log(`  - Ažuriram status navigacije`);
+        updateNavigationWithHref();
       }
     }],
     views: [
@@ -153,15 +200,17 @@ function initBarba() {
     ]
   });
 
-  console.log("✅ Barba.js initialized successfully");
+  console.log("✅ Barba.js uspješno inicijaliziran");
 }
 
 window.addEventListener('beforeunload', () => {
-  console.log("🔄 Resetting scroll before leaving the page");
+  console.log("🔄 beforeunload: Resetiram scroll prije napuštanja stranice");
   window.scrollTo(0, 0);
 });
 
+console.log("🚀 Pokrećem Barba.js inicijalizaciju");
 initBarba();
+console.log("✅ Barba.js konfiguracija kompletna");
 
 // // Inicijalizacija custom funkcija nakon Barba tranzicija
 // function initScripts() {
@@ -185,7 +234,7 @@ initBarba();
 //     } catch (error) {
 //       console.error("Greška u initPhotoModal:", error);
 //     }
-//   }
+//   });
 
 //   // Ponovno dodavanje event listenera za sve gumbe
 //   document.querySelectorAll(".some-button").forEach(button => {
