@@ -6,10 +6,8 @@ export default defineConfig({
     rollupOptions: {
       input: 'src/index.js',
       output: {
-        format: 'es',
-        preserveModules: true,
-        preserveModulesRoot: 'src',
-        preserveEntrySignatures: 'allow-extension'
+        format: 'es', // ✅ ES module
+        entryFileNames: 'main.js'
       }
     }
   }
