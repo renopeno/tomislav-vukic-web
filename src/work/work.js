@@ -123,7 +123,7 @@ function initWork() {
   }
 }
 
-// Dodaj ovo u initWork() ili kao zasebnu funkciju koja se poziva nakon initWork()
+// Dodaj ovo u initWork()  ili kao zasebnu funkciju koja se poziva nakon initWork()
 function initCategoryTitleAnimation() {
   const titleWrapper = document.querySelectorAll('.work-categories-title-wrapper, .work-categories-top-margin');
   

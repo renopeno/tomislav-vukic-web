@@ -139,7 +139,7 @@ function initPhotoModal() {
             ease: "power2.in"
         });
     
-        // Skrolaj grid do originalne slike
+        // Skrolaj grid do originalne slike 
         const originalParent = photoElement.originalParent;
         const originalRect = originalParent.getBoundingClientRect();
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
