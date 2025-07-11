@@ -6,7 +6,9 @@ export default defineConfig({
     rollupOptions: {
       input: 'src/index.js',
       output: {
-        entryFileNames: 'main.js'
+        format: 'es',
+        preserveModules: true,
+        preserveModulesRoot: 'src'
       }
     }
   }
