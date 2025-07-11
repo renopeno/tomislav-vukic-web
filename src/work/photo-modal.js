@@ -35,7 +35,6 @@ function initPhotoModal() {
         const actualIndex = window.shuffledPhotos.indexOf(container);
 
         // Spremi referencu na originalni container direktno u DOM elementu
-        photo.originalParent = photo.parentElement;
         photoData[actualIndex] = {
             src: photo.getAttribute("src"),
             title: photo.getAttribute("data-title"),

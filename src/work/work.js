@@ -9,6 +9,12 @@ function initWork() {
   if (!photoContainers.length) return;
   
   try {
+    // DODAJ OVO NA POČETAK - postavi originalParent PRIJE mijenjanja DOM-a
+    const gridPhotos = document.querySelectorAll(".photo");
+    gridPhotos.forEach(photo => {
+      photo.originalParent = photo.parentElement;
+    });
+    
     const MAX_PHOTOS = 30;
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
     
