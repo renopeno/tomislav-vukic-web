@@ -8,7 +8,8 @@ export default defineConfig({
       output: {
         format: 'es',
         preserveModules: true,
-        preserveModulesRoot: 'src'
+        preserveModulesRoot: 'src',
+        preserveEntrySignatures: 'allow-extension'
       }
     }
   }
