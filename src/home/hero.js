@@ -95,9 +95,9 @@ function initHero() {
   );
   camera.position.z = 900;
   
-  // Na mobilnim uređajima digni carousel (spusti kameru)
+  // Na mobilnim uređajima malo spusti carousel (digni kameru)
   const isMobile = window.innerWidth <= 768;
-  camera.position.y = isMobile ? -80 : 0; // Digni carousel na mobitelu
+  camera.position.y = isMobile ? 30 : 0; // Spusti carousel na mobitelu
 
   const renderer = new THREE.WebGLRenderer({ 
     alpha: true, 
@@ -528,21 +528,77 @@ function initHero() {
     console.log('🖱️ Drag završio, inertia:', inertiaAmount);
   };
 
-  // Touch drag handlers (mobitel)
-  const touchstartHandler = (e) => {
-    // Na mobilnim uređajima ograniči drag area (samo centar ekrana ±25%)
-    if (isMobile) {
-      const touchY = e.touches[0].clientY;
-      const viewportHeight = window.innerHeight;
-      const centerY = viewportHeight / 2;
-      const allowedRange = viewportHeight * 0.25; // ±25% od centra
-      
-      const isInDragArea = Math.abs(touchY - centerY) < allowedRange;
-      
-      if (!isInDragArea) {
-        // Touch je izvan drag area - dozvoli normalno scrollanje
-        return;
+  // ═══════════════════════════════════════════════════════════
+  //  GYROSCOPE KONTROLA (MOBITEL)
+  // ═══════════════════════════════════════════════════════════
+  
+  let gyroActive = false;
+  let lastGyroRotation = 0;
+  
+  const gyroHandler = (e) => {
+    if (!isMobile) return;
+    
+    // gamma = lijevo/desno nagib (-90 do 90)
+    const tilt = e.gamma || 0;
+    
+    // Buffer zone: ne reagiraj na male pokrete (±15 stupnjeva)
+    const deadZone = 15;
+    const maxTilt = 45; // Maksimalni tilt za full speed
+    
+    if (Math.abs(tilt) < deadZone) {
+      // Unutar dead zone - vrati na default rotation
+      if (gyroActive) {
+        gyroActive = false;
+        targetRotationSpeed = baseRotationSpeed;
+        console.log('📱 Gyro inactive (dead zone)');
       }
+      return;
+    }
+    
+    // Aktiviraj gyro kontrolu
+    if (!gyroActive) {
+      gyroActive = true;
+      console.log('📱 Gyro active!');
+    }
+    
+    // Mapiranje tilt-a na rotation speed
+    const adjustedTilt = Math.abs(tilt) > deadZone ? tilt - Math.sign(tilt) * deadZone : 0;
+    const normalizedTilt = Math.max(-1, Math.min(1, adjustedTilt / (maxTilt - deadZone)));
+    
+    // Brzina rotacije ovisno o tiltu (negativan tilt = rotacija ulijevo)
+    const gyroSpeed = normalizedTilt * 0.003; // Max 0.003 rotation speed
+    
+    lastGyroRotation = gyroSpeed;
+    targetRotationSpeed = baseRotationSpeed + gyroSpeed;
+  };
+  
+  // Request gyro permission (iOS 13+)
+  if (isMobile && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS - zatraži permission
+    console.log('📱 iOS - Gyro permission dostupan (zatraži kasnije)');
+    
+    // Možeš dodati button u UI za ovo
+    window.requestGyroPermission = () => {
+      DeviceOrientationEvent.requestPermission()
+        .then(permissionState => {
+          if (permissionState === 'granted') {
+            window.addEventListener('deviceorientation', gyroHandler);
+            console.log('✅ Gyro permission granted');
+          }
+        })
+        .catch(console.error);
+    };
+  } else if (isMobile) {
+    // Android ili stariji iOS - ne treba permission
+    window.addEventListener('deviceorientation', gyroHandler);
+    console.log('📱 Gyro aktiviran (Android ili stariji iOS)');
+  }
+
+  // Touch drag handlers (desktop tablet sa touch + mouse)
+  const touchstartHandler = (e) => {
+    // Na mobilnim uređajima disableaj drag - koristi gyro
+    if (isMobile) {
+      return;
     }
     
     isDragging = true;
@@ -719,6 +775,9 @@ function initHero() {
     renderer.domElement.removeEventListener('touchstart', touchstartHandler);
     renderer.domElement.removeEventListener('touchmove', touchmoveHandler);
     renderer.domElement.removeEventListener('touchend', touchendHandler);
+    
+    // Cleanup gyro handler
+    window.removeEventListener('deviceorientation', gyroHandler);
     
     planeMeshes.forEach(mesh => {
       if (mesh.geometry) mesh.geometry.dispose();
