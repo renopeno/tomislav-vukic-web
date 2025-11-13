@@ -111,6 +111,9 @@ Webflow.push(function() {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@barba/core"></script>
 
+<!-- Three.js r159 (zadnja globalna verzija bez deprecation warninga) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+
 <!-- Production -->
 <!-- <script type="module" src="https://tomislav-vukic-web-team-renopeno.vercel.app/index.js"></script> -->
 

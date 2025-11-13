@@ -1,58 +1,257 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ *  HERO SECTION - 3D CYLINDER CAROUSEL
+ * ═══════════════════════════════════════════════════════════
+ * 
+ * Features:
+ * - Dinamično učitavanje slika iz Webflow CMS-a
+ * - 3D cylinder carousel sa zakrivljenim slikama
+ * - Continuous rotation oko Y-osi
+ * - Minimalni razmak između slika
+ * - GSAP reveal animacija
+ */
+
 function initHero() {
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
-  const heroImageContainer = document.querySelector(".hero-images-container");
-  
-  // Dodajemo provjeru postojanja potrebnih elemenata
-  if (!heroImageContainer) return;
-  
-  let heroImages = Array.from(document.querySelectorAll(".hero-image"));
 
-  function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-      }
+  // WEBFLOW CMS STRUKTURA: Svaka slika je u posebnom .hero-images-container
+  const heroWrapper = document.querySelector(".hero-images-wrapper");
+  
+  if (!heroWrapper) {
+    console.warn("Hero wrapper nije pronađen!");
+    return;
   }
+
+  // Dohvati SVE slike iz svih containera (dinamično iz CMS-a)
+  const heroImages = Array.from(document.querySelectorAll(".hero-image"));
+  const totalImages = heroImages.length;
   
-  // Prvo shufflaj array
-  shuffleArray(heroImages);
-  
-  // Zatim očisti container
+  console.log(`✅ Pronađeno ${totalImages} slika u CMS-u (bez duplikata)`);
+
+  if (totalImages === 0) {
+    console.warn("⚠️ Nema slika za prikaz!");
+    return;
+  }
+
+  // Koristit ćemo PRVI .hero-images-container za canvas
+  const heroImageContainer = document.querySelector(".hero-images-container");
+
+  // ═══════════════════════════════════════════════════════════
+  //  THREE.JS SETUP
+  // ═══════════════════════════════════════════════════════════
+
+  if (typeof THREE === 'undefined') {
+    console.error("❌ Three.js nije učitan! Provjerite Webflow Footer Code.");
+    return;
+  }
+
+  console.log("🎨 Pokrećem 3D Cylinder Carousel...");
+
+  // Sakrij SVE originalne Webflow slike
+  heroImages.forEach(img => {
+    img.style.display = 'none';
+  });
+
+  // Pripremi wrapper
+  heroWrapper.style.position = 'absolute';
+  heroWrapper.style.top = '0';
+  heroWrapper.style.left = '0';
+  heroWrapper.style.width = '100%';
+  heroWrapper.style.height = '100%';
+  heroWrapper.style.pointerEvents = 'none';
+
+  // Pripremi container za canvas
   heroImageContainer.innerHTML = '';
-  
-  // Dodaj shufflane slike u container
-  heroImages.forEach((img) => {
-      heroImageContainer.appendChild(img);
-  });
-  
-  // Ponovno dohvati slike nakon što su dodane u DOM
-  const heroImage = document.querySelectorAll(".hero-images-container > *");
+  heroImageContainer.style.position = 'relative';
+  heroImageContainer.style.width = '100%';
+  heroImageContainer.style.height = '100%';
+  heroImageContainer.style.overflow = 'hidden';
 
-  // Postavi stil za container da omogući centriranje
-  gsap.set(heroImageContainer, {
-    position: "relative",
-    width: "100%",
-    height: "100%", 
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "visible"
-  });
+  // Kreiraj scenu, kameru, renderer
+  const scene = new THREE.Scene();
+  
+  const camera = new THREE.PerspectiveCamera(
+    40,
+    heroImageContainer.offsetWidth / heroImageContainer.offsetHeight,
+    0.1,
+    3000
+  );
+  camera.position.z = 900;
+  camera.position.y = 0;
 
-  // Dodaj varijablu za praćenje učitanih slika
+  const renderer = new THREE.WebGLRenderer({ 
+    alpha: true, 
+    antialias: true 
+  });
+  renderer.setSize(heroImageContainer.offsetWidth, heroImageContainer.offsetHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  
+  renderer.domElement.style.position = 'absolute';
+  renderer.domElement.style.top = '0';
+  renderer.domElement.style.left = '0';
+  renderer.domElement.style.width = '100%';
+  renderer.domElement.style.height = '100%';
+  
+  heroImageContainer.appendChild(renderer.domElement);
+
+  // Ambient light
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+  directionalLight.position.set(0, 500, 800);
+  scene.add(directionalLight);
+
+  // ═══════════════════════════════════════════════════════════
+  //  CURVED SHADER ZA CYLINDER EFEKT
+  // ═══════════════════════════════════════════════════════════
+
+  const curvedVertexShader = `
+    uniform float uBend;
+    varying vec2 vUv;
+    varying float vBendAmount;
+
+    void main() {
+      vUv = uv;
+      vec3 pos = position;
+      
+      // Cylinder bend - zakrivljenje po X-osi
+      float bend = pos.x * pos.x * uBend;
+      pos.z -= bend;
+      
+      // Šalji bend amount u fragment shader za lighting
+      vBendAmount = bend;
+      
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    }
+  `;
+
+  const curvedFragmentShader = `
+    uniform sampler2D uTexture;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    varying float vBendAmount;
+
+    void main() {
+      vec4 texColor = texture2D(uTexture, vUv);
+      
+      // Shadow na rubovima za naglašavanje benda
+      float edgeShadow = 1.0 - smoothstep(0.5, 1.0, abs(vUv.x - 0.5) * 2.0) * 0.25;
+      
+      // Vignette za dubinu
+      vec2 center = vUv - 0.5;
+      float vignette = 1.0 - smoothstep(0.3, 0.8, length(center)) * 0.1;
+      
+      vec3 finalColor = texColor.rgb * edgeShadow * vignette;
+      
+      gl_FragColor = vec4(finalColor, texColor.a * uOpacity);
+    }
+  `;
+
+
+  // ═══════════════════════════════════════════════════════════
+  //  UČITAJ SLIKE I KREIRAJ 3D CYLINDER CAROUSEL
+  // ═══════════════════════════════════════════════════════════
+
+  const textureLoader = new THREE.TextureLoader();
+  const planeMeshes = [];
+  const carousel = new THREE.Group();
+  scene.add(carousel);
+
+  // 🎲 RANDOM ROTACIJA ODMAH (različit svaki reload!)
+  const randomRotX = Math.random() * 0.4 - 0.2; // -0.2 do 0.2 rad (~±11° range)
+  const randomRotZ = Math.random() * 0.4 - 0.2; // -0.2 do 0.2 rad (~±11° range)
+  carousel.rotation.x = randomRotX;
+  carousel.rotation.z = randomRotZ;
+  console.log(`🎲 Random tilt: X=${(randomRotX * 180/Math.PI).toFixed(1)}°, Z=${(randomRotZ * 180/Math.PI).toFixed(1)}°`);
+
+  // Parametri carousela
+  const radius = 280; // MANJI radijus = uži carousel
+  const planeWidth = 165; // VEĆE za manje slika (bilo 140, sad 8 slika umjesto 10)
+  const planeHeight = 185; // Proporcionalno veće (bilo 160)
+  const angleStep = (2 * Math.PI) / totalImages;
+  
+  // 📐 ASPECT RATIO: 165:185 ≈ 0.89:1 (približno 3:4 portrait ratio)
+  // Za najbolje rezultate: pripremi fotke u 3:4 ratio (npr: 1200x1600, 900x1200, itd.)
+  
+  // Debug: izračunaj razmak između slika
+  const circumference = 2 * Math.PI * radius; // Obim kruga
+  const availableSpacePerImage = circumference / totalImages;
+  const gap = availableSpacePerImage - planeWidth;
+  console.log(`📏 Obim: ${circumference.toFixed(0)}px, Prostor: ${availableSpacePerImage.toFixed(0)}px, Slika: ${planeWidth}px, Razmak: ${gap.toFixed(0)}px`);
+
+  console.log(`📸 Kreiram 3D cylinder carousel s ${totalImages} slika (PO REDU iz CMS-a)...`);
+
   let loadedCount = 0;
   
-  heroImage.forEach((img) => {
-    const imgElement = new Image();
-    imgElement.src = img.src;
-    imgElement.onload = () => {
-      loadedCount++;
-      if (loadedCount === heroImage.length) {
-        startAnimation();
+  // Pre-allociraj array da zadržimo redoslijed (texture loading je async)
+  const planeMeshesTemp = new Array(totalImages);
+
+  heroImages.forEach((img, index) => {
+    textureLoader.load(
+      img.src,
+      (texture) => {
+        // PlaneGeometry s MNOGO segmenata za smooth curve
+        const geometry = new THREE.PlaneGeometry(
+          planeWidth, 
+          planeHeight, 
+          64, // VIŠE width segments za glatki bend
+          1   // height segments
+        );
+
+        // Curved shader material
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            uTexture: { value: texture },
+            uBend: { value: 0.0015 }, // Malo jači bend za manji radius
+            uOpacity: { value: 0 } // Startuje nevidljivo (reveal animacija)
+          },
+          vertexShader: curvedVertexShader,
+          fragmentShader: curvedFragmentShader,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+
+        // Pozicija u cilindru (FINALNA)
+        const angle = -angleStep * index + Math.PI; // Počinje straga
+        const finalX = Math.sin(angle) * radius;
+        const finalZ = Math.cos(angle) * radius;
+
+        // 🎬 REVEAL: SVE fotke već na pozicijama, ali nevidljive + male
+        mesh.position.set(finalX, 30, finalZ);
+        mesh.rotation.y = angle;
+        
+        // Startuju nevidljive + malo manje (fade + scale reveal)
+        mesh.material.uniforms.uOpacity.value = 0;
+        mesh.scale.set(0.7, 0.7, 0.7); // Malo manje na početku
+
+        carousel.add(mesh);
+        planeMeshesTemp[index] = mesh; // Spremi na PRAVI index (zadržava redoslijed)
+
+        loadedCount++;
+        console.log(`✓ Učitana slika ${loadedCount}/${totalImages} (index: ${index})`);
+
+        if (loadedCount === totalImages) {
+          // Kopiraj u pravi planeMeshes array (sada svi u ispravnom redoslijedu)
+          planeMeshesTemp.forEach(mesh => planeMeshes.push(mesh));
+          console.log(`✅ Sve slike učitane PO REDU iz CMS-a!`);
+          startAnimation();
+        }
+      },
+      undefined,
+      (error) => {
+        console.error(`❌ Greška pri učitavanju slike ${index}:`, error);
       }
-    };
+    );
   });
+
+  // ═══════════════════════════════════════════════════════════
+  //  TEXT ANIMACIJA (GSAP)
+  // ═══════════════════════════════════════════════════════════
 
   function splitTextToSpans(element) {
     if (element) {
@@ -63,146 +262,384 @@ function initHero() {
         .join("");
     }
   }
+  
   splitTextToSpans(heroTitle);
-
   const characters = heroTitle ? heroTitle.querySelectorAll("span") : [];
 
-  // Spremi originalne stilove slika prije bilo kakvih promjena
-  const originalStyles = [];
-  heroImage.forEach((img) => {
-    const computedStyle = window.getComputedStyle(img);
-    originalStyles.push({
-      width: computedStyle.width,
-      height: computedStyle.height,
-      position: computedStyle.position,
-      objectFit: computedStyle.objectFit,
-      maxWidth: computedStyle.maxWidth,
-      maxHeight: computedStyle.maxHeight,
-      transform: computedStyle.transform
-    });
-  });
-
-  // Pohrani pozicije slika za parallax
-  const imagePositions = [];
-  
-  // Postavi slike direktno bez wrappera
-  heroImage.forEach((img) => {
-    // Postavi stil direktno na sliku
-    img.style.position = 'absolute';
-    img.style.objectFit = 'cover';
-    img.style.opacity = '1';
-    
-    // Postavi početnu poziciju za animaciju
-    gsap.set(img, {
-      x: 0,
-      y: 200,
-      rotation: 0,
-      scale: 0,
-      opacity: 1
-    });
-  });
-  
-  gsap.to(heroImage, {
-    y: 0,
-    opacity: 1,
-    scale: 1,
-    duration: 0.8,
-    ease: "power1.inOut"
-  });
-  
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 200, opacity: 0 });
 
-  // Zastavica za praćenje stanja animacije
-  let animationComplete = false;
+  // ═══════════════════════════════════════════════════════════
+  //  REVEAL ANIMACIJA
+  // ═══════════════════════════════════════════════════════════
 
   function startAnimation() {
-    const mainTimeline = gsap.timeline({
-      onComplete: function() {
-        animationComplete = true;
-      }
-    });
+    console.log("🎬 Pokrećem jednostavnu animaciju...");
+
+    const mainTimeline = gsap.timeline();
+
+    // 1. Animiraj tekst
+    mainTimeline.to(
+      characters,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.03,
+        ease: "power3.out"
+      },
+      0
+    );
+
+    // 2. Animiraj footer
+    mainTimeline.to(
+      heroFooters,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        stagger: 0.1,
+        ease: "power3.out"
+      },
+      0.2
+    );
+
+    // 🎬 3. LIJEPI REVEAL: Fotke fade-in + carousel lagano rotira (RANIJE!)
     
-    // Transformacija slika u lepezu
-    mainTimeline.to(heroImage, {
-      x: (index) => {
-        const totalImages = heroImage.length;
-        const spread = window.innerWidth * 0.35;
-        const position = (index / (totalImages - 1)) * spread - spread/2;
-        imagePositions[index] = position;
-        return position;
-      },
-      y: (index) => {
-        const totalImages = heroImage.length;
-        const normalizedIndex = index / (totalImages - 1);
-        const arcHeight = -10;
-        return 4 * arcHeight * Math.pow(normalizedIndex - 0.5, 2) + arcHeight;
-      },
-      rotation: (index) => {
-        const totalImages = heroImage.length;
-        const startAngle = -25;
-        const endAngle = 25;
-        return startAngle + (index / (totalImages - 1)) * (endAngle - startAngle);
-      },
-      duration: 1,
-      stagger: 0.05,
-      ease: "power3.inOut"
+    // ODMAH pokreni rotaciju (umjerena brzina)
+    startContinuousRotation(0.008); // Brže od normale, ali ne prebrzo
+    console.log("🔄 Carousel rotacija pokrenuta za reveal!");
+    
+    // Fotke fade-in + scale-up (JAKO BRZO - 1.5s ukupno!)
+    planeMeshes.forEach((mesh, index) => {
+      const startTime = 0.2 + index * 0.15; // Brži stagger (bilo 0.2)
+      
+      // Fade-in (opacity)
+      mainTimeline.to(
+        mesh.material.uniforms.uOpacity,
+        {
+          value: 1,
+          duration: 0.6, // JOŠ BRŽE (bilo 0.8)
+          ease: "power1.out",
+          onComplete: () => {
+            console.log(`✓ Slika ${index + 1}/${planeMeshes.length} se pojavila`);
+          }
+        },
+        startTime
+      );
+      
+      // Scale-up (veličina)
+      mainTimeline.to(
+        mesh.scale,
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          duration: 0.6, // JOŠ BRŽE (bilo 0.8)
+          ease: "back.out(1.2)",
+        },
+        startTime
+      );
     });
 
-    // Započni animaciju teksta na 60% lepeza animacije
-    mainTimeline.to(characters, {
-      y: 0,
-      opacity: 1,
-      duration: 0.3,
-      stagger: 0.05,
-      ease: "power3.out"
-    }, "-=0.6"); // Počni ranije
-
-    mainTimeline.to(heroFooters, {
-      y: 0,
-      opacity: 1,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: "power3.out"
-    }, "-=0.8"); // Počni u isto vrijeme kad i tekst
+    // 4. SMOOTH USPORAVANJE + ROTATING EFEKT (ranije počinje usporavanje!)
+    const revealEndTime = 0.2 + (planeMeshes.length - 1) * 0.15 + 0.6; // Reveal traje ~1.5s!
+    
+    // Kreiraj dummy objekt da GSAP može animirati broj (targetRotationSpeed)
+    const speedController = { value: 0.008 }; // Početna umjerena brzina
+    
+    mainTimeline.to(
+      speedController,
+      {
+        value: baseRotationSpeed, // Ciljana default brzina (0.0006 - malo brža!)
+        duration: 2.0, // Smooth prijelaz
+        ease: "power2.out",
+        onUpdate: () => {
+          targetRotationSpeed = speedController.value;
+        },
+        onComplete: () => {
+          console.log("✨ Sve fotke stigle! Carousel na default brzinu (malo brže nego prije)!");
+          startFloatingEffect(); // Pokreni breathing efekt nakon reveal-a
+        }
+      },
+      revealEndTime
+    );
   }
 
-  // Parallax stack photos - poboljšana verzija
-  window.addEventListener("mousemove", (event) => {
-    // Provjeri je li animacija završena prije nego što primijeniš parallax
-    if (!animationComplete) return;
+  // ═══════════════════════════════════════════════════════════
+  //  BREATHING EFEKT - Lagano ljuljanje oko random osi
+  // ═══════════════════════════════════════════════════════════
+
+  function startFloatingEffect() {
+    console.log("🌊 Pokrećem breathing efekt - carousel se lagano ljulja!");
     
-    const parallaxFactor = 24;
-
-    const { clientX, clientY } = event;
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    const offsetX = (clientX - centerX) / centerX;
-    const offsetY = (clientY - centerY) / centerY;
-
-    heroImage.forEach((img, index) => {
-      // Povećava fleksibilnost za 30% sa svakom fotografijom
-      const baseDepth = 1;
-      const depthMultiplier = 1 + index * 0.3;
-      const depth = baseDepth * depthMultiplier;
-
-      // Koristi originalnu poziciju iz lepeze kao bazu
-      const baseX = imagePositions[index] || 0;
-      
-      // Dodaj parallax efekt na originalnu poziciju
-      const moveX = offsetX * parallaxFactor * depth;
-      const moveY = offsetY * parallaxFactor * depth;
-
-      gsap.to(img, { 
-        x: baseX + moveX, 
-        y: moveY, 
-        duration: 0.4, 
-        ease: "power1.out" 
-      });
+    // Čitaj trenutnu rotaciju (već postavljena random na početku)
+    const currentRotX = carousel.rotation.x;
+    const currentRotZ = carousel.rotation.z;
+    
+    // Lagani "breathing" tilt oko trenutne osi (malo se ljulja gore-dolje)
+    gsap.to(carousel.rotation, {
+      x: currentRotX + 0.03, // Malo jači breathing
+      duration: 4,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1 // Beskonačno
     });
+    
+    // Lagani "breathing" tilt (malo se ljulja lijevo-desno)
+    gsap.to(carousel.rotation, {
+      z: currentRotZ + 0.025, // Malo jači breathing
+      duration: 5.5,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1 // Beskonačno
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  CONTINUOUS ROTATION + SCROLL-DRIVEN SPEED
+  // ═══════════════════════════════════════════════════════════
+
+  let baseRotationSpeed = 0.0006; // Default brzina (malo brža - bilo 0.0003)
+  let currentRotationSpeed = 0;
+  let targetRotationSpeed = baseRotationSpeed;
+  let maxRotationSpeed = 0.008; // Maksimalna brzina na scroll
+
+  function startContinuousRotation(speed) {
+    // Ako je speed proslijeđen, koristi tu brzinu (za reveal), inače base
+    const rotationSpeed = speed !== undefined ? speed : baseRotationSpeed;
+    targetRotationSpeed = rotationSpeed;
+    console.log(`🔄 Carousel rotacija postavljena na ${rotationSpeed.toFixed(4)} rad/frame`);
+  }
+
+  // SCROLL-DRIVEN ACCELERATION ✨
+  let lastScrollY = 0;
+  let scrollVelocity = 0;
+
+  // ═══════════════════════════════════════════════════════════
+  //  DRAG INTERAKCIJA (miš + touch)
+  // ═══════════════════════════════════════════════════════════
+
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragCurrentX = 0;
+  let dragVelocity = 0;
+  let previousDragX = 0;
+  let autoRotationPaused = false;
+  let savedRotationSpeed = 0;
+
+  // Mouse drag handlers
+  const mousedownHandler = (e) => {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragCurrentX = e.clientX;
+    previousDragX = e.clientX;
+    dragVelocity = 0;
+    
+    savedRotationSpeed = targetRotationSpeed;
+    targetRotationSpeed = 0;
+    autoRotationPaused = true;
+    
+    heroImageContainer.style.cursor = 'grabbing';
+    console.log('🖱️ Drag započeo');
+  };
+
+  const mousemoveHandler = (e) => {
+    if (!isDragging) return;
+    
+    dragCurrentX = e.clientX;
+    const deltaX = dragCurrentX - previousDragX;
+    
+    carousel.rotation.y += deltaX * 0.005;
+    
+    dragVelocity = deltaX * 0.005;
+    previousDragX = dragCurrentX;
+  };
+
+  const mouseupHandler = () => {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    heroImageContainer.style.cursor = 'grab';
+    
+    if (Math.abs(dragVelocity) > 0.001) {
+      gsap.to(carousel.rotation, {
+        y: carousel.rotation.y + dragVelocity * 30,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    }
+    
+    setTimeout(() => {
+      if (!isDragging) {
+        targetRotationSpeed = savedRotationSpeed;
+        autoRotationPaused = false;
+        console.log('🔄 Automatska rotacija nastavljena');
+      }
+    }, 1000);
+    
+    console.log('🖱️ Drag završio');
+  };
+
+  // Touch drag handlers (mobitel)
+  const touchstartHandler = (e) => {
+    isDragging = true;
+    dragStartX = e.touches[0].clientX;
+    dragCurrentX = e.touches[0].clientX;
+    previousDragX = e.touches[0].clientX;
+    dragVelocity = 0;
+    
+    savedRotationSpeed = targetRotationSpeed;
+    targetRotationSpeed = 0;
+    autoRotationPaused = true;
+    
+    console.log('📱 Touch drag započeo');
+  };
+
+  const touchmoveHandler = (e) => {
+    if (!isDragging) return;
+    
+    dragCurrentX = e.touches[0].clientX;
+    const deltaX = dragCurrentX - previousDragX;
+    
+    carousel.rotation.y += deltaX * 0.005;
+    
+    dragVelocity = deltaX * 0.005;
+    previousDragX = dragCurrentX;
+  };
+
+  const touchendHandler = () => {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    
+    if (Math.abs(dragVelocity) > 0.001) {
+      gsap.to(carousel.rotation, {
+        y: carousel.rotation.y + dragVelocity * 30,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    }
+    
+    setTimeout(() => {
+      if (!isDragging) {
+        targetRotationSpeed = savedRotationSpeed;
+        autoRotationPaused = false;
+        console.log('🔄 Automatska rotacija nastavljena');
+      }
+    }, 1000);
+    
+    console.log('📱 Touch drag završio');
+  };
+
+  // Attach drag event listeners
+  heroImageContainer.addEventListener('mousedown', mousedownHandler);
+  window.addEventListener('mousemove', mousemoveHandler);
+  window.addEventListener('mouseup', mouseupHandler);
+  heroImageContainer.addEventListener('touchstart', touchstartHandler);
+  heroImageContainer.addEventListener('touchmove', touchmoveHandler);
+  heroImageContainer.addEventListener('touchend', touchendHandler);
+
+  // Set cursor
+  heroImageContainer.style.cursor = 'grab';
+  
+  console.log('🖱️ Drag funkcionalnost aktivirana!');
+
+  // ═══════════════════════════════════════════════════════════
+  //  ANIMATION LOOP
+  // ═══════════════════════════════════════════════════════════
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // SMOOTH transition brzine
+    currentRotationSpeed += (targetRotationSpeed - currentRotationSpeed) * 0.06;
+
+    // Rotiraj cijeli carousel
+    carousel.rotation.y += currentRotationSpeed;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // ═══════════════════════════════════════════════════════════
+  //  RESPONSIVE RESIZE
+  // ═══════════════════════════════════════════════════════════
+
+  function onWindowResize() {
+    const width = heroImageContainer.offsetWidth;
+    const height = heroImageContainer.offsetHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+  }
+
+  window.addEventListener('resize', onWindowResize);
+
+  // ═══════════════════════════════════════════════════════════
+  //  CLEANUP
+  // ═══════════════════════════════════════════════════════════
+
+  // Store scroll listener za cleanup
+  const scrollHandler = () => {
+    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+    
+    scrollVelocity = Math.min(scrollDelta * 0.0002, maxRotationSpeed);
+    const scrollProgress = Math.min(currentScrollY / 1000, 1);
+    targetRotationSpeed = baseRotationSpeed + (scrollVelocity * 3) + (scrollProgress * 0.003);
+    
+    lastScrollY = currentScrollY;
+    
+    setTimeout(() => {
+      scrollVelocity *= 0.9;
+    }, 50);
+  };
+
+  // Zamijeni inline scroll listener sa named function
+  window.removeEventListener('scroll', scrollHandler); // Cleanup prethodni ako postoji
+  window.addEventListener('scroll', scrollHandler);
+
+
+  window.addEventListener('barba:before-leave', () => {
+    console.log("🧹 Čistim Three.js resurse...");
+    
+    // Zaustavi GSAP animacije (rotating efekt + drag inertija)
+    gsap.killTweensOf(carousel.rotation);
+    
+    // Cleanup drag handlers
+    heroImageContainer.removeEventListener('mousedown', mousedownHandler);
+    window.removeEventListener('mousemove', mousemoveHandler);
+    window.removeEventListener('mouseup', mouseupHandler);
+    heroImageContainer.removeEventListener('touchstart', touchstartHandler);
+    heroImageContainer.removeEventListener('touchmove', touchmoveHandler);
+    heroImageContainer.removeEventListener('touchend', touchendHandler);
+    
+    planeMeshes.forEach(mesh => {
+      if (mesh.geometry) mesh.geometry.dispose();
+      if (mesh.material) {
+        if (mesh.material.uniforms.uTexture.value) {
+          mesh.material.uniforms.uTexture.value.dispose();
+        }
+        mesh.material.dispose();
+      }
+    });
+
+    renderer.dispose();
+    window.removeEventListener('resize', onWindowResize);
+    window.removeEventListener('scroll', scrollHandler);
   });
+
+  console.log("✅ 3D Cylinder Carousel spreman!");
 }
 
+// Export za Barba.js
 window.initHero = initHero;
-initHero();
+
+// Pokreni odmah ako smo na home stranici
+if (document.querySelector('.hero-images-container')) {
+  initHero();
+}
