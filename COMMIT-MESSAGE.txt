@@ -1,0 +1,33 @@
+Fix: Dark mode flicker i pojednostavljen workflow
+
+🐛 Ispravljeno:
+- Dark mode flicker pri Barba.js tranzicijama
+- Unificiran localStorage ključ na 'dark-mode'
+- Unificirana CSS klasa na 'ui-dark-mode'
+- Dark mode se primjenjuje prije prikaza stranice (Barba hooks)
+- Primjena dark mode-a na <html> i <body> elemente
+
+✨ Novo:
+- Node.js dev server s CORS supportom (server.js)
+- Pojednostavljen workflow (isti file lokalno i u produkciji)
+- Vercel auto-deployment konfiguracija
+- Kompletna dokumentacija (README, WEBFLOW-INSTRUCTIONS, DEPLOYMENT, CHANGELOG)
+
+📝 Izmijenjeni file-ovi:
+- src/global/barba-config.js - Dodani Barba hooks za dark mode
+- src/global/dark-mode.js - Unificirani ključ i klasa
+- vite.config.js - Output: index.js, port: 5500
+- vercel.json - Build i CORS konfiguracija
+- package.json - npm run dev → node server.js
+
+📦 Novi file-ovi:
+- server.js - Development server s CORS-om
+- .gitignore - Git ignore rules
+- README.md - Glavna dokumentacija
+- WEBFLOW-INSTRUCTIONS.md - Webflow setup
+- DEPLOYMENT.md - Vercel deployment
+- CHANGELOG.md - Povijest izmjena
+- test-server.html - Test page
+
+🎉 Rezultat: Dark mode flicker potpuno riješen!
+

@@ -83,15 +83,6 @@ function initGlobalFunctions(data) {
   console.log('🔄 Ponovno inicijalizacija Lenis-a (duplikacija?)');
   initLenis?.();
   
-  console.log('🌓 Primjena Dark Mode postavki iz localStorage-a');
-  if (localStorage.getItem("darkMode") === "enabled") {
-    console.log('  - Dark Mode aktivan');
-    document.body.classList.add("dark-mode");
-  } else {
-    console.log('  - Dark Mode neaktivan');
-    document.body.classList.remove("dark-mode");
-  }
-  
   console.log('🔓 Vraćanje normalnog overflow svojstva na body');
   document.body.style.overflow = '';
   
@@ -150,18 +141,51 @@ function initBarba() {
   }
 
   console.log("⚙️ Konfiguriram Barba.js tranzicije i namespace-ove");
+  
+  // 🌓 Globalni hook - osigurava da dark mode bude primijenjen UVIJEK prije svake tranzicije
+  barba.hooks.beforeEnter(() => {
+    console.log('🌓 [Global Hook] Primjena Dark Mode prije svake tranzicije');
+    if (localStorage.getItem("dark-mode") === "enabled") {
+      document.documentElement.classList.add("ui-dark-mode");
+      document.body.classList.add("ui-dark-mode");
+    } else {
+      document.documentElement.classList.remove("ui-dark-mode");
+      document.body.classList.remove("ui-dark-mode");
+    }
+  });
+  
   barba.init({
     transitions: [{
       name: 'fade',
       leave(data) {
         console.log(`🚪 LEAVE: Napuštam stranicu ${data.current.namespace}`);
         console.log(`  - URL: ${data.current.url.path}`);
+        
+        // 🌓 Primijeni dark mode i na izlasku da se spriječi flicker
+        console.log('🌓 Održavam Dark Mode postavke tijekom izlazne tranzicije');
+        if (localStorage.getItem("dark-mode") === "enabled") {
+          document.documentElement.classList.add("ui-dark-mode");
+          document.body.classList.add("ui-dark-mode");
+        }
+        
         console.log(`  - Primjenjujem izlaznu animaciju (opacity: 0)`);
         return gsap.to(data.current.container, { opacity: 0, duration: 0.3 });
       },
       beforeEnter(data) {
         console.log(`🔑 BEFORE ENTER: Pripremam ulazak na stranicu ${data.next.namespace}`);
         console.log(`  - URL: ${data.next.url.path}`);
+        
+        // 🌓 KRITIČNO: Primijeni dark mode ODMAH prije nego što se stranica prikaže
+        console.log('🌓 Primjena Dark Mode postavki iz localStorage-a (PRIJE prikaza)');
+        if (localStorage.getItem("dark-mode") === "enabled") {
+          console.log('  - Dark Mode aktivan - dodajem ui-dark-mode klasu na html i body');
+          document.documentElement.classList.add("ui-dark-mode");
+          document.body.classList.add("ui-dark-mode");
+        } else {
+          console.log('  - Dark Mode neaktivan - uklanjam ui-dark-mode klasu');
+          document.documentElement.classList.remove("ui-dark-mode");
+          document.body.classList.remove("ui-dark-mode");
+        }
         
         console.log('  - Pokrećem Lenis');
         lenis.start();
