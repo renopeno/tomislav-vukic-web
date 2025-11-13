@@ -2,6 +2,16 @@
 // Custom cursor - crna točka (bijela u dark mode-u)
 
 export function initCustomCursor() {
+  // Ne prikazuj custom cursor na touch devices (mobitel/tablet)
+  const isTouchDevice = ('ontouchstart' in window) || 
+                        (navigator.maxTouchPoints > 0) || 
+                        (navigator.msMaxTouchPoints > 0);
+  
+  if (isTouchDevice) {
+    console.log('🖱️ Touch device detektiran - custom cursor onemogućen');
+    return; // Ne inicijaliziraj cursor na touch devices
+  }
+  
   // Kreiraj cursor element
   const cursor = document.createElement('div');
   cursor.id = 'custom-cursor';
