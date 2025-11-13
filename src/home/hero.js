@@ -94,7 +94,10 @@ function initHero() {
     3000
   );
   camera.position.z = 900;
-  camera.position.y = 0;
+  
+  // Na mobilnim uređajima digni carousel (spusti kameru)
+  const isMobile = window.innerWidth <= 768;
+  camera.position.y = isMobile ? -80 : 0; // Digni carousel na mobitelu
 
   const renderer = new THREE.WebGLRenderer({ 
     alpha: true, 
@@ -527,6 +530,21 @@ function initHero() {
 
   // Touch drag handlers (mobitel)
   const touchstartHandler = (e) => {
+    // Na mobilnim uređajima ograniči drag area (samo centar ekrana ±25%)
+    if (isMobile) {
+      const touchY = e.touches[0].clientY;
+      const viewportHeight = window.innerHeight;
+      const centerY = viewportHeight / 2;
+      const allowedRange = viewportHeight * 0.25; // ±25% od centra
+      
+      const isInDragArea = Math.abs(touchY - centerY) < allowedRange;
+      
+      if (!isInDragArea) {
+        // Touch je izvan drag area - dozvoli normalno scrollanje
+        return;
+      }
+    }
+    
     isDragging = true;
     dragStartX = e.touches[0].clientX;
     dragCurrentX = e.touches[0].clientX;
