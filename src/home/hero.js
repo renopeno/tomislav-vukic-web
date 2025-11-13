@@ -14,6 +14,21 @@
 function initHero() {
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
+  
+  // Osiguraj da su hero footer linkovi klikabili (iznad canvas-a)
+  heroFooters.forEach(footer => {
+    footer.style.position = 'relative';
+    footer.style.zIndex = '10';
+    footer.style.pointerEvents = 'auto';
+    
+    // Osiguraj da svi child elementi u footeru mogu biti kliknuti
+    const links = footer.querySelectorAll('a, button, [role="button"]');
+    links.forEach(link => {
+      link.style.position = 'relative';
+      link.style.zIndex = '11';
+      link.style.pointerEvents = 'auto';
+    });
+  });
 
   // WEBFLOW CMS STRUKTURA: Svaka slika je u posebnom .hero-images-container
   const heroWrapper = document.querySelector(".hero-images-wrapper");
@@ -36,7 +51,7 @@ function initHero() {
 
   // Koristit ćemo PRVI .hero-images-container za canvas
   const heroImageContainer = document.querySelector(".hero-images-container");
-
+  
   // ═══════════════════════════════════════════════════════════
   //  THREE.JS SETUP
   // ═══════════════════════════════════════════════════════════
@@ -59,7 +74,7 @@ function initHero() {
   heroWrapper.style.left = '0';
   heroWrapper.style.width = '100%';
   heroWrapper.style.height = '100%';
-  heroWrapper.style.pointerEvents = 'none';
+  heroWrapper.style.pointerEvents = 'auto'; // OMOGUĆI pointer events! (bilo: 'none')
 
   // Pripremi container za canvas
   heroImageContainer.innerHTML = '';
@@ -67,6 +82,7 @@ function initHero() {
   heroImageContainer.style.width = '100%';
   heroImageContainer.style.height = '100%';
   heroImageContainer.style.overflow = 'hidden';
+  heroImageContainer.style.pointerEvents = 'auto'; // OMOGUĆI pointer events!
 
   // Kreiraj scenu, kameru, renderer
   const scene = new THREE.Scene();
@@ -93,8 +109,11 @@ function initHero() {
   renderer.domElement.style.left = '0';
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
+  renderer.domElement.style.zIndex = '1'; // Canvas je iza hero footer elemenata (koji su z-index: 10)
   
   heroImageContainer.appendChild(renderer.domElement);
+  
+  console.log('🎨 Canvas kreiran i dodan - pointer events OMOGUĆENI!');
 
   // Ambient light
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -232,14 +251,14 @@ function initHero() {
         carousel.add(mesh);
         planeMeshesTemp[index] = mesh; // Spremi na PRAVI index (zadržava redoslijed)
 
-        loadedCount++;
+      loadedCount++;
         console.log(`✓ Učitana slika ${loadedCount}/${totalImages} (index: ${index})`);
 
         if (loadedCount === totalImages) {
           // Kopiraj u pravi planeMeshes array (sada svi u ispravnom redoslijedu)
           planeMeshesTemp.forEach(mesh => planeMeshes.push(mesh));
           console.log(`✅ Sve slike učitane PO REDU iz CMS-a!`);
-          startAnimation();
+        startAnimation();
         }
       },
       undefined,
@@ -265,7 +284,7 @@ function initHero() {
   
   splitTextToSpans(heroTitle);
   const characters = heroTitle ? heroTitle.querySelectorAll("span") : [];
-
+  
   gsap.set(heroFooters, { y: 20, opacity: 0 });
   gsap.set(characters, { y: 200, opacity: 0 });
 
@@ -282,11 +301,11 @@ function initHero() {
     mainTimeline.to(
       characters,
       {
-        y: 0,
-        opacity: 1,
-        duration: 0.3,
+      y: 0,
+      opacity: 1,
+      duration: 0.3,
         stagger: 0.03,
-        ease: "power3.out"
+      ease: "power3.out"
       },
       0
     );
@@ -295,11 +314,11 @@ function initHero() {
     mainTimeline.to(
       heroFooters,
       {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.1,
-        ease: "power3.out"
+      y: 0,
+      opacity: 1,
+      duration: 0.4,
+      stagger: 0.1,
+      ease: "power3.out"
       },
       0.2
     );
@@ -351,14 +370,14 @@ function initHero() {
     mainTimeline.to(
       speedController,
       {
-        value: baseRotationSpeed, // Ciljana default brzina (0.0006 - malo brža!)
+        value: baseRotationSpeed, // Ciljana default brzina (0.001)
         duration: 2.0, // Smooth prijelaz
         ease: "power2.out",
         onUpdate: () => {
           targetRotationSpeed = speedController.value;
         },
         onComplete: () => {
-          console.log("✨ Sve fotke stigle! Carousel na default brzinu (malo brže nego prije)!");
+          console.log("✨ Sve fotke stigle! Default brzina: 0.001 (scroll ga ubrzava 1:1, drag radi!)");
           startFloatingEffect(); // Pokreni breathing efekt nakon reveal-a
         }
       },
@@ -400,10 +419,10 @@ function initHero() {
   //  CONTINUOUS ROTATION + SCROLL-DRIVEN SPEED
   // ═══════════════════════════════════════════════════════════
 
-  let baseRotationSpeed = 0.0006; // Default brzina (malo brža - bilo 0.0003)
+  let baseRotationSpeed = 0.001; // Default brzina
   let currentRotationSpeed = 0;
   let targetRotationSpeed = baseRotationSpeed;
-  let maxRotationSpeed = 0.008; // Maksimalna brzina na scroll
+  let maxRotationSpeed = 0.015; // Povećana max brzina za scroll
 
   function startContinuousRotation(speed) {
     // Ako je speed proslijeđen, koristi tu brzinu (za reveal), inače base
@@ -436,23 +455,31 @@ function initHero() {
     previousDragX = e.clientX;
     dragVelocity = 0;
     
+    // Kill any ongoing GSAP tweens za smooth transition
+    gsap.killTweensOf(carousel.rotation);
+    
     savedRotationSpeed = targetRotationSpeed;
     targetRotationSpeed = 0;
     autoRotationPaused = true;
     
-    heroImageContainer.style.cursor = 'grabbing';
+    // Emit custom event za cursor
+    window.dispatchEvent(new CustomEvent('hero:drag:start'));
+    
+    renderer.domElement.style.cursor = 'grabbing';
     console.log('🖱️ Drag započeo');
   };
 
   const mousemoveHandler = (e) => {
     if (!isDragging) return;
     
+    e.preventDefault(); // Spriječi text selection
+    
     dragCurrentX = e.clientX;
     const deltaX = dragCurrentX - previousDragX;
     
-    carousel.rotation.y += deltaX * 0.005;
+    carousel.rotation.y += deltaX * 0.0009; // Smanjeno za 70% (0.003 * 0.3 = 0.0009)
     
-    dragVelocity = deltaX * 0.005;
+    dragVelocity = deltaX * 0.0009;
     previousDragX = dragCurrentX;
   };
 
@@ -460,25 +487,42 @@ function initHero() {
     if (!isDragging) return;
     
     isDragging = false;
-    heroImageContainer.style.cursor = 'grab';
+    renderer.domElement.style.cursor = 'grab';
     
-    if (Math.abs(dragVelocity) > 0.001) {
-      gsap.to(carousel.rotation, {
-        y: carousel.rotation.y + dragVelocity * 30,
-        duration: 1.5,
-        ease: "power2.out"
-      });
-    }
+    // Emit custom event za cursor
+    window.dispatchEvent(new CustomEvent('hero:drag:end'));
     
+    // Inertia efekt - uvijek se izvršava za smooth nastavak
+    const inertiaAmount = dragVelocity * 80; // Povećano sa 40 na 80 za jaču inertiju
+    const inertiaDuration = 3.0; // Fiksni duration - uvijek 3s
+    
+    gsap.to(carousel.rotation, {
+      y: carousel.rotation.y + inertiaAmount,
+      duration: inertiaDuration,
+      ease: "power2.out" // Smooth deceleration
+    });
+    
+    // Smooth tranzicija nazad na auto-rotation (duže čekanje)
     setTimeout(() => {
       if (!isDragging) {
-        targetRotationSpeed = savedRotationSpeed;
-        autoRotationPaused = false;
-        console.log('🔄 Automatska rotacija nastavljena');
+        // Smooth ease umjesto nagle promjene
+        gsap.to({ speed: 0 }, {
+          speed: savedRotationSpeed,
+          duration: 1.0,
+          ease: "power2.inOut",
+          onUpdate: function() {
+            targetRotationSpeed = this.targets()[0].speed;
+          },
+          onComplete: () => {
+            targetRotationSpeed = savedRotationSpeed;
+            autoRotationPaused = false;
+            console.log('🔄 Automatska rotacija nastavljena');
+          }
+        });
       }
-    }, 1000);
+    }, 2500); // Nakon inertia efekta
     
-    console.log('🖱️ Drag završio');
+    console.log('🖱️ Drag završio, inertia:', inertiaAmount);
   };
 
   // Touch drag handlers (mobitel)
@@ -489,9 +533,15 @@ function initHero() {
     previousDragX = e.touches[0].clientX;
     dragVelocity = 0;
     
+    // Kill any ongoing GSAP tweens za smooth transition
+    gsap.killTweensOf(carousel.rotation);
+    
     savedRotationSpeed = targetRotationSpeed;
     targetRotationSpeed = 0;
     autoRotationPaused = true;
+    
+    // Emit custom event za cursor
+    window.dispatchEvent(new CustomEvent('hero:drag:start'));
     
     console.log('📱 Touch drag započeo');
   };
@@ -499,12 +549,14 @@ function initHero() {
   const touchmoveHandler = (e) => {
     if (!isDragging) return;
     
+    e.preventDefault(); // Spriječi default touch behavior
+    
     dragCurrentX = e.touches[0].clientX;
     const deltaX = dragCurrentX - previousDragX;
     
-    carousel.rotation.y += deltaX * 0.005;
+    carousel.rotation.y += deltaX * 0.0009; // Smanjeno za 70% (0.003 * 0.3 = 0.0009)
     
-    dragVelocity = deltaX * 0.005;
+    dragVelocity = deltaX * 0.0009;
     previousDragX = dragCurrentX;
   };
 
@@ -513,37 +565,60 @@ function initHero() {
     
     isDragging = false;
     
-    if (Math.abs(dragVelocity) > 0.001) {
-      gsap.to(carousel.rotation, {
-        y: carousel.rotation.y + dragVelocity * 30,
-        duration: 1.5,
-        ease: "power2.out"
-      });
-    }
+    // Emit custom event za cursor
+    window.dispatchEvent(new CustomEvent('hero:drag:end'));
     
+    // Inertia efekt - uvijek se izvršava za smooth nastavak
+    const inertiaAmount = dragVelocity * 80; // Povećano sa 40 na 80 za jaču inertiju
+    const inertiaDuration = 3.0; // Fiksni duration - uvijek 3s
+    
+    gsap.to(carousel.rotation, {
+      y: carousel.rotation.y + inertiaAmount,
+      duration: inertiaDuration,
+      ease: "power2.out" // Smooth deceleration
+    });
+    
+    // Smooth tranzicija nazad na auto-rotation (duže čekanje)
     setTimeout(() => {
       if (!isDragging) {
-        targetRotationSpeed = savedRotationSpeed;
-        autoRotationPaused = false;
-        console.log('🔄 Automatska rotacija nastavljena');
+        // Smooth ease umjesto nagle promjene
+        gsap.to({ speed: 0 }, {
+          speed: savedRotationSpeed,
+          duration: 1.0,
+          ease: "power2.inOut",
+          onUpdate: function() {
+            targetRotationSpeed = this.targets()[0].speed;
+          },
+          onComplete: () => {
+            targetRotationSpeed = savedRotationSpeed;
+            autoRotationPaused = false;
+            console.log('🔄 Automatska rotacija nastavljena');
+          }
+        });
       }
-    }, 1000);
+    }, 2500); // Nakon inertia efekta
     
-    console.log('📱 Touch drag završio');
+    console.log('📱 Touch drag završio, inertia:', inertiaAmount);
   };
 
-  // Attach drag event listeners
-  heroImageContainer.addEventListener('mousedown', mousedownHandler);
+  // Attach drag event listeners DIREKTNO NA CANVAS!
+  renderer.domElement.addEventListener('mousedown', mousedownHandler);
   window.addEventListener('mousemove', mousemoveHandler);
   window.addEventListener('mouseup', mouseupHandler);
-  heroImageContainer.addEventListener('touchstart', touchstartHandler);
-  heroImageContainer.addEventListener('touchmove', touchmoveHandler);
-  heroImageContainer.addEventListener('touchend', touchendHandler);
+  renderer.domElement.addEventListener('touchstart', touchstartHandler, { passive: false });
+  renderer.domElement.addEventListener('touchmove', touchmoveHandler, { passive: false });
+  renderer.domElement.addEventListener('touchend', touchendHandler);
 
-  // Set cursor
-  heroImageContainer.style.cursor = 'grab';
+  // Set cursor + CSS za bolji drag UX NA CANVASU!
+  renderer.domElement.style.cursor = 'grab';
+  renderer.domElement.style.userSelect = 'none';
+  renderer.domElement.style.webkitUserSelect = 'none';
+  renderer.domElement.style.touchAction = 'none';
   
-  console.log('🖱️ Drag funkcionalnost aktivirana!');
+  // Debug log za provjeru
+  console.log('🖱️ Drag funkcionalnost aktivirana NA CANVASU!');
+  console.log('  - Canvas element:', renderer.domElement);
+  console.log('  - Cursor:', renderer.domElement.style.cursor);
 
   // ═══════════════════════════════════════════════════════════
   //  ANIMATION LOOP
@@ -552,8 +627,8 @@ function initHero() {
   function animate() {
     requestAnimationFrame(animate);
 
-    // SMOOTH transition brzine
-    currentRotationSpeed += (targetRotationSpeed - currentRotationSpeed) * 0.06;
+    // RESPONSIVE transition brzine (brža interpolacija za scroll response!)
+    currentRotationSpeed += (targetRotationSpeed - currentRotationSpeed) * 0.15;
 
     // Rotiraj cijeli carousel
     carousel.rotation.y += currentRotationSpeed;
@@ -585,18 +660,27 @@ function initHero() {
 
   // Store scroll listener za cleanup
   const scrollHandler = () => {
+    // Ne reagiraj na scroll ako je drag aktivan
+    if (isDragging || autoRotationPaused) return;
+    
     const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
     const scrollDelta = Math.abs(currentScrollY - lastScrollY);
     
-    scrollVelocity = Math.min(scrollDelta * 0.0002, maxRotationSpeed);
-    const scrollProgress = Math.min(currentScrollY / 1000, 1);
-    targetRotationSpeed = baseRotationSpeed + (scrollVelocity * 3) + (scrollProgress * 0.003);
+    // DIREKTNA VEZA: Scroll brzina = Carousel brzina!
+    // Što brže scrollaš, to se brže vrti (1:1 mapping)
+    scrollVelocity = Math.min(scrollDelta * 0.0008, maxRotationSpeed); // Povećan multiplier za osjetljiviji response
+    
+    // Dok scrollaš: koristi scroll velocity
+    // Kad prestaneš: vrati na base speed
+    if (scrollDelta > 0.5) {
+      // Kill bilo kakve GSAP tweens kad user počne scrollati (smooth transition iz draga)
+      gsap.killTweensOf(carousel.rotation);
+      targetRotationSpeed = baseRotationSpeed + scrollVelocity;
+    } else {
+      targetRotationSpeed = baseRotationSpeed; // Vrati na default
+    }
     
     lastScrollY = currentScrollY;
-    
-    setTimeout(() => {
-      scrollVelocity *= 0.9;
-    }, 50);
   };
 
   // Zamijeni inline scroll listener sa named function
@@ -611,12 +695,12 @@ function initHero() {
     gsap.killTweensOf(carousel.rotation);
     
     // Cleanup drag handlers
-    heroImageContainer.removeEventListener('mousedown', mousedownHandler);
+    renderer.domElement.removeEventListener('mousedown', mousedownHandler);
     window.removeEventListener('mousemove', mousemoveHandler);
     window.removeEventListener('mouseup', mouseupHandler);
-    heroImageContainer.removeEventListener('touchstart', touchstartHandler);
-    heroImageContainer.removeEventListener('touchmove', touchmoveHandler);
-    heroImageContainer.removeEventListener('touchend', touchendHandler);
+    renderer.domElement.removeEventListener('touchstart', touchstartHandler);
+    renderer.domElement.removeEventListener('touchmove', touchmoveHandler);
+    renderer.domElement.removeEventListener('touchend', touchendHandler);
     
     planeMeshes.forEach(mesh => {
       if (mesh.geometry) mesh.geometry.dispose();
@@ -641,5 +725,5 @@ window.initHero = initHero;
 
 // Pokreni odmah ako smo na home stranici
 if (document.querySelector('.hero-images-container')) {
-  initHero();
+initHero();
 }
