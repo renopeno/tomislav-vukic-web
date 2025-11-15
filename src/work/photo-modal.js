@@ -1,24 +1,16 @@
-// Side-effect koji sprječava tree-shaking - izvršava se ODMAH pri učitavanju modula
-console.log('📦 photo-modal.js učitan');
-
 // Globalne varijable za cleanup
 window.photoModalCleanup = null;
 
 function initPhotoModal() {
-    console.log('🖼️ Inicijaliziram Photo Modal');
-
     // Ako već postoji prethodna instanca, očisti je prvo
     if (window.photoModalCleanup) {
-        console.log('🧹 Čistim prethodnu Photo Modal instancu');
         window.photoModalCleanup();
         window.photoModalCleanup = null;
     }
 
     const modal = document.querySelector(".modal-photo");
     
-    // Dodajemo provjeru postojanja modal elementa
     if (!modal) {
-        console.log('⚠️ Modal element ne postoji, izlazim iz initPhotoModal');
         return;
     }
     
@@ -397,8 +389,6 @@ function initPhotoModal() {
 
     // Kreiraj cleanup funkciju
     window.photoModalCleanup = () => {
-        console.log('🧹 Photo Modal cleanup');
-        
         // Ukloni sve event listenere sa fotki
         photoClickHandlers.forEach(({ element, handler }) => {
             element.removeEventListener("click", handler);
@@ -423,24 +413,12 @@ function initPhotoModal() {
             if (window.lenis) window.lenis.start();
             document.body.style.overflow = '';
         }
-        
-        console.log('✅ Photo Modal cleanup završen');
     };
-    
-    console.log('✅ Photo Modal uspješno inicijaliziran');
 }
 
 
-// Postavi funkciju na window (kao Hero i About)
+// Postavi funkciju na window
 window.initPhotoModal = initPhotoModal;
-
-// Side-effect koji sprječava tree-shaking
-console.log('📦 photo-modal.js module loaded - funkcija spremna na window objektu');
-
-// Dodatni side-effect - postavi cleanup na window odmah
-if (typeof window.photoModalCleanup === 'undefined') {
-  window.photoModalCleanup = null;
-}
 
 // Export za Vite
 export { initPhotoModal };

@@ -1,25 +1,17 @@
 let isWorkInitializing = false;
 
 async function initWork() {
-  console.log('🔍 initWork() POZVAN!');
-  
   if (isWorkInitializing) {
-    console.log('⚠️ initWork() već se izvršava, preskačem');
     return;
   }
   isWorkInitializing = true;
   
-  // Provjera da znamo da smo na pageu koji ima grid
   const photoContainers = document.querySelectorAll('.photo-container');
-  console.log('🔍 Pronađeno photo containers:', photoContainers.length);
   
   if (!photoContainers.length) {
-    console.log('⚠️ Nema photo containers - nije work page, izlazim');
     isWorkInitializing = false;
     return;
   }
-  
-  console.log('✅ Inicijaliziram Work page grid!');
   
   try {
     // DODAJ OVO NA POČETAK - postavi originalParent PRIJE mijenjanja DOM-a
@@ -30,8 +22,6 @@ async function initWork() {
     
     const MAX_PHOTOS = 30;
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
-    
-    console.log('🔍 Ukupno photo containers:', allPhotoContainers.length);
     
     // Prvih 6 fotki - eager loading s high priority, ostale lazy
     allPhotoContainers.forEach((container, index) => {
@@ -59,19 +49,14 @@ async function initWork() {
       container.style.transform = '';
     });
 
-    console.log('✅ Reset svih photo containers');
-
     // Ograniči broj prikazanih fotografija
     const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
     allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
       container.style.display = 'none';
     });
-    
-    console.log(`📸 Prikazujem prvih ${MAX_PHOTOS} fotki, sakrivam ${allPhotoContainers.length - MAX_PHOTOS}`);
 
-    // ✅ FIX: UVIJEK uzmi NOVE elemente iz DOM-a, nemoj cachirati stare reference
+    // UVIJEK uzmi NOVE elemente iz DOM-a, nemoj cachirati stare reference
     // Barba.js zamijeni cijeli container pri navigaciji, stare reference postanu mrtve!
-    console.log('🔀 Shuffleam fotke (NOVI DOM elementi nakon Barba tranzicije)');
     window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
     window.lastPath = window.location.pathname;
 
@@ -101,11 +86,6 @@ async function initWork() {
         const photo = container.querySelector(".photo");
         const isHorizontal = photo.naturalWidth > photo.naturalHeight;
         const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
-        
-        // Debug za prvu 3 fotke
-        if (index < 3) {
-          console.log(`📸 Foto ${index}: naturalWidth=${photo.naturalWidth}, naturalHeight=${photo.naturalHeight}, isHorizontal=${isHorizontal}`);
-        }
 
         let startCol;
         if (config.columns === 1) {
@@ -124,7 +104,6 @@ async function initWork() {
           }
         }
 
-        // ✅ KLJUČNI FIX: Eksplicitno postavi display da se vidi
         container.style.display = "block";
         container.style.gridColumnStart = startCol;
         container.style.gridColumnEnd = startCol + colSpan;
@@ -133,8 +112,6 @@ async function initWork() {
         isLeft = !isLeft;
         currentRow++;
       });
-      
-      console.log(`🧪 setupGrid() ZAVRŠEN - postavio ${window.shuffledPhotos.length} containera`);
     }
 
     // Čekaj da sve slike budu učitane prije postavljanja grida
@@ -151,26 +128,11 @@ async function initWork() {
 
     await Promise.all(imageLoadPromises);
     
-    console.log('✅ Sve slike učitane, postavljam grid');
     if (!window.isSettingUpGrid) {
       window.isSettingUpGrid = true;
       setupGrid();
       window.isSettingUpGrid = false;
     }
-    
-    // Provjeri da li je grid ZAISTA postavljen
-    const firstContainer = window.shuffledPhotos[0];
-    const parentGrid = document.querySelector('.grid.work');
-    
-    console.log('🧪 TEST: Prvi container gridColumnStart =', firstContainer.style.gridColumnStart);
-    console.log('🧪 TEST: Prvi container gridRowStart =', firstContainer.style.gridRowStart);
-    console.log('🧪 TEST: Pri container display =', firstContainer.style.display);
-    console.log('🧪 TEST: Parent grid element =', parentGrid);
-    console.log('🧪 TEST: Parent display =', window.getComputedStyle(parentGrid).display);
-    console.log('🧪 TEST: Parent grid-template-columns =', window.getComputedStyle(parentGrid).gridTemplateColumns);
-    
-    // Force reflow - ponekad je potrebno
-    parentGrid.offsetHeight;
     
     // Tranzicija za ulazak fotki u view
     gsap.fromTo(
@@ -182,10 +144,7 @@ async function initWork() {
         y: 0,
         duration: 0.8,
         ease: "power3.out",
-        stagger: 0.1,
-        onComplete: () => {
-          console.log("✅ GSAP animacija ZAVRŠENA - grid bi trebao biti vidljiv");
-        }
+        stagger: 0.1
       }
     );
   } finally {
@@ -214,8 +173,6 @@ function initCategoryTitleAnimation() {
   });
 }
 
-// Postavi funkcije na window (kao Hero i About)
+// Postavi funkcije na window
 window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
-
-console.log('📦 work.js module loaded - funkcije spremne na window objektu');
