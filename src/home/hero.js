@@ -620,11 +620,36 @@ function initHero() {
   console.log('🖱️ Mouse drag aktiviran (desktop), touch scroll omogućen (mobitel/tablet)');
 
   // ═══════════════════════════════════════════════════════════
+  //  INTERSECTION OBSERVER - Pauziraj kad nije u viewportu
+  // ═══════════════════════════════════════════════════════════
+  
+  let isHeroVisible = true;
+  
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      isHeroVisible = entry.isIntersecting;
+      if (!isHeroVisible) {
+        console.log('🛑 Hero sekcija izvan viewporta - pauziran rendering');
+      } else {
+        console.log('▶️ Hero sekcija u viewportu - nastavljam rendering');
+      }
+    });
+  }, {
+    threshold: 0, // Reagiraj čim bilo koji pixel hero-a uđe/izađe
+    rootMargin: '100px' // Malo buffer zone
+  });
+  
+  heroObserver.observe(heroSection);
+
+  // ═══════════════════════════════════════════════════════════
   //  ANIMATION LOOP
   // ═══════════════════════════════════════════════════════════
 
   function animate() {
     requestAnimationFrame(animate);
+
+    // ⚡ Optimizacija: Ne renderaj ako hero nije vidljiv
+    if (!isHeroVisible) return;
 
     // RESPONSIVE transition brzine (brža interpolacija za scroll response!)
     currentRotationSpeed += (targetRotationSpeed - currentRotationSpeed) * 0.15;
@@ -657,34 +682,42 @@ function initHero() {
   //  CLEANUP
   // ═══════════════════════════════════════════════════════════
 
-  // Store scroll listener za cleanup
+  // ⚡ THROTTLED SCROLL HANDLER - optimiziran za performanse
+  let isScrollHandlerActive = false;
+  
   const scrollHandler = () => {
     // Ne reagiraj na scroll ako je drag aktivan
     if (isDragging || autoRotationPaused) return;
     
-    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+    // Throttle - preskoči ako već procesiramo scroll
+    if (isScrollHandlerActive) return;
     
-    // DIREKTNA VEZA: Scroll brzina = Carousel brzina!
-    // Što brže scrollaš, to se brže vrti (1:1 mapping)
-    scrollVelocity = Math.min(scrollDelta * 0.0008, maxRotationSpeed); // Povećan multiplier za osjetljiviji response
+    isScrollHandlerActive = true;
     
-    // Dok scrollaš: koristi scroll velocity
-    // Kad prestaneš: vrati na base speed
-    if (scrollDelta > 0.5) {
-      // Kill bilo kakve GSAP tweens kad user počne scrollati (smooth transition iz draga)
-      gsap.killTweensOf(carousel.rotation);
-      targetRotationSpeed = baseRotationSpeed + scrollVelocity;
-    } else {
-      targetRotationSpeed = baseRotationSpeed; // Vrati na default
-    }
-    
-    lastScrollY = currentScrollY;
+    // Koristi requestAnimationFrame za optimalno procesiranje
+    requestAnimationFrame(() => {
+      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+      
+      // DIREKTNA VEZA: Scroll brzina = Carousel brzina!
+      scrollVelocity = Math.min(scrollDelta * 0.0008, maxRotationSpeed);
+      
+      // Dok scrollaš: koristi scroll velocity
+      if (scrollDelta > 0.5) {
+        gsap.killTweensOf(carousel.rotation);
+        targetRotationSpeed = baseRotationSpeed + scrollVelocity;
+      } else {
+        targetRotationSpeed = baseRotationSpeed;
+      }
+      
+      lastScrollY = currentScrollY;
+      isScrollHandlerActive = false;
+    });
   };
 
-  // Zamijeni inline scroll listener sa named function
-  window.removeEventListener('scroll', scrollHandler); // Cleanup prethodni ako postoji
-  window.addEventListener('scroll', scrollHandler);
+  // Passive event listener za bolje performanse
+  window.removeEventListener('scroll', scrollHandler);
+  window.addEventListener('scroll', scrollHandler, { passive: true });
 
 
   window.addEventListener('barba:before-leave', () => {
@@ -692,6 +725,11 @@ function initHero() {
     
     // Zaustavi GSAP animacije (rotating efekt + drag inertija)
     gsap.killTweensOf(carousel.rotation);
+    
+    // Cleanup Intersection Observer
+    if (heroObserver) {
+      heroObserver.disconnect();
+    }
     
     // Cleanup drag handlers
     renderer.domElement.removeEventListener('mousedown', mousedownHandler);
