@@ -5,6 +5,7 @@ import './global/dark-mode.js';
 import './global/footer-gsap.js';
 import './global/links-hover.js';
 import './global/ios-safari-fix.js';
+import './global/scroll-debug.js'; // Debug sustav
 import { initCustomCursor } from './global/custom-cursor.js';
 
 // Pokreni custom cursor

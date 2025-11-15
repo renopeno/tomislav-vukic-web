@@ -54,7 +54,16 @@ function initAboutSection() {
       end: "bottom 30%",
       scrub: false,
       toggleActions: "play none none reverse",
-      id: "about-title"
+      id: "about-title",
+      onEnter: () => console.log('🎬 ABOUT TITLE: onEnter'),
+      onLeave: () => console.log('🚪 ABOUT TITLE: onLeave'),
+      onEnterBack: () => console.log('⬅️ ABOUT TITLE: onEnterBack'),
+      onLeaveBack: () => console.log('⬆️ ABOUT TITLE: onLeaveBack'),
+      onUpdate: (self) => {
+        if (self.direction === -1) {
+          console.log('🔙 ABOUT TITLE: Scrolling BACK, progress:', self.progress.toFixed(2));
+        }
+      }
     }
   });
 
@@ -63,7 +72,10 @@ function initAboutSection() {
     y: 0,
     duration: 0.6,
     stagger: 0.015,
-    ease: "power2.out"
+    ease: "power2.out",
+    onStart: () => console.log('▶️ ABOUT TITLE animation START'),
+    onComplete: () => console.log('✅ ABOUT TITLE animation COMPLETE'),
+    onReverseComplete: () => console.log('⏮️ ABOUT TITLE animation REVERSE COMPLETE')
   });
 
   // Masked reveal za scroll text - slide up from bottom (BEZ SCRUB-a)
@@ -74,7 +86,16 @@ function initAboutSection() {
       end: "bottom 30%",
       scrub: false,
       toggleActions: "play none none reverse",
-      id: "about-scroll"
+      id: "about-scroll",
+      onEnter: () => console.log('🎬 ABOUT SCROLL: onEnter'),
+      onLeave: () => console.log('🚪 ABOUT SCROLL: onLeave'),
+      onEnterBack: () => console.log('⬅️ ABOUT SCROLL: onEnterBack'),
+      onLeaveBack: () => console.log('⬆️ ABOUT SCROLL: onLeaveBack'),
+      onUpdate: (self) => {
+        if (self.direction === -1) {
+          console.log('🔙 ABOUT SCROLL: Scrolling BACK, progress:', self.progress.toFixed(2));
+        }
+      }
     }
   });
 
@@ -83,7 +104,10 @@ function initAboutSection() {
     y: 0,
     duration: 0.6,
     stagger: 0.015,
-    ease: "power2.out"
+    ease: "power2.out",
+    onStart: () => console.log('▶️ ABOUT SCROLL animation START'),
+    onComplete: () => console.log('✅ ABOUT SCROLL animation COMPLETE'),
+    onReverseComplete: () => console.log('⏮️ ABOUT SCROLL animation REVERSE COMPLETE')
   });
 }
 
