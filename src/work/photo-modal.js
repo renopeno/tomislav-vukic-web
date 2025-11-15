@@ -428,12 +428,7 @@ function initPhotoModal() {
 }
 
 
-// Izvezi funkciju i postavi na window
+// Postavi funkciju na window (kao Hero i About)
 window.initPhotoModal = initPhotoModal;
 
-// Izvezi kao named export da Vite ne tree-shake
-export { initPhotoModal };
-
-// Funkcija će biti pozvana SAMO kroz Barba hooks ili na prvi load
-// (Barba config poziva initPhotoModal() automatski)
 console.log('📦 photo-modal.js module loaded - funkcija spremna na window objektu');

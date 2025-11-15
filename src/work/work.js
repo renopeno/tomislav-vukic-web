@@ -172,13 +172,8 @@ function initCategoryTitleAnimation() {
   });
 }
 
-// Izvezi funkcije i postavi na window
+// Postavi funkcije na window (kao Hero i About)
 window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
 
-// Izvezi kao named exports da Vite ne tree-shake
-export { initWork, initCategoryTitleAnimation };
-
-// Funkcije će biti pozvane SAMO kroz Barba hooks ili na prvi load
-// (Barba config poziva initWork() i initCategoryTitleAnimation() automatski)
 console.log('📦 work.js module loaded - funkcije spremne na window objektu');

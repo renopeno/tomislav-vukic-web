@@ -17,23 +17,9 @@ import './home/about-section.js';
 import './home/highlights.js';
 import './home/categories.js';
 
-// Work page skripte
-import { initWork, initCategoryTitleAnimation } from './work/work.js';
-import { initPhotoModal } from './work/photo-modal.js';
-
-// Sprječava Vite da tree-shake-a ove funkcije jer se koriste dinamički
-// Postavi ih na window i aktivno ih referenciraj da Vite vidi da se koriste
-window.initWork = initWork;
-window.initCategoryTitleAnimation = initCategoryTitleAnimation;
-window.initPhotoModal = initPhotoModal;
-
-// Dummy poziv koji osigurava da Vite zadrži funkcije u buildu
-// (nikad se neće izvršiti, ali Vite vidi da se funkcije "koriste")
-if (false) {
-  initWork();
-  initCategoryTitleAnimation();
-  initPhotoModal();
-}
+// Work page skripte (side-effect imports kao Hero i About)
+import './work/work.js';
+import './work/photo-modal.js';
 
 // About page
 import './about/about-page.js';
