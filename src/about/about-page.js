@@ -20,13 +20,13 @@ function initAbout() {
       
       .about-page-title .char {
         display: inline-block;
-        opacity: 0;
+        opacity: 0.1;
       }
       
       /* Stil za linije paragrafa */
       .about-page-paragraph .line {
         display: block;
-        opacity: 0;
+        opacity: 0.1;
       }
       
       /* Pocetno sakrij sliku sa clip-path (od gore prema dolje) */
@@ -88,7 +88,7 @@ function initAbout() {
             opacity: 1,
             duration: 0.05,
             ease: "none"
-          }, 0.6 + delay); // Počinje nakon 0.6s (usred slike)
+          }, 0.7 + delay); // Počinje nakon 0.7s (usred slike)
           
           // Dodaj delay za sljedeći karakter
           delay += 0.04; // Brza standardna brzina
