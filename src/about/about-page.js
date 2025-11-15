@@ -3,6 +3,16 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
+    // CSS za word wrapping
+    const style = document.createElement('style');
+    style.textContent = `
+      .about-page-title .word {
+        display: inline-block;
+        white-space: nowrap;
+      }
+    `;
+    document.head.appendChild(style);
+    
     // Dohvati elemente
     const section = document.querySelector('.section.about-page');
     const image = document.querySelector('.about-page-mobile-img');
@@ -31,6 +41,9 @@ function initAbout() {
     // Provjeri postoje li elementi
     if (!section) return;
     
+    // Split instance za cleanup
+    const splitInstances = [];
+    
     // Kreiraj glavni timeline
     const masterTimeline = gsap.timeline({ paused: true });
     
@@ -44,25 +57,35 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. TYPEWRITER EFEKT za glavni title (bez SplitType)
+    // 2. WORD BY WORD REVEAL za glavni title
+    let titleEndTime = 0;
     if (mainTitle) {
-      const titleText = mainTitle.textContent;
-      const titleHTML = mainTitle.innerHTML;
+      // Split title na riječi
+      const titleSplit = new SplitType(mainTitle, { 
+        types: 'words'
+      });
+      splitInstances.push(titleSplit);
       
-      // Wrap text u span sa overflow hidden
-      mainTitle.innerHTML = `<span class="typewriter-wrapper" style="display: inline-block; overflow: hidden; max-width: 0;"><span class="typewriter-text" style="white-space: nowrap;">${titleHTML}</span></span>`;
-      
-      const wrapper = mainTitle.querySelector('.typewriter-wrapper');
-      
-      // Typewriter animacija -ширимо wrapper
-      masterTimeline.to(wrapper, {
-        maxWidth: '100%',
-        duration: 3,
-        ease: "none"
-      }, 0.6);
+      if (titleSplit.words && titleSplit.words.length > 0) {
+        const words = titleSplit.words;
+        
+        // Postavi sve riječi na opacity 0
+        gsap.set(words, { opacity: 0 });
+        
+        // Animiraj riječ po riječ
+        masterTimeline.to(words, {
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.08,
+          ease: "power2.out"
+        }, 0.6);
+        
+        // Izračunaj kad title završava
+        titleEndTime = 0.6 + (words.length * 0.08);
+      }
     }
     
-    // Helper funkcija za divider + content reveal
+    // Helper funkcija za divider + content reveal (za master timeline)
     function createDividerSequence(divider, title, content, startTime) {
       if (!divider) return startTime;
       
@@ -99,59 +122,101 @@ function initAbout() {
         }, startTime + 0.5);
       }
       
-      return startTime + 1.2; // Return next start time
+      return startTime + 1.2;
     }
     
-    // 3. SEKCIJE sa dividerima
-    let currentTime = 4.0; // Počinje nakon typewritera
+    // Helper funkcija za scroll triggered divider + content
+    function createScrollDividerSequence(divider, title, content) {
+      if (!divider) return;
+      
+      // Sakrij divider i content na početku
+      gsap.set(divider, { width: 0, opacity: 0 });
+      if (title) gsap.set(title, { opacity: 0, y: 20 });
+      if (content) gsap.set(content, { opacity: 0, y: 20 });
+      
+      // Scroll trigger za divider
+      ScrollTrigger.create({
+        trigger: divider,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          const tl = gsap.timeline();
+          
+          // Divider
+          tl.to(divider, {
+            opacity: 1,
+            width: '100%',
+            duration: 0.6,
+            ease: "power2.inOut"
+          }, 0);
+          
+          // Title
+          if (title) {
+            tl.to(title, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out"
+            }, 0.3);
+          }
+          
+          // Content
+          if (content) {
+            tl.to(content, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out"
+            }, 0.5);
+          }
+        }
+      });
+    }
     
-    // About me
+    // 3. PRVA SEKCIJA (About me) - animira se nakon title-a
     if (dividers[0]) {
-      currentTime = createDividerSequence(
+      createDividerSequence(
         dividers[0], 
         aboutMeTitle, 
         aboutMeParagraph, 
-        currentTime
+        titleEndTime + 0.3
       );
     }
     
+    // 4. OSTALE SEKCIJE - scroll triggered
     // What I photograph
     if (dividers[1]) {
-      currentTime = createDividerSequence(
+      createScrollDividerSequence(
         dividers[1], 
         whatIPhotographTitle, 
-        whatIPhotographContent, 
-        currentTime
+        whatIPhotographContent
       );
     }
     
     // How I work
     if (dividers[2]) {
-      currentTime = createDividerSequence(
+      createScrollDividerSequence(
         dividers[2], 
         howIWorkTitle, 
-        howIWorkParagraph, 
-        currentTime
+        howIWorkParagraph
       );
     }
     
     // Who I work with
     if (dividers[3]) {
-      currentTime = createDividerSequence(
+      createScrollDividerSequence(
         dividers[3], 
         whoIWorkWithTitle, 
-        whoIWorkWithContent, 
-        currentTime
+        whoIWorkWithContent
       );
     }
     
     // Footer divider + items
     if (dividers[4]) {
-      currentTime = createDividerSequence(
+      createScrollDividerSequence(
         dividers[4], 
         locationItem, 
-        availabilityItem, 
-        currentTime
+        availabilityItem
       );
     }
     
@@ -179,10 +244,18 @@ function initAbout() {
     // Cleanup za Barba.js transitions
     if (typeof barba !== 'undefined') {
       barba.hooks.beforeLeave(() => {
+        // Revert split text
+        splitInstances.forEach(split => {
+          if (split && split.revert) split.revert();
+        });
         // Clear timeline
         if (masterTimeline) masterTimeline.kill();
         // Clear ScrollTriggers
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        // Clear style tag
+        if (style && style.parentNode) {
+          style.parentNode.removeChild(style);
+        }
       });
     }
   });
