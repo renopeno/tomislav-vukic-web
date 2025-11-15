@@ -1,6 +1,6 @@
 let isWorkInitializing = false;
 
-function initWork() {
+async function initWork() {
   console.log('🔍 initWork() POZVAN!');
   
   if (isWorkInitializing) {
@@ -149,30 +149,30 @@ function initWork() {
       });
     });
 
-    Promise.all(imageLoadPromises).then(() => {
-      console.log('✅ Sve slike učitane, postavljam grid');
-      if (!window.isSettingUpGrid) {
-        window.isSettingUpGrid = true;
-        setupGrid();
-        window.isSettingUpGrid = false;
+    await Promise.all(imageLoadPromises);
+    
+    console.log('✅ Sve slike učitane, postavljam grid');
+    if (!window.isSettingUpGrid) {
+      window.isSettingUpGrid = true;
+      setupGrid();
+      window.isSettingUpGrid = false;
+    }
+    
+    // Tranzicija za ulazak fotki u view
+    gsap.fromTo(
+      window.shuffledPhotos,
+      { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.1,
       }
-      
-      // Tranzicija za ulazak fotki u view
-      gsap.fromTo(
-        window.shuffledPhotos,
-        { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          y: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          stagger: 0.1,
-        }
-      );
-    });
+    );
 
-    console.log("✅ Grid setup funkcija završena.");
+    console.log("✅ Grid postavljen i animiran!");
   } finally {
     isWorkInitializing = false;
   }
