@@ -94,10 +94,15 @@ function initWork() {
       let lastLeftCol = null;
       let lastRightCol = null;
 
-      window.shuffledPhotos.forEach((container) => {
+      window.shuffledPhotos.forEach((container, index) => {
         const photo = container.querySelector(".photo");
         const isHorizontal = photo.naturalWidth > photo.naturalHeight;
         const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
+        
+        // Debug za prvu 3 fotke
+        if (index < 3) {
+          console.log(`📸 Foto ${index}: naturalWidth=${photo.naturalWidth}, naturalHeight=${photo.naturalHeight}, isHorizontal=${isHorizontal}`);
+        }
 
         let startCol;
         if (config.columns === 1) {
