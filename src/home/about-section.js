@@ -49,13 +49,12 @@ function initAboutSection() {
     ScrollTrigger.refresh();
     
     // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
+    // toggleActions: "play none none none" - animacija se odvija samo pri ulasku, ne vraća unatrag
     const titleTl = gsap.timeline({
       scrollTrigger: {
         trigger: homeAboutTitle,
         start: "top 80%",
-        end: "bottom 30%",
-        scrub: 0.5,
-        invalidateOnRefresh: true
+        toggleActions: "play none none none"
       }
     });
     
@@ -63,17 +62,17 @@ function initAboutSection() {
     titleTl.to(titleSplit.words.slice(6), {
       opacity: 1,
       stagger: 0.015,
+      duration: 1.5,
       ease: "power2.out"
     });
     
     // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
+    // toggleActions: "play none none none" - animacija se odvija samo pri ulasku, ne vraća unatrag
     const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: aboutScroll,
         start: "top 80%",
-        end: "bottom 40%",
-        scrub: 0.5,
-        invalidateOnRefresh: true
+        toggleActions: "play none none none"
       }
     });
     
@@ -81,6 +80,7 @@ function initAboutSection() {
     scrollTl.to(scrollSplit.words, {
       opacity: 1,
       stagger: 0.015,
+      duration: 1,
       ease: "power2.out"
     });
   });
