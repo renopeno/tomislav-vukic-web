@@ -36,7 +36,7 @@ function initAbout() {
       /* Typewriter cursor */
       .typewriter-cursor {
         display: inline-block;
-        width: 2px;
+        width: 3px;
         height: 1em;
         background-color: var(--text-color, currentColor);
         margin-left: 4px;
@@ -54,16 +54,11 @@ function initAbout() {
         51%, 100% { opacity: 0; }
       }
       
-      /* Stil za linije paragrafa */
-      .about-page-paragraph .line {
-        display: block;
-        opacity: 0;
-      }
-      
-      /* Paragraf riječi wrap */
+      /* Paragraf riječi wrap i opacity */
       .about-page-paragraph .word {
         display: inline-block;
         white-space: nowrap;
+        opacity: 0.1;
       }
     `;
     document.head.appendChild(style);
@@ -117,37 +112,39 @@ function initAbout() {
         // Postavi cursor prije prvog karaktera
         chars[0].parentElement.insertBefore(cursor, chars[0]);
         
-        // Prikaži cursor na početku typewritera i započni blinkanje
-        masterTimeline.call(() => {
-          cursor.style.opacity = '1';
-          cursor.classList.add('active');
-        }, null, 0.5);
-        
         // Typewriter animacija s manualnim staggerom za pauze
         let delay = 0;
         chars.forEach((char, index) => {
           const charText = char.textContent;
           
-          // Animiraj svaki karakter
+          // Prikaži cursor skupa sa prvim karakterom
+          if (index === 0) {
+            masterTimeline.call(() => {
+              cursor.style.opacity = '1';
+              cursor.classList.add('active');
+            }, null, 0.5 + delay);
+          }
+          
+          // Animiraj svaki karakter (sporije i smootherije)
           masterTimeline.to(char, {
             opacity: 1,
-            duration: 0.08,
-            ease: "power1.out"
+            duration: 0.12,
+            ease: "power2.out"
           }, 0.5 + delay);
           
           // Pomakni cursor iza trenutnog karaktera (ali ne ako je to zadnji karakter)
           if (index < chars.length - 1) {
             masterTimeline.call(() => {
               chars[index + 1].parentElement.insertBefore(cursor, chars[index + 1]);
-            }, null, 0.5 + delay + 0.04);
+            }, null, 0.5 + delay + 0.06);
           }
           
-          // Dodaj delay za sljedeći karakter
-          delay += 0.04; // Brza standardna brzina
+          // Dodaj delay za sljedeći karakter (sporije)
+          delay += 0.06;
           
           // Ako je trenutni karakter zarez ili točka, dodaj ekstra pauzu
           if (charText === ',' || charText === '.') {
-            delay += 0.4; // Pauza nakon interpunkcije
+            delay += 0.5; // Duža pauza nakon interpunkcije
           }
         });
         
@@ -166,47 +163,49 @@ function initAbout() {
       }
     }
     
-    // 3. PARAGRAF - Scroll reveal line by line nakon typewritera
+    // 3. PARAGRAF - Word by word reveal nakon typewritera
     let paragraphTimeline = null;
     if (paragraph) {
-      // Split paragraf na riječi i linije (riječi ostaju zajedno)
+      // Split paragraf na riječi (riječi ostaju zajedno)
       const paragraphSplit = new SplitType(paragraph, { 
-        types: 'words,lines',
-        tagName: 'span',
-        lineClass: 'line'
+        types: 'words',
+        tagName: 'span'
       });
       splitInstances.push(paragraphSplit);
       
-      if (paragraphSplit.lines && paragraphSplit.lines.length > 0) {
-        const lines = paragraphSplit.lines;
+      if (paragraphSplit.words && paragraphSplit.words.length > 0) {
+        const words = paragraphSplit.words;
         
-        // Prvo prikaži cijeli paragraf (fade in) taman kad završava typewriter
+        // Prvo prikaži cijeli paragraf (fade in) ranije - odmah nakon što typewriter započne sa zadnjim redom
         masterTimeline.to(paragraph, {
           opacity: 1,
           duration: 0.3,
           ease: "power2.out"
-        }, typewriterEndTime);
+        }, typewriterEndTime - 1.0); // Pojavljuje se 1s prije kraja typewritera
         
-        // Prikaži prvu liniju odmah
-        masterTimeline.to(lines[0], {
+        // Prikaži prvu riječ odmah nakon fade-in
+        masterTimeline.to(words[0], {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.3,
           ease: "power2.out"
-        }, typewriterEndTime + 0.2);
+        }, typewriterEndTime - 0.8);
         
-        // Ostale linije - scroll reveal red po red
-        if (lines.length > 1) {
-          for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            const prevLine = lines[i - 1];
+        // Ostale riječi - scroll reveal word by word
+        if (words.length > 1) {
+          // Grupiraj po ~ 3-4 riječi za smootheriji efekt
+          const wordsPerGroup = 3;
+          
+          for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const prevWord = words[i - 1];
             
             ScrollTrigger.create({
-              trigger: prevLine,
-              start: "top 75%",
+              trigger: prevWord,
+              start: "top 80%",
               onEnter: () => {
-                gsap.to(line, {
+                gsap.to(word, {
                   opacity: 1,
-                  duration: 0.4,
+                  duration: 0.35,
                   ease: "power2.out"
                 });
               },
