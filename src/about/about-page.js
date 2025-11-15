@@ -10,25 +10,14 @@ function initAbout() {
         overflow: visible;
       }
       
-      .about-page-title .line {
-        display: block;
-        overflow: visible;
-      }
-      
       .about-page-title .word {
         display: inline;
         white-space: normal;
+        opacity: 0.1; /* Ghost text */
       }
       
-      /* Ghost text - 0.1 opacity za nereveal-ani content */
-      .about-page-paragraph-title,
-      .about-page-paragraph,
-      #w-node-af8686f0-0eff-8a7c-0ed7-beca4d3b4ae5-e0820647,
-      #w-node-f5866f73-1277-b3c6-9637-905ed2896c1d-e0820647,
-      #w-node-_108f6310-e8be-638b-dc73-332ac7dd5576-e0820647,
-      #w-node-_959dd736-48e6-8ca1-a499-ecdb1597fdfc-e0820647,
-      #w-node-_81d87156-36a4-f557-ac99-5a50eaa2aede-e0820647 {
-        opacity: 0.1;
+      .about-page-title .word.revealed {
+        opacity: 1;
       }
     `;
     document.head.appendChild(style);
@@ -77,146 +66,146 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. LINE BY LINE REVEAL za glavni title
-    let titleEndTime = 0;
+    // 2. SCROLL REVEAL za glavni title - prvih nekoliko riječi vidljivo, ostalo 0.1
     if (mainTitle) {
-      // Split title na linije - održava prirodan layout
+      // Split title na riječi - održava prirodan layout
       const titleSplit = new SplitType(mainTitle, { 
-        types: 'lines',
-        lineClass: 'line'
+        types: 'words'
       });
       splitInstances.push(titleSplit);
       
-      if (titleSplit.lines && titleSplit.lines.length > 0) {
-        const lines = titleSplit.lines;
+      if (titleSplit.words && titleSplit.words.length > 0) {
+        const words = titleSplit.words;
         
-        // Sakrij sve linije na početku
-        gsap.set(lines, { autoAlpha: 0, y: 20 });
+        // Prvih 6 riječi odmah vidljivo (opacity 1)
+        const initialWordsCount = Math.min(6, words.length);
+        for (let i = 0; i < initialWordsCount; i++) {
+          words[i].classList.add('revealed');
+        }
         
-        // Smooth reveal linija po linija
-        masterTimeline.to(lines, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.15, // 150ms između svake linije
-          ease: "power2.out"
-        }, 0.6);
+        // Scroll reveal za ostatak riječi
+        words.forEach((word, index) => {
+          if (index < initialWordsCount) return; // Skip prve riječi
+          
+          ScrollTrigger.create({
+            trigger: word,
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              gsap.to(word, {
+                opacity: 1,
+                duration: 0.4,
+                ease: "power2.out",
+                onComplete: () => {
+                  word.classList.add('revealed');
+                }
+              });
+            }
+          });
+        });
         
-        // Izračunaj vrijeme završetka
-        const totalDuration = 0.6 + (lines.length * 0.15) + 0.8;
-        // Ali prvi divider počinje malo prije kraja
-        titleEndTime = totalDuration - 0.5; // Divider počinje 0.5s prije kraja title-a
+        // Trigger za prve dvije sekcije kada title bude skoro cijeli reveal-an
+        // Pretpostavljam da je to oko 80% reveal-a
+        const triggerWordIndex = Math.floor(words.length * 0.8);
+        if (words[triggerWordIndex]) {
+          ScrollTrigger.create({
+            trigger: words[triggerWordIndex],
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              // Trigger prve dvije sekcije
+              triggerFirstSections();
+            }
+          });
+        }
       }
     }
     
-    // Helper funkcija za divider + content reveal (za master timeline)
-    function createDividerSequence(divider, title, content, startTime) {
-      if (!divider) return startTime;
+    // Helper funkcija za divider + content reveal
+    function revealSection(divider, title, content, delay = 0) {
+      if (!divider) return;
       
-      // Sakrij divider na početku (content je već 0.1 opacity)
+      // Sakrij divider i content na početku
       gsap.set(divider, { width: 0, opacity: 0 });
-      if (title) gsap.set(title, { y: 20 });
-      if (content) gsap.set(content, { y: 20 });
+      if (title) gsap.set(title, { opacity: 0, y: 20 });
+      if (content) gsap.set(content, { opacity: 0, y: 20 });
       
-      // Divider animacija (fade in + width)
-      masterTimeline.to(divider, {
+      const tl = gsap.timeline({ delay });
+      
+      // Divider
+      tl.to(divider, {
         opacity: 1,
         width: '100%',
         duration: 0.6,
         ease: "power2.inOut"
-      }, startTime);
+      }, 0);
       
-      // Title reveal (0.1 → 1 opacity)
+      // Title
       if (title) {
-        masterTimeline.to(title, {
+        tl.to(title, {
           opacity: 1,
           y: 0,
           duration: 0.6,
           ease: "power2.out"
-        }, startTime + 0.3);
+        }, 0.3);
       }
       
-      // Content reveal (0.1 → 1 opacity)
+      // Content
       if (content) {
-        masterTimeline.to(content, {
+        tl.to(content, {
           opacity: 1,
           y: 0,
           duration: 0.6,
           ease: "power2.out"
-        }, startTime + 0.5);
+        }, 0.5);
       }
-      
-      return startTime + 1.2;
     }
     
-    // Helper funkcija za scroll triggered divider + content
+    // Helper funkcija za scroll triggered sekcije
     function createScrollDividerSequence(divider, title, content) {
       if (!divider) return;
       
-      // Sakrij divider na početku (content je već 0.1 opacity)
+      // Sakrij divider i content na početku
       gsap.set(divider, { width: 0, opacity: 0 });
-      if (title) gsap.set(title, { y: 20 });
-      if (content) gsap.set(content, { y: 20 });
+      if (title) gsap.set(title, { opacity: 0, y: 20 });
+      if (content) gsap.set(content, { opacity: 0, y: 20 });
       
       // Scroll trigger čim uđe u viewport
       ScrollTrigger.create({
         trigger: divider,
-        start: "top 95%", // Triggeruje čim uđe u viewport
+        start: "top 95%",
         once: true,
         onEnter: () => {
-          const tl = gsap.timeline({ delay: 0.3 }); // 0.3s delay prije reveal-a
-          
-          // Divider
-          tl.to(divider, {
-            opacity: 1,
-            width: '100%',
-            duration: 0.6,
-            ease: "power2.inOut"
-          }, 0);
-          
-          // Title reveal (0.1 → 1 opacity)
-          if (title) {
-            tl.to(title, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: "power2.out"
-            }, 0.3);
-          }
-          
-          // Content reveal (0.1 → 1 opacity)
-          if (content) {
-            tl.to(content, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: "power2.out"
-            }, 0.5);
-          }
+          revealSection(divider, title, content, 0.2);
         }
       });
     }
     
-    // 3. PRVA SEKCIJA (About me) - animira se nakon title-a
-    if (dividers[0]) {
-      createDividerSequence(
-        dividers[0], 
-        aboutMeTitle, 
-        aboutMeParagraph, 
-        titleEndTime + 0.3
-      );
+    // Funkcija za triggeranje prvih sekcija
+    let firstSectionsTriggered = false;
+    function triggerFirstSections() {
+      if (firstSectionsTriggered) return;
+      firstSectionsTriggered = true;
+      
+      // Prva sekcija (About me) - odmah
+      if (dividers[0]) {
+        revealSection(dividers[0], aboutMeTitle, aboutMeParagraph, 0);
+      }
+      
+      // Druga sekcija (What I photograph) - sa delayom ako je u viewportu
+      if (dividers[1]) {
+        const secondSectionRect = dividers[1].getBoundingClientRect();
+        if (secondSectionRect.top < window.innerHeight) {
+          // U viewportu je, triggeruj sa delayem
+          revealSection(dividers[1], whatIPhotographTitle, whatIPhotographContent, 0.8);
+        } else {
+          // Nije u viewportu, postavi scroll trigger
+          createScrollDividerSequence(dividers[1], whatIPhotographTitle, whatIPhotographContent);
+        }
+      }
     }
     
-    // 4. OSTALE SEKCIJE - scroll triggered
-    // What I photograph
-    if (dividers[1]) {
-      createScrollDividerSequence(
-        dividers[1], 
-        whatIPhotographTitle, 
-        whatIPhotographContent
-      );
-    }
-    
+    // 3. OSTALE SEKCIJE - scroll triggered
     // How I work
     if (dividers[2]) {
       createScrollDividerSequence(
