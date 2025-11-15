@@ -268,6 +268,10 @@ if (document.readyState === 'loading') {
         initWork();
         initCategoryTitleAnimation();
         initWorkCategoriesReveal();
+        // ✅ NE ZABORAVI PHOTO MODAL!
+        if (window.initPhotoModal) {
+          window.initPhotoModal();
+        }
       }
     }
   });
@@ -278,6 +282,10 @@ if (document.readyState === 'loading') {
       initWork();
       initCategoryTitleAnimation();
       initWorkCategoriesReveal();
+      // ✅ NE ZABORAVI PHOTO MODAL!
+      if (window.initPhotoModal) {
+        window.initPhotoModal();
+      }
     }
   }
 }
