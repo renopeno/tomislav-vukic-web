@@ -1,20 +1,9 @@
 function initAbout() {
-  console.log('🔍 initAbout() POZVAN!');
-  console.log('🔍 document.readyState:', document.readyState);
-  console.log('🔍 Tražim .section.about-page...');
-  
-  // Provjeri jesmo li na ABOUT page-u PRIJE bilo čega drugog
   const section = document.querySelector('.section.about-page');
   
-  console.log('🔍 .section.about-page pronađen?', !!section);
-  
   if (!section) {
-    // Tiho izađi - nismo na about page-u
-    console.log('⚠️ .section.about-page NE POSTOJI - izlazim iz initAbout()');
     return;
   }
-  
-  console.log('✅ 🎨 Inicijaliziram About Page animacije!');
   
   // Inicijalizacija GSAP
   gsap.registerPlugin(ScrollTrigger);
@@ -63,18 +52,18 @@ function initAbout() {
     // Flag za praćenje je li title završio
     let titleRevealed = false;
     
-    // Master timeline - BEZ ScrollTrigger (pokreće se odmah na load)
+    // Master timeline - pokreće se odmah na load
     const masterTimeline = gsap.timeline();
     
-    // 1. SLIKA - Clip-path reveal (odmah na load)
+    // 1. SLIKA - Clip-path reveal (odmah bez delaya)
     if (image) {
       gsap.set(image, { clipPath: 'inset(0% 0% 100% 0%)' });
       
       masterTimeline.to(image, {
         clipPath: 'inset(0% 0% 0% 0%)',
         duration: 1.2,
-        ease: "expo.inOut" // Jači, dinamičniji ease
-      }, 0.2);
+        ease: "expo.inOut"
+      }, 0); // ✅ Uklonjeno 0.2s delay - kreće ODMAH!
     }
     
     // 2. ABOUT TITLE - Line by line reveal
@@ -239,12 +228,8 @@ function initAbout() {
 
 window.initAbout = initAbout;
 
-// Inicijaliziraj odmah ili na DOMContentLoaded
-console.log('📦 about-page.js loaded, document.readyState:', document.readyState);
 if (document.readyState === 'loading') {
-  console.log('⏳ Čekam DOMContentLoaded...');
   document.addEventListener('DOMContentLoaded', initAbout);
 } else {
-  console.log('▶️ DOM već loaded, pozivam initAbout() odmah');
   initAbout();
 }
