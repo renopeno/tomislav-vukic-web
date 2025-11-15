@@ -63,56 +63,76 @@ function initAboutSection() {
       scrollWords: scrollSplit.words.length
     });
     
+    console.log('📊 Trenutno aktivnih ScrollTrigger instanci:', ScrollTrigger.getAll().length);
+    
     // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
-    // toggleActions: "play none none none" - animacija se odvija samo pri ulasku, ne vraća unatrag
+    // scrub: riječ po riječ reveal dok scrollaš
+    let titleCompleted = false;
     const titleTl = gsap.timeline({
       scrollTrigger: {
         trigger: homeAboutTitle,
         start: "top 80%",
-        toggleActions: "play none none none",
+        end: "bottom 30%",
+        scrub: 0.5,
         markers: true,
         id: "home-about-title",
         onEnter: () => console.log('✅ Title ScrollTrigger: onEnter'),
         onLeave: () => console.log('🚪 Title ScrollTrigger: onLeave'),
-        onEnterBack: () => console.log('⬅️ Title ScrollTrigger: onEnterBack'),
-        onLeaveBack: () => console.log('⬆️ Title ScrollTrigger: onLeaveBack')
+        onEnterBack: () => {
+          console.log('⬅️ Title ScrollTrigger: onEnterBack');
+          // Ako je već completed, postavi sve na opacity 1
+          if (titleCompleted) {
+            gsap.set(titleSplit.words.slice(6), { opacity: 1 });
+          }
+        },
+        onLeaveBack: () => console.log('⬆️ Title ScrollTrigger: onLeaveBack'),
+        onComplete: () => {
+          console.log('✅ Title ScrollTrigger COMPLETED - ostajem revealed');
+          titleCompleted = true;
+        }
       }
     });
     
-    // Animiraj riječi od 7. nadalje: 0.1 -> 1
+    // Animiraj riječi od 7. nadalje: 0.1 -> 1 (scrub animacija)
     titleTl.to(titleSplit.words.slice(6), {
       opacity: 1,
       stagger: 0.015,
-      duration: 1.5,
-      ease: "power2.out",
-      onStart: () => console.log('🎬 Title animacija započela'),
-      onComplete: () => console.log('✅ Title animacija završena')
+      ease: "none"
     });
     
     // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
-    // toggleActions: "play none none none" - animacija se odvija samo pri ulasku, ne vraća unatrag
+    // scrub: riječ po riječ reveal dok scrollaš
+    let scrollCompleted = false;
     const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: aboutScroll,
         start: "top 80%",
-        toggleActions: "play none none none",
+        end: "bottom 40%",
+        scrub: 0.5,
         markers: true,
         id: "about-scroll",
         onEnter: () => console.log('✅ Scroll ScrollTrigger: onEnter'),
         onLeave: () => console.log('🚪 Scroll ScrollTrigger: onLeave'),
-        onEnterBack: () => console.log('⬅️ Scroll ScrollTrigger: onEnterBack'),
-        onLeaveBack: () => console.log('⬆️ Scroll ScrollTrigger: onLeaveBack')
+        onEnterBack: () => {
+          console.log('⬅️ Scroll ScrollTrigger: onEnterBack');
+          // Ako je već completed, postavi sve na opacity 1
+          if (scrollCompleted) {
+            gsap.set(scrollSplit.words, { opacity: 1 });
+          }
+        },
+        onLeaveBack: () => console.log('⬆️ Scroll ScrollTrigger: onLeaveBack'),
+        onComplete: () => {
+          console.log('✅ Scroll ScrollTrigger COMPLETED - ostajem revealed');
+          scrollCompleted = true;
+        }
       }
     });
     
-    // Animiraj scroll tekst riječ po riječ
+    // Animiraj scroll tekst riječ po riječ (scrub animacija)
     scrollTl.to(scrollSplit.words, {
       opacity: 1,
       stagger: 0.015,
-      duration: 1,
-      ease: "power2.out",
-      onStart: () => console.log('🎬 Scroll animacija započela'),
-      onComplete: () => console.log('✅ Scroll animacija završena')
+      ease: "none"
     });
     
     console.log('🎯 ScrollTrigger animacije kreirane');
