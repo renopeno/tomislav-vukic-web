@@ -90,13 +90,13 @@ function initPageSpecificFunctions(namespace) {
     case 'home':
       console.log('🏠 Učitavanje HOME komponenti:');
       console.log('  - Inicijalizacija Hero sekcije');
-      initHero?.();
+      window.initHero?.();
       console.log('  - Inicijalizacija About sekcije');
-      initAboutSection?.();
+      window.initAboutSection?.();
       console.log('  - Inicijalizacija Highlights sekcije');
-      initHighlights?.();
+      window.initHighlights?.();
       console.log('  - Inicijalizacija Categories sekcije');
-      initCategories?.();
+      window.initCategories?.();
       break;
     case 'work':
     case 'work-abstract':
@@ -106,23 +106,23 @@ function initPageSpecificFunctions(namespace) {
     case 'work-architecture':
       console.log('💼 Učitavanje WORK komponenti:');
       console.log('  - Inicijalizacija Work sekcije');
-      initWork?.();
+      window.initWork?.();
       console.log('  - Inicijalizacija animacije naslova kategorije');
-      initCategoryTitleAnimation?.();
+      window.initCategoryTitleAnimation?.();
       console.log('  - Inicijalizacija Photo modala');
       console.log('🔍 DEBUG: typeof window.initPhotoModal =', typeof window.initPhotoModal);
       console.log('🔍 DEBUG: window.initPhotoModal =', window.initPhotoModal);
-      initPhotoModal?.();
+      window.initPhotoModal?.();
       console.log('✅ initPhotoModal?.() pozvan');
       break;
     case 'about':
       console.log('👤 Učitavanje ABOUT komponenti:');
       console.log('  - Inicijalizacija About sekcije');
-      console.log('🔍 DEBUG: typeof initAbout =', typeof initAbout);
+      console.log('🔍 DEBUG: typeof window.initAbout =', typeof window.initAbout);
       console.log('🔍 DEBUG: window.initAbout =', window.initAbout);
-      console.log('🔍 DEBUG: Pozivam initAbout?.()...');
-      initAbout?.();
-      console.log('🔍 DEBUG: initAbout?.() završen');
+      console.log('🔍 DEBUG: Pozivam window.initAbout?.()...');
+      window.initAbout?.();
+      console.log('🔍 DEBUG: window.initAbout?.() završen');
       break;
     default:
       console.log(`⚠️ Nepoznati namespace: ${namespace}, ne inicijaliziram specifične funkcije`);
