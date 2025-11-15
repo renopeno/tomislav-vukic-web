@@ -609,29 +609,20 @@ function initHero() {
     console.log('📱 Touch drag završio, inertia:', inertiaAmount);
   };
 
-  // Attach drag event listeners
+  // Attach drag event listeners - SAMO MOUSE (ne touch da ne blokiramo scroll)
   renderer.domElement.addEventListener('mousedown', mousedownHandler);
   window.addEventListener('mousemove', mousemoveHandler);
   window.addEventListener('mouseup', mouseupHandler);
   
-  // Touch eventi SAMO na desktopu/tabletu (ne na mobitelu) da ne blokiramo scroll
-  if (!isMobile) {
-    renderer.domElement.addEventListener('touchstart', touchstartHandler, { passive: false });
-    renderer.domElement.addEventListener('touchmove', touchmoveHandler, { passive: false });
-    renderer.domElement.addEventListener('touchend', touchendHandler);
-    
-    // Cursor + CSS za drag UX
-    renderer.domElement.style.cursor = 'grab';
-    renderer.domElement.style.userSelect = 'none';
-    renderer.domElement.style.webkitUserSelect = 'none';
-    renderer.domElement.style.touchAction = 'none';
-    
-    console.log('🖱️ Drag funkcionalnost aktivirana (desktop/tablet)');
-  } else {
-    // Na mobitelu omogući normalno scrollanje
-    renderer.domElement.style.touchAction = 'auto';
-    console.log('📱 Mobitel - scroll omogućen, drag onemogućen');
-  }
+  // Cursor + CSS za drag UX (samo desktop)
+  renderer.domElement.style.cursor = 'grab';
+  renderer.domElement.style.userSelect = 'none';
+  renderer.domElement.style.webkitUserSelect = 'none';
+  
+  // BITNO: omogući normalno scrollanje na svim touch uređajima
+  renderer.domElement.style.touchAction = 'auto';
+  
+  console.log('🖱️ Mouse drag aktiviran (desktop), touch scroll omogućen (mobitel/tablet)');
 
   // ═══════════════════════════════════════════════════════════
   //  ANIMATION LOOP
@@ -711,12 +702,6 @@ function initHero() {
     renderer.domElement.removeEventListener('mousedown', mousedownHandler);
     window.removeEventListener('mousemove', mousemoveHandler);
     window.removeEventListener('mouseup', mouseupHandler);
-    
-    if (!isMobile) {
-      renderer.domElement.removeEventListener('touchstart', touchstartHandler);
-      renderer.domElement.removeEventListener('touchmove', touchmoveHandler);
-      renderer.domElement.removeEventListener('touchend', touchendHandler);
-    }
     
     planeMeshes.forEach(mesh => {
       if (mesh.geometry) mesh.geometry.dispose();
