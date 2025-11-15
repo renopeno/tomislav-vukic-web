@@ -2,12 +2,10 @@
  * ═══════════════════════════════════════════════════════════
  *  HERO SECTION - 3D CYLINDER CAROUSEL
  * ═══════════════════════════════════════════════════════════
- * POTPUNO ISKLJUČENO - testiranje freeze problema
  */
 
 function initHero() {
-  console.log('⚠️ HERO.JS COMPLETELY DISABLED FOR TESTING');
-  return;
+  console.log('🎨 HERO.JS ENABLED - testiranje sa optimizacijama');
   
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
