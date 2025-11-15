@@ -2,16 +2,13 @@
  * ═══════════════════════════════════════════════════════════
  *  HERO SECTION - 3D CYLINDER CAROUSEL
  * ═══════════════════════════════════════════════════════════
- * 
- * Features:
- * - Dinamično učitavanje slika iz Webflow CMS-a
- * - 3D cylinder carousel sa zakrivljenim slikama
- * - Continuous rotation oko Y-osi
- * - Minimalni razmak između slika
- * - GSAP reveal animacija
+ * POTPUNO ISKLJUČENO - testiranje freeze problema
  */
 
 function initHero() {
+  console.log('⚠️ HERO.JS COMPLETELY DISABLED FOR TESTING');
+  return;
+  
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
   
