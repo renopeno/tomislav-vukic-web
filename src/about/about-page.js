@@ -83,7 +83,7 @@ function initAbout() {
         const lines = titleSplit.lines;
         
         // Početna pozicija (sve linije skrivene)
-        gsap.set(lines, { opacity: 0, y: 30 }); // Veći offset za bolju dinamiku
+        gsap.set(lines, { opacity: 0, y: 20 });
         
         // Počni reveal RANIJE (umjesto 1.0s -> 0.6s)
         const titleStartTime = 0.6; 
@@ -92,9 +92,9 @@ function initAbout() {
           masterTimeline.to(line, {
             opacity: 1,
             y: 0,
-            duration: 0.5, // Malo brže (0.6 -> 0.5)
-            ease: "back.out(1.7)" // Elastičniji ease za dinamiku
-          }, titleStartTime + (index * 0.15)); // Brži stagger (0.2 -> 0.15)
+            duration: 0.5,
+            ease: "power2.out"
+          }, titleStartTime + (index * 0.15));
         });
         
         // Izračunaj kada zadnja linija završava
@@ -119,7 +119,7 @@ function initAbout() {
       masterTimeline.to(dividers[0], {
         opacity: 1,
         width: '100%',
-        duration: 0.6,
+        duration: 0.4, // Brže (0.6 -> 0.4)
         ease: "power2.inOut"
       }, titleEndTime);
       
@@ -127,22 +127,22 @@ function initAbout() {
         masterTimeline.to(aboutMeTitle, {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.4, // Brže (0.6 -> 0.4)
           ease: "power2.out"
-        }, titleEndTime + 0.3);
+        }, titleEndTime + 0.2); // Manji delay (0.3 -> 0.2)
       }
       
       if (aboutMeParagraph) {
         masterTimeline.to(aboutMeParagraph, {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.4, // Brže (0.6 -> 0.4)
           ease: "power2.out"
-        }, titleEndTime + 0.5);
+        }, titleEndTime + 0.3); // Manji delay (0.5 -> 0.3)
       }
       
       // Izračunaj kad prva sekcija završava
-      const firstSectionEndTime = titleEndTime + 0.5 + 0.6;
+      const firstSectionEndTime = titleEndTime + 0.3 + 0.4; // Ažurirano
       
       // Postavi flag kada prva sekcija završi
       let firstSectionRevealed = false;
@@ -167,7 +167,7 @@ function initAbout() {
         tl.to(dividers[1], {
           opacity: 1,
           width: '100%',
-          duration: 0.6,
+          duration: 0.4, // Brže
           ease: "power2.inOut"
         }, 0);
         
@@ -175,18 +175,18 @@ function initAbout() {
           tl.to(whatIPhotographTitle, {
             opacity: 1,
             y: 0,
-            duration: 0.6,
+            duration: 0.4, // Brže
             ease: "power2.out"
-          }, 0.3);
+          }, 0.2); // Manji delay
         }
         
         if (whatIPhotographContent) {
           tl.to(whatIPhotographContent, {
             opacity: 1,
             y: 0,
-            duration: 0.6,
+            duration: 0.4, // Brže
             ease: "power2.out"
-          }, 0.5);
+          }, 0.3); // Manji delay
         }
       }
     }
@@ -210,7 +210,7 @@ function initAbout() {
           tl.to(dividers[1], {
             opacity: 1,
             width: '100%',
-            duration: 0.6,
+            duration: 0.4,
             ease: "power2.inOut"
           }, 0);
           
@@ -218,18 +218,18 @@ function initAbout() {
             tl.to(whatIPhotographTitle, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.2);
           }
           
           if (whatIPhotographContent) {
             tl.to(whatIPhotographContent, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.3);
           }
         }
       });
@@ -251,7 +251,7 @@ function initAbout() {
           tl.to(dividers[2], {
             opacity: 1,
             width: '100%',
-            duration: 0.6,
+            duration: 0.4,
             ease: "power2.inOut"
           }, 0);
           
@@ -259,18 +259,18 @@ function initAbout() {
             tl.to(howIWorkTitle, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.2);
           }
           
           if (howIWorkParagraph) {
             tl.to(howIWorkParagraph, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.3);
           }
         }
       });
@@ -292,7 +292,7 @@ function initAbout() {
           tl.to(dividers[3], {
             opacity: 1,
             width: '100%',
-            duration: 0.6,
+            duration: 0.4,
             ease: "power2.inOut"
           }, 0);
           
@@ -300,18 +300,18 @@ function initAbout() {
             tl.to(whoIWorkWithTitle, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.2);
           }
           
           if (whoIWorkWithContent) {
             tl.to(whoIWorkWithContent, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.3);
           }
         }
       });
@@ -333,7 +333,7 @@ function initAbout() {
           tl.to(dividers[4], {
             opacity: 1,
             width: '100%',
-            duration: 0.6,
+            duration: 0.4,
             ease: "power2.inOut"
           }, 0);
           
@@ -341,18 +341,18 @@ function initAbout() {
             tl.to(locationItem, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.2);
           }
           
           if (availabilityItem) {
             tl.to(availabilityItem, {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.3);
           }
         }
       });
