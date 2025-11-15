@@ -1,19 +1,20 @@
 function initAboutSection() {
-  // Provjeri jesmo li na HOME page-u (samo tamo postoji .home-about-title)
-  const homeAboutTitle = document.querySelector('.home-about-title');
+  // PRECIZNA PROVJERA: Radi SAMO na HOME page-u
+  const barbaContainer = document.querySelector('[data-barba-namespace="home"]');
   
-  if (!homeAboutTitle) {
+  if (!barbaContainer) {
     // Tiho izađi - nismo na home page-u
     return;
   }
   
-  console.log('🎨 Inicijaliziram About Section text reveal');
+  console.log('🎨 Inicijaliziram About Section text reveal (HOME page)');
   
   const aboutSection = document.querySelector('.section.about');
+  const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
 
-  if (!aboutScroll || !aboutSection) {
-    console.error('❌ About elementi nisu potpuno pronađeni');
+  if (!aboutScroll || !aboutSection || !homeAboutTitle) {
+    console.error('❌ About Section elementi nisu kompletni na HOME page-u');
     return;
   }
 
