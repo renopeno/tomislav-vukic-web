@@ -44,12 +44,12 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // Home about title - prvih 6 riječi opacity 1, ostale 0
+  // Home about title - prvih 6 riječi opacity 1, ostale 0.1
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
-  gsap.set(titleSplit.words.slice(6), { opacity: 0 });
+  gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
   
-  // Scroll tekst - početna opacity 0
-  gsap.set(scrollSplit.words, { opacity: 0 });
+  // Scroll tekst - početna opacity 0.1
+  gsap.set(scrollSplit.words, { opacity: 0.1 });
   
   // Pričekaj da se layout stabilizira
   requestAnimationFrame(() => {
@@ -60,6 +60,8 @@ function initAboutSection() {
     let scrollMaxProgress = 0;
     
     // Timeline za home-about-title - riječ po riječ reveal
+    const revealedTitleWords = new Set(); // Prati koje riječi su već revealed
+    
     ScrollTrigger.create({
       trigger: homeAboutTitle,
       start: "top 80%",
@@ -77,7 +79,8 @@ function initAboutSection() {
         
         wordsToReveal.forEach((word, index) => {
           const wordProgress = index / totalWords;
-          if (titleMaxProgress > wordProgress) {
+          if (titleMaxProgress > wordProgress && !revealedTitleWords.has(index)) {
+            revealedTitleWords.add(index); // Označi kao revealed
             gsap.to(word, { opacity: 1, duration: 0.3, overwrite: true });
           }
         });
@@ -85,6 +88,8 @@ function initAboutSection() {
     });
     
     // Timeline za about-scroll - riječ po riječ reveal
+    const revealedScrollWords = new Set(); // Prati koje riječi su već revealed
+    
     ScrollTrigger.create({
       trigger: aboutScroll,
       start: "top 80%",
@@ -102,7 +107,8 @@ function initAboutSection() {
         
         wordsToReveal.forEach((word, index) => {
           const wordProgress = index / totalWords;
-          if (scrollMaxProgress > wordProgress) {
+          if (scrollMaxProgress > wordProgress && !revealedScrollWords.has(index)) {
+            revealedScrollWords.add(index); // Označi kao revealed
             gsap.to(word, { opacity: 1, duration: 0.3, overwrite: true });
           }
         });
