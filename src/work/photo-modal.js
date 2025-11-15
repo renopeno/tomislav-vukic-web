@@ -1,3 +1,6 @@
+// Side-effect koji sprječava tree-shaking - izvršava se ODMAH pri učitavanju modula
+console.log('📦 photo-modal.js učitan');
+
 // Globalne varijable za cleanup
 window.photoModalCleanup = null;
 
@@ -431,4 +434,13 @@ function initPhotoModal() {
 // Postavi funkciju na window (kao Hero i About)
 window.initPhotoModal = initPhotoModal;
 
+// Side-effect koji sprječava tree-shaking
 console.log('📦 photo-modal.js module loaded - funkcija spremna na window objektu');
+
+// Dodatni side-effect - postavi cleanup na window odmah
+if (typeof window.photoModalCleanup === 'undefined') {
+  window.photoModalCleanup = null;
+}
+
+// Export za Vite
+export { initPhotoModal };

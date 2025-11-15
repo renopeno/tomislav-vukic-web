@@ -17,9 +17,12 @@ import './home/about-section.js';
 import './home/highlights.js';
 import './home/categories.js';
 
-// Work page skripte (side-effect imports kao Hero i About)
+// Work page skripte
 import './work/work.js';
-import './work/photo-modal.js';
+import { initPhotoModal } from './work/photo-modal.js';
+
+// Forsiramo Vite da zadrži funkciju postavljanjem na window
+window.initPhotoModal = initPhotoModal;
 
 // About page
 import './about/about-page.js';
