@@ -1,74 +1,47 @@
 function initAboutSection() {
-  console.log('🎬 initAboutSection pozvana');
-  
   const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
 
-  if (!homeAboutTitle || !aboutScroll) {
-    console.warn('❌ About elementi nisu pronađeni');
-    return;
-  }
-
-  console.log('✅ Elementi pronađeni:', { homeAboutTitle, aboutScroll });
+  if (!homeAboutTitle || !aboutScroll) return;
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Očisti postojeće ScrollTrigger instance
-  ScrollTrigger.getAll().forEach(trigger => {
-    if (trigger.vars.id?.includes('about-')) {
-      trigger.kill();
-    }
-  });
-
-  // Split text u riječi
+  // Split text
   const titleSplit = new SplitType(homeAboutTitle, { types: 'words' });
   const scrollSplit = new SplitType(aboutScroll, { types: 'words' });
 
-  console.log('📝 Split gotov:', {
-    titleWords: titleSplit.words.length,
-    scrollWords: scrollSplit.words.length
-  });
-
-  // Postavi početne opacitye - prvih 6 riječi vidljivo, ostalo 0.1
+  // Početna opacity
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
   gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
   gsap.set(scrollSplit.words, { opacity: 0.1 });
 
-  // Pričekaj da se layout stabilizira
-  requestAnimationFrame(() => {
-    ScrollTrigger.refresh();
+  // Reveal na scroll - SAMO JEDNOM
+  ScrollTrigger.create({
+    trigger: homeAboutTitle,
+    start: "top 80%",
+    once: true,
+    onEnter: () => {
+      gsap.to(titleSplit.words.slice(6), {
+        opacity: 1,
+        duration: 0.05,
+        stagger: 0.05,
+        ease: "none"
+      });
+    }
+  });
 
-    // Animacija za home-about-title (od 7. riječi nadalje)
-    gsap.to(titleSplit.words.slice(6), {
-      opacity: 1,
-      stagger: 0.02,
-      ease: "none",
-      scrollTrigger: {
-        trigger: homeAboutTitle,
-        start: "top 80%",
-        end: "bottom 30%",
-        scrub: true,
-        markers: true,
-        id: "about-title"
-      }
-    });
-
-    // Animacija za about-scroll
-    gsap.to(scrollSplit.words, {
-      opacity: 1,
-      stagger: 0.02,
-      ease: "none",
-      scrollTrigger: {
-        trigger: aboutScroll,
-        start: "top 80%",
-        end: "bottom 40%",
-        scrub: true,
-        markers: true,
-        id: "about-scroll"
-      }
-    });
-
-    console.log('🎯 ScrollTrigger animacije kreirane');
+  ScrollTrigger.create({
+    trigger: aboutScroll,
+    start: "top 80%",
+    once: true,
+    onEnter: () => {
+      gsap.to(scrollSplit.words, {
+        opacity: 1,
+        duration: 0.05,
+        stagger: 0.05,
+        ease: "none"
+      });
+    }
   });
 }
 
