@@ -1,4 +1,8 @@
 function initAboutSection() {
+  // PRIVREMENO ISKLJUČENO - testiranje Barba problema
+  console.log('⚠️ about-section.js PRIVREMENO ISKLJUČEN');
+  return;
+  
   // PRECIZNA PROVJERA: Radi SAMO na HOME page-u
   const barbaContainer = document.querySelector('[data-barba-namespace="home"]');
   
