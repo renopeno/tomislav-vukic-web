@@ -48,14 +48,8 @@ function initAbout() {
     // Split instance za cleanup
     const splitInstances = [];
     
-    // Master timeline
-    const masterTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        once: true
-      }
-    });
+    // Master timeline - BEZ ScrollTrigger (pokreće se odmah na load)
+    const masterTimeline = gsap.timeline();
     
     // 1. SLIKA - Clip-path reveal (odmah na load)
     if (image) {
@@ -94,48 +88,51 @@ function initAbout() {
             ease: "power2.out"
           }, titleStartTime + (index * 0.2)); // Stagger između linija
         });
-        
-        // Timing za kraj zadnjeg reda
-        const lastLineStartTime = titleStartTime + ((lines.length - 1) * 0.2);
-        
-        // 3. PRVA SEKCIJA - Paralelno sa zadnjim redom
-        if (dividers[0]) {
-          gsap.set(dividers[0], { width: 0, opacity: 0 });
-          if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
-          if (aboutMeParagraph) gsap.set(aboutMeParagraph, { opacity: 0, y: 20 });
+      }
+    }
+    
+    // 3. SVE SEKCIJE - scroll triggered (uključujući About me)
+    
+    // About me sekcija
+    if (dividers[0]) {
+      gsap.set(dividers[0], { width: 0, opacity: 0 });
+      if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
+      if (aboutMeParagraph) gsap.set(aboutMeParagraph, { opacity: 0, y: 20 });
+      
+      ScrollTrigger.create({
+        trigger: dividers[0],
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          const tl = gsap.timeline();
           
-          // Divider
-          masterTimeline.to(dividers[0], {
+          tl.to(dividers[0], {
             opacity: 1,
             width: '100%',
             duration: 0.6,
             ease: "power2.inOut"
-          }, lastLineStartTime);
+          }, 0);
           
-          // Title
           if (aboutMeTitle) {
-            masterTimeline.to(aboutMeTitle, {
+            tl.to(aboutMeTitle, {
               opacity: 1,
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, lastLineStartTime + 0.3);
+            }, 0.3);
           }
           
-          // Content
           if (aboutMeParagraph) {
-            masterTimeline.to(aboutMeParagraph, {
+            tl.to(aboutMeParagraph, {
               opacity: 1,
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, lastLineStartTime + 0.5);
+            }, 0.5);
           }
         }
-      }
+      });
     }
-    
-    // 4. OSTALE SEKCIJE - scroll triggered
     
     // What I photograph sekcija
     if (dividers[1]) {
