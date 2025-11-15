@@ -648,12 +648,10 @@ function initHero() {
   heroObserver.observe(heroSection);
 
   // ═══════════════════════════════════════════════════════════
-  //  ANIMATION LOOP
+  //  ANIMATION LOOP - INTEGRIRANO SA GSAP TICKER-OM
   // ═══════════════════════════════════════════════════════════
 
-  function animate() {
-    requestAnimationFrame(animate);
-
+  const heroTickerCallback = () => {
     // ⚡ Optimizacija: Ne renderaj ako hero nije vidljiv
     if (!isHeroVisible) return;
 
@@ -664,9 +662,12 @@ function initHero() {
     carousel.rotation.y += currentRotationSpeed;
 
     renderer.render(scene, camera);
-  }
+  };
 
-  animate();
+  // Dodaj hero rendering u GSAP ticker (sinhronizirano sa Lenis-om!)
+  gsap.ticker.add(heroTickerCallback);
+  
+  console.log('✅ Hero rendering integriran sa GSAP ticker-om (sinkroniziran sa Lenis-om)');
 
   // ═══════════════════════════════════════════════════════════
   //  RESPONSIVE RESIZE
@@ -728,6 +729,10 @@ function initHero() {
 
   window.addEventListener('barba:before-leave', () => {
     console.log("🧹 Čistim Three.js resurse...");
+    
+    // Ukloni hero rendering iz GSAP ticker-a
+    gsap.ticker.remove(heroTickerCallback);
+    console.log('🛑 Hero ticker callback uklonjen');
     
     // Zaustavi GSAP animacije (rotating efekt + drag inertija)
     gsap.killTweensOf(carousel.rotation);
