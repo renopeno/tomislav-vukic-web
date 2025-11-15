@@ -16,11 +16,15 @@ function initAbout() {
       .about-page-title .word {
         display: inline-block;
         white-space: nowrap;
+        margin: 0;
+        padding: 0;
       }
       
       .about-page-title .char {
-        display: inline-block;
+        display: inline !important;
         opacity: 0;
+        margin: 0;
+        padding: 0;
       }
       
       /* Sakrij paragraf dok typewriter ne završi */
@@ -56,9 +60,11 @@ function initAbout() {
       
       /* Paragraf riječi wrap i opacity */
       .about-page-paragraph .word {
-        display: inline-block;
+        display: inline-block !important;
         white-space: nowrap;
         opacity: 0.1;
+        margin: 0;
+        padding: 0;
       }
     `;
     document.head.appendChild(style);
