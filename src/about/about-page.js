@@ -1,29 +1,30 @@
 function initAbout() {
-  document.addEventListener('DOMContentLoaded', function() {
-    // Provjeri jesmo li na ABOUT page-u PRIJE bilo čega drugog
-    const section = document.querySelector('.section.about-page');
-    
-    if (!section) {
-      // Tiho izađi - nismo na about page-u
-      return;
+  // Provjeri jesmo li na ABOUT page-u PRIJE bilo čega drugog
+  const section = document.querySelector('.section.about-page');
+  
+  if (!section) {
+    // Tiho izađi - nismo na about page-u
+    return;
+  }
+  
+  console.log('🎨 Inicijaliziram About Page animacije');
+  
+  // Inicijalizacija GSAP
+  gsap.registerPlugin(ScrollTrigger);
+  
+  // CSS za pravilnu strukturu
+  const style = document.createElement('style');
+  style.textContent = `
+    .about-page-title {
+      overflow: visible;
     }
     
-    // Inicijalizacija GSAP
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // CSS za pravilnu strukturu
-    const style = document.createElement('style');
-    style.textContent = `
-      .about-page-title {
-        overflow: visible;
-      }
-      
-      .about-page-title .line {
-        display: block;
-        opacity: 0;
-      }
-    `;
-    document.head.appendChild(style);
+    .about-page-title .line {
+      display: block;
+      opacity: 0;
+    }
+  `;
+  document.head.appendChild(style);
     
     // Dohvati elemente
     const image = document.querySelector('.about-page-mobile-img');
@@ -227,8 +228,13 @@ function initAbout() {
         }
       });
     }
-  });
 }
 
 window.initAbout = initAbout;
-initAbout();
+
+// Inicijaliziraj odmah ili na DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAbout);
+} else {
+  initAbout();
+}
