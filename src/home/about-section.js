@@ -2,7 +2,7 @@ function initAboutSection() {
   const aboutSection = document.querySelector('.section.about');
   if (!aboutSection) return;
   
-  const aboutSideTitle = document.querySelector('.about-side-title');
+  const homeAboutSmallTitle = document.querySelector('.home-about-small-title');
   const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
   
@@ -38,9 +38,9 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // 1. About me naslov - UVIJEK VIDLJIV
-  if (aboutSideTitle) {
-    gsap.set(aboutSideTitle, { opacity: 1 });
+  // 1. Mali naslov "Hi, I'm Tom" - UVIJEK VIDLJIV
+  if (homeAboutSmallTitle) {
+    gsap.set(homeAboutSmallTitle, { opacity: 1 });
   }
   
   // 2. Home about title - prvih 6 riječi opacity 1, ostale 0.1
