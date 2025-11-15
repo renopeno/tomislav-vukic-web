@@ -3,6 +3,7 @@ function initAboutSection() {
   const aboutSection = document.querySelector('.section.about');
   if (!aboutSection) return;
   
+  const aboutSideTitle = document.querySelector('.about-side-title');
   const aboutTitle = document.querySelector('.about-title');
   const aboutScroll = document.querySelector('.about-scroll');
   
@@ -36,41 +37,55 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // Postavi početnu vidljivost riječi na 0
+  // Postavi početnu vidljivost elemenata na 0
+  if (aboutSideTitle) {
+    gsap.set(aboutSideTitle, { opacity: 0, y: 20 });
+  }
   gsap.set(titleSplit.words, { opacity: 0 });
   gsap.set(scrollSplit.words, { opacity: 0 });
   
-  // Osvježi ScrollTrigger nakon SplitType operacije
-  ScrollTrigger.refresh();
+  // 1. Animiraj "About me" naslov kad sekcija uđe u viewport na 20%
+  if (aboutSideTitle) {
+    gsap.to(aboutSideTitle, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: aboutSection,
+        start: "top 80%",
+        toggleActions: "play none none none"
+      }
+    });
+  }
   
-  // Kreiraj timeline za naslov
+  // 2. Kreiraj scroll reveal timeline za glavni tekst
   const titleTl = gsap.timeline({
     scrollTrigger: {
       trigger: '.about-reveal-start',
       endTrigger: '.about-reveal-end',
-      start: "top 100%",
+      start: "top 80%",
       end: "top 20%",
       scrub: 0.5,
       invalidateOnRefresh: true
     }
   });
   
-  // Animiraj naslov
+  // Animiraj glavni tekst riječ po riječ
   titleTl.to(titleSplit.words, {
     opacity: 1,
     stagger: 0.015,
-    ease: "power2.out"
+    ease: "none"
   });
   
-  // Kreiraj timeline za scroll tekst
+  // 3. Kreiraj timeline za scroll tekst (prikazuje se na kraju)
   const scrollTl = gsap.timeline({
     scrollTrigger: {
         trigger: '.about-title',
         endTrigger: '.about-reveal-end',
-        start: "center 70%",
-        end: "top 40%",
+        start: "center 60%",
+        end: "bottom 40%",
         scrub: 0.5,
-        markers: false,
         invalidateOnRefresh: true
     }
   });
@@ -79,7 +94,7 @@ function initAboutSection() {
   scrollTl.to(scrollSplit.words, {
     opacity: 1,
     stagger: 0.015,
-    ease: "power2.out"
+    ease: "none"
   });
 }
 
