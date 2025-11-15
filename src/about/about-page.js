@@ -133,7 +133,7 @@ function initAbout() {
           y: 0,
           duration: 0.6,
           ease: "power2.out"
-        }, firstSectionStartTime + 0.3);
+        }, firstSectionStartTime + 0.15); // Manji delay (0.3 -> 0.15)
       }
       
       if (aboutMeParagraph) {
@@ -142,12 +142,12 @@ function initAbout() {
           y: 0,
           duration: 0.6,
           ease: "power2.out"
-        }, firstSectionStartTime + 0.5);
+        }, firstSectionStartTime + 0.25); // Manji delay (0.5 -> 0.25)
       }
       
-      // Izračunaj kad prva sekcija završava
-      const firstSectionEndTime = firstSectionStartTime + 0.5 + 0.6;
-      // Izračunaj 70% prve sekcije - tu počinje druga sekcija (ranije: 90% -> 70%)
+      // Izračunaj kad prva sekcija završava (ažurirano sa novim delayima)
+      const firstSectionEndTime = firstSectionStartTime + 0.25 + 0.6;
+      // Izračunaj 70% prve sekcije - tu počinje druga sekcija
       const firstSectionDuration = firstSectionEndTime - firstSectionStartTime;
       secondSectionStartTime = firstSectionStartTime + (firstSectionDuration * 0.7);
       
@@ -157,7 +157,7 @@ function initAbout() {
         if (whatIPhotographTitle) gsap.set(whatIPhotographTitle, { opacity: 0, y: 20 });
         if (whatIPhotographContent) gsap.set(whatIPhotographContent, { opacity: 0, y: 20 });
         
-        // Dodaj u master timeline - kreće na 90% prve sekcije
+        // Dodaj u master timeline - kreće na 70% prve sekcije
         masterTimeline.to(dividers[1], {
           opacity: 1,
           width: '100%',
@@ -171,7 +171,7 @@ function initAbout() {
             y: 0,
             duration: 0.6,
             ease: "power2.out"
-          }, secondSectionStartTime + 0.3);
+          }, secondSectionStartTime + 0.15); // Manji delay (0.3 -> 0.15)
         }
         
         if (whatIPhotographContent) {
@@ -180,7 +180,7 @@ function initAbout() {
             y: 0,
             duration: 0.6,
             ease: "power2.out"
-          }, secondSectionStartTime + 0.5);
+          }, secondSectionStartTime + 0.25); // Manji delay (0.5 -> 0.25)
         }
       }
     }
@@ -213,7 +213,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.15); // Manji delay (0.3 -> 0.15)
           }
           
           if (howIWorkParagraph) {
@@ -222,7 +222,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.25); // Manji delay (0.5 -> 0.25)
           }
         }
       });
@@ -254,7 +254,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.15); // Manji delay (0.3 -> 0.15)
           }
           
           if (whoIWorkWithContent) {
@@ -263,7 +263,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.25); // Manji delay (0.5 -> 0.25)
           }
         }
       });
@@ -295,7 +295,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.15); // Manji delay (0.3 -> 0.15)
           }
           
           if (availabilityItem) {
@@ -304,7 +304,7 @@ function initAbout() {
               y: 0,
               duration: 0.6,
               ease: "power2.out"
-            }, 0.5);
+            }, 0.25); // Manji delay (0.5 -> 0.25)
           }
         }
       });
