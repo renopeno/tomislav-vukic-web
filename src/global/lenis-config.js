@@ -1,23 +1,17 @@
+// LENIS POTPUNO ISKLJUČEN - testiranje sa native scroll-om
 function initLenis() {
-  const lenis = new Lenis({
-    lerp: 0.1,
-    wheelMultiplier: 1,
-    smoothWheel: true,
-    smoothTouch: false,
-    infinite: false
-  });
-
-  // Globalna instance za pristup iz drugih fileova
-  window.lenis = lenis;
-
-  // Integracija sa GSAP ticker-om za bolje performanse
-  lenis.on('scroll', ScrollTrigger.update);
+  console.log('⚠️ LENIS COMPLETELY DISABLED - using native scroll');
   
-  gsap.ticker.add((time) => {
-    lenis.raf(time * 1000);
-  });
+  // Postavi placeholder da Barba ne javi error
+  window.lenis = {
+    scroll: 0,
+    scrollTo: () => {},
+    start: () => {},
+    stop: () => {},
+    destroy: () => {}
+  };
   
-  gsap.ticker.lagSmoothing(0);
+  return;
 }
 
 window.initLenis = initLenis;
