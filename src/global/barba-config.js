@@ -54,22 +54,9 @@ function destroyPageSpecificFunctions(namespace) {
 
 function initGlobalFunctions(data) {
   console.log('🚀 Inicijalizacija globalnih funkcija');
-  console.log('🔄 Premještanje skrola na vrh stranice');
-  window.scrollTo(0, 0);
-  
-  console.log('🔒 Postavljanje overflow:hidden na body');
-  document.body.style.overflow = 'hidden';
-  
-  if (window.lenis) {
-    console.log('🛑 Uništavam postojeću Lenis instancu');
-    window.lenis.destroy();
-  }
   
   console.log('🌓 Inicijalizacija Dark Mode-a');
   initDarkMode?.();
-  
-  console.log('🔄 Inicijalizacija Lenis smooth scroll-a');
-  initLenis?.();
   
   console.log('🔗 Inicijalizacija hover efekta na linkovima');
   initLinksHover?.();
@@ -80,11 +67,12 @@ function initGlobalFunctions(data) {
   console.log('📱 Inicijalizacija iOS Safari popravka');
   initIosSafariFix?.();
   
-  console.log('🔄 Ponovno inicijalizacija Lenis-a (duplikacija?)');
-  initLenis?.();
-  
-  console.log('🔓 Vraćanje normalnog overflow svojstva na body');
-  document.body.style.overflow = '';
+  // Lenis se inicijalizira samo jednom na page load u lenis-config.js
+  // Ovdje samo provjeravamo da li postoji
+  if (!window.lenis) {
+    console.log('⚠️ Lenis nije pronađen, inicijaliziram...');
+    initLenis?.();
+  }
   
   console.log('✅ Globalne funkcije uspješno inicijalizirane');
 }
@@ -161,6 +149,11 @@ function initBarba() {
         console.log(`🚪 LEAVE: Napuštam stranicu ${data.current.namespace}`);
         console.log(`  - URL: ${data.current.url.path}`);
         
+        // Zaustavi Lenis tijekom tranzicije
+        if (window.lenis) {
+          window.lenis.stop();
+        }
+        
         // 🧹 Očisti sve ScrollTrigger instance prije napuštanja
         console.log('🧹 Čišćenje ScrollTrigger instanci');
         ScrollTrigger.getAll().forEach((trigger) => {
@@ -193,14 +186,10 @@ function initBarba() {
           document.body.classList.remove("ui-dark-mode");
         }
         
-        console.log('  - Pokrećem Lenis');
-        lenis.start();
-        
-        if (lenis) {
-          console.log('  - Postavljam scroll na vrh bez animacije (immediate: true)');
-          lenis.scrollTo(0, { immediate: true });
+        // Postavi scroll na vrh
+        if (window.lenis) {
+          window.lenis.scrollTo(0, { immediate: true, force: true });
         } else {
-          console.log('  - Lenis nije definiran, koristim standardni window.scrollTo');
           window.scrollTo(0, 0);
         }
       },
@@ -217,11 +206,13 @@ function initBarba() {
         console.log(`  - Ažuriram status navigacije`);
         updateNavigationWithHref();
         
-        // 🔄 Osvježi ScrollTrigger nakon što su sve funkcije inicijalizirane
-        console.log('🔄 Osvježavam ScrollTrigger pozicije');
-        setTimeout(() => {
-          ScrollTrigger.refresh();
-        }, 100);
+        // Pokreni Lenis i osvježi ScrollTrigger
+        requestAnimationFrame(() => {
+          if (window.lenis) {
+            window.lenis.start();
+          }
+          ScrollTrigger.refresh(true);
+        });
       }
     }],
     views: [
