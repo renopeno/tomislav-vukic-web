@@ -12,19 +12,15 @@ function initAbout() {
         z-index: 1;
       }
       
-      /* Typewriter stil za naslov */
-      .about-page-title .word {
-        display: inline-block;
-        white-space: nowrap;
-        margin: 0;
-        padding: 0;
+      /* Typewriter stil za naslov - inline karakteri */
+      .about-page-title {
+        display: block;
+        white-space: normal;
       }
       
-      .about-page-title .char {
-        display: inline !important;
-        opacity: 0;
-        margin: 0;
-        padding: 0;
+      .about-page-title > * {
+        display: inline;
+        white-space: normal;
       }
       
       /* Sakrij paragraf dok typewriter ne završi */
@@ -39,18 +35,26 @@ function initAbout() {
       
       /* Typewriter cursor */
       .typewriter-cursor {
+        display: inline;
+        width: 0;
+        position: relative;
+      }
+      
+      .typewriter-cursor::after {
+        content: '';
         display: inline-block;
         width: 3px;
         height: 1em;
         background-color: var(--text-color, currentColor);
-        margin-left: 4px;
+        margin-left: 2px;
         margin-right: 2px;
-        opacity: 0;
         vertical-align: text-bottom;
+        opacity: 0;
       }
       
-      .typewriter-cursor.active {
+      .typewriter-cursor.active::after {
         animation: blink 0.7s steps(1, end) infinite;
+        opacity: 1;
       }
       
       @keyframes blink {
@@ -59,12 +63,13 @@ function initAbout() {
       }
       
       /* Paragraf riječi wrap i opacity */
+      .about-page-paragraph > * {
+        display: inline;
+        white-space: normal;
+      }
+      
       .about-page-paragraph .word {
-        display: inline-block !important;
-        white-space: nowrap;
         opacity: 0.1;
-        margin: 0;
-        padding: 0;
       }
     `;
     document.head.appendChild(style);
@@ -101,22 +106,24 @@ function initAbout() {
     // 2. TYPEWRITER EFEKT ZA NASLOV - počinje usred revealing slike
     let typewriterEndTime = 0;
     if (title) {
-      // Split naslov na riječi i karaktere (riječi ostaju zajedno)
+      // Split naslov samo na karaktere (inline pristup)
       const titleSplit = new SplitType(title, { 
-        types: 'words,chars',
-        tagName: 'span'
+        types: 'chars'
       });
       splitInstances.push(titleSplit);
       
       if (titleSplit.chars && titleSplit.chars.length > 0) {
         const chars = titleSplit.chars;
         
+        // Postavi sve karaktere na opacity 0
+        gsap.set(chars, { opacity: 0 });
+        
         // Kreiraj typewriter cursor
         const cursor = document.createElement('span');
         cursor.className = 'typewriter-cursor';
         
         // Postavi cursor prije prvog karaktera
-        chars[0].parentElement.insertBefore(cursor, chars[0]);
+        title.insertBefore(cursor, chars[0]);
         
         // Typewriter animacija s manualnim staggerom za pauze
         let delay = 0;
@@ -126,7 +133,6 @@ function initAbout() {
           // Prikaži cursor skupa sa prvim karakterom
           if (index === 0) {
             masterTimeline.call(() => {
-              cursor.style.opacity = '1';
               cursor.classList.add('active');
             }, null, 0.5 + delay);
           }
@@ -138,11 +144,11 @@ function initAbout() {
             ease: "power2.out"
           }, 0.5 + delay);
           
-          // Pomakni cursor iza trenutnog karaktera (ali ne ako je to zadnji karakter)
+          // Pomakni cursor ODMAH nakon što karakter postane vidljiv
           if (index < chars.length - 1) {
             masterTimeline.call(() => {
-              chars[index + 1].parentElement.insertBefore(cursor, chars[index + 1]);
-            }, null, 0.5 + delay + 0.06);
+              title.insertBefore(cursor, chars[index + 1]);
+            }, null, 0.5 + delay + 0.12);
           }
           
           // Dodaj delay za sljedeći karakter (sporije)
@@ -160,12 +166,7 @@ function initAbout() {
         // Sakrij cursor prije nego što se prikaže zadnji karakter
         masterTimeline.call(() => {
           cursor.classList.remove('active');
-        }, null, typewriterEndTime - 0.1);
-        
-        masterTimeline.to(cursor, {
-          opacity: 0,
-          duration: 0.1
-        }, typewriterEndTime - 0.1);
+        }, null, typewriterEndTime - 0.15);
       }
     }
     
