@@ -66,37 +66,35 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. WORD BY WORD REVEAL za glavni title - pravilna struktura
+    // 2. LINE BY LINE REVEAL za glavni title
     let titleEndTime = 0;
     if (mainTitle) {
-      // Split title na lines i words - održava prirodan layout
+      // Split title na linije - održava prirodan layout
       const titleSplit = new SplitType(mainTitle, { 
-        types: 'lines,words',
+        types: 'lines',
         lineClass: 'line'
       });
       splitInstances.push(titleSplit);
       
-      if (titleSplit.words && titleSplit.words.length > 0) {
-        const words = titleSplit.words;
+      if (titleSplit.lines && titleSplit.lines.length > 0) {
+        const lines = titleSplit.lines;
         
-        // Sakrij sve riječi na početku
-        gsap.set(words, { autoAlpha: 0, y: 8 });
+        // Sakrij sve linije na početku
+        gsap.set(lines, { autoAlpha: 0, y: 20 });
         
-        // Smooth reveal sa y translate i opacity
-        masterTimeline.to(words, {
+        // Smooth reveal linija po linija
+        masterTimeline.to(lines, {
           autoAlpha: 1,
           y: 0,
-          duration: 0.5,
-          stagger: {
-            amount: 1.4, // Ukupno 1.4s za sve riječi - sporiji za smootheriji efekt
-            ease: "power2.inOut"
-          },
+          duration: 0.8,
+          stagger: 0.15, // 150ms između svake linije
           ease: "power2.out"
         }, 0.6);
         
-        // Title završava nakon 0.6 + 1.4 = 2.0s
+        // Izračunaj vrijeme završetka
+        const totalDuration = 0.6 + (lines.length * 0.15) + 0.8;
         // Ali prvi divider počinje malo prije kraja
-        titleEndTime = 1.6; // Divider počinje 0.4s prije kraja title-a
+        titleEndTime = totalDuration - 0.5; // Divider počinje 0.5s prije kraja title-a
       }
     }
     
