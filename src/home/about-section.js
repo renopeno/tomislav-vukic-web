@@ -54,9 +54,6 @@ function initAboutSection() {
   requestAnimationFrame(() => {
     ScrollTrigger.refresh();
     
-    console.log('ScrollTrigger refresh nakon RAF');
-    console.log('homeAboutTitle pozicija:', homeAboutTitle.getBoundingClientRect());
-    
     // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
     const titleTl = gsap.timeline({
       scrollTrigger: {
@@ -64,9 +61,7 @@ function initAboutSection() {
         start: "top 80%",
         end: "bottom 30%",
         scrub: 0.5,
-        invalidateOnRefresh: true,
-        markers: true,
-        id: "home-about-title"
+        invalidateOnRefresh: true
       }
     });
     
@@ -84,9 +79,7 @@ function initAboutSection() {
         start: "top 80%",
         end: "bottom 40%",
         scrub: 0.5,
-        invalidateOnRefresh: true,
-        markers: true,
-        id: "about-scroll"
+        invalidateOnRefresh: true
       }
     });
     
@@ -96,8 +89,6 @@ function initAboutSection() {
       stagger: 0.015,
       ease: "power2.out"
     });
-    
-    console.log('ScrollTrigger animacije kreirane');
   });
 }
 
