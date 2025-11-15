@@ -130,27 +130,42 @@ function initWork() {
       });
     }
 
-    if (!window.isSettingUpGrid) {
-      window.isSettingUpGrid = true;
-      setupGrid();
-      window.isSettingUpGrid = false;
-    }
-
-    // Tranzicija za ulazak fotki u view
-    gsap.fromTo(
-      window.shuffledPhotos,
-      { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
-      { 
-        opacity: 1, 
-        scale: 1, 
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.1,
+    // Čekaj da sve slike budu učitane prije postavljanja grida
+    const allImages = window.shuffledPhotos.map(c => c.querySelector('.photo'));
+    const imageLoadPromises = allImages.map(img => {
+      if (img.complete && img.naturalWidth > 0) {
+        return Promise.resolve();
       }
-    );
+      return new Promise(resolve => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Resolve i na error da ne blokira
+      });
+    });
 
-    console.log("✅ Grid postavljen.");
+    Promise.all(imageLoadPromises).then(() => {
+      console.log('✅ Sve slike učitane, postavljam grid');
+      if (!window.isSettingUpGrid) {
+        window.isSettingUpGrid = true;
+        setupGrid();
+        window.isSettingUpGrid = false;
+      }
+      
+      // Tranzicija za ulazak fotki u view
+      gsap.fromTo(
+        window.shuffledPhotos,
+        { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.1,
+        }
+      );
+    });
+
+    console.log("✅ Grid setup funkcija završena.");
   } finally {
     isWorkInitializing = false;
   }
