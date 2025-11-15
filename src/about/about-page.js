@@ -3,12 +3,12 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // CSS za word wrapping
+    // CSS za word wrapping i smooth reveal
     const style = document.createElement('style');
     style.textContent = `
       .about-page-title .word {
-        display: inline-block;
-        white-space: nowrap;
+        display: inline;
+        opacity: 0;
       }
     `;
     document.head.appendChild(style);
@@ -69,19 +69,19 @@ function initAbout() {
       if (titleSplit.words && titleSplit.words.length > 0) {
         const words = titleSplit.words;
         
-        // Postavi sve riječi na opacity 0
-        gsap.set(words, { opacity: 0 });
-        
-        // Animiraj riječ po riječ
+        // Smooth stagger animacija - brža i fluidnija
         masterTimeline.to(words, {
           opacity: 1,
-          duration: 0.3,
-          stagger: 0.08,
+          duration: 0.4,
+          stagger: {
+            amount: 1.2, // Total 1.2s za sve riječi
+            ease: "power1.out"
+          },
           ease: "power2.out"
         }, 0.6);
         
-        // Izračunaj kad title završava
-        titleEndTime = 0.6 + (words.length * 0.08);
+        // Title završava nakon 0.6 + 1.2 + 0.4 = ~2.2s
+        titleEndTime = 2.2;
       }
     }
     
@@ -230,12 +230,12 @@ function initAbout() {
       }
     });
     
-    // Sticky efekt za about section
+    // Sticky efekt za about section sa dodatnim spacingom
     ScrollTrigger.create({
       trigger: section,
       start: "bottom bottom",
       endTrigger: ".footer",
-      end: "bottom bottom",
+      end: "top bottom-=200", // Dodaj 200px spacing prije footera
       pinSpacing: false,
       pin: true,
       markers: false
