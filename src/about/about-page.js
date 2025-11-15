@@ -3,6 +3,16 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
+    // Dodaj CSS za split linije (sakriva overflow tokom animacije)
+    const style = document.createElement('style');
+    style.textContent = `
+      .split-line {
+        overflow: hidden;
+        display: block;
+      }
+    `;
+    document.head.appendChild(style);
+    
     // Dohvati elemente koje želimo animirati
     const section = document.querySelector('.section.about-page');
     const title = document.querySelector('.about-page-title');
@@ -22,25 +32,19 @@ function initAbout() {
       }
     });
     
-    // Elementi koje animiramo
-    const elements = [mobileImage, title, paragraph].filter(Boolean);
-    
-    // Koristi fromTo animaciju koja je konzistentna s grid.js
-    elements.forEach((element, index) => {
+    // Mobile image reveal
+    if (mobileImage) {
       gsap.fromTo(
-        element,
+        mobileImage,
         { 
           opacity: 0, 
-          scale: 0.8, 
-          y: window.innerHeight / 5
+          scale: 0.95
         },
         { 
           opacity: 1, 
-          scale: 1, 
-          y: 0,
+          scale: 1,
           duration: 1,
           ease: "power3.out",
-          delay: index * 0.1,
           scrollTrigger: {
             trigger: section,
             start: "top 80%",
@@ -48,6 +52,41 @@ function initAbout() {
           }
         }
       );
+    }
+    
+    // Split title i paragraph po linijama
+    const textElements = [title, paragraph].filter(Boolean);
+    const splitInstances = [];
+    
+    textElements.forEach(element => {
+      if (element) {
+        const split = new SplitType(element, { 
+          types: 'lines',
+          lineClass: 'split-line'
+        });
+        splitInstances.push(split);
+        
+        // Animiraj svaku liniju sa stagger efektom
+        gsap.fromTo(
+          split.lines,
+          {
+            opacity: 0,
+            y: 20
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            stagger: 0.05, // 50ms između svake linije
+            scrollTrigger: {
+              trigger: section,
+              start: "top 80%",
+              toggleActions: "play none none none"
+            }
+          }
+        );
+      }
     });
     
     // Dodatna provjera za mobilne uređaje
@@ -70,6 +109,16 @@ function initAbout() {
       pin: true,
       markers: false
     });
+    
+    // Cleanup za Barba.js transitions
+    if (typeof barba !== 'undefined') {
+      barba.hooks.beforeLeave(() => {
+        // Revert split text
+        splitInstances.forEach(split => {
+          if (split && split.revert) split.revert();
+        });
+      });
+    }
   });
 }
 
