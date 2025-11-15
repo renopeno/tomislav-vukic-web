@@ -7,8 +7,14 @@
 function initHero() {
   console.log('🎨 HERO.JS ENABLED - testiranje sa optimizacijama');
   
+  const heroSection = document.querySelector(".section.hero");
   const heroTitle = document.querySelector(".hero-title");
   const heroFooters = document.querySelectorAll(".hero-footer");
+  
+  if (!heroSection) {
+    console.error('❌ Hero sekcija nije pronađena!');
+    return;
+  }
   
   // Osiguraj da su hero footer linkovi klikabili (iznad canvas-a)
   heroFooters.forEach(footer => {
