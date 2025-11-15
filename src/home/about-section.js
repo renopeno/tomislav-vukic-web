@@ -13,10 +13,12 @@ function initAboutSection() {
   // Registriraj ScrollTrigger plugin
   gsap.registerPlugin(ScrollTrigger);
   
-  // Očisti postojeće ScrollTrigger instance za ovu sekciju
-  ScrollTrigger.getAll().forEach(trigger => {
+  // Očisti SVE ScrollTrigger instance vezane za about sekciju
+  const existingTriggers = ScrollTrigger.getAll();
+  console.log('🧹 Čistim sve about section triggere, pronađeno:', existingTriggers.length);
+  existingTriggers.forEach(trigger => {
     if (trigger.vars.id === 'home-about-title' || trigger.vars.id === 'about-scroll') {
-      console.log('🧹 Čistim stari trigger:', trigger.vars.id);
+      console.log('  ❌ Uklanjam trigger:', trigger.vars.id);
       trigger.kill();
     }
   });
@@ -45,9 +47,9 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // Home about title - prvih 6 riječi opacity 1, ostale 0.1
+  // Home about title - prvih 6 riječi opacity 1, ostale 0.05 (jasniji kontrast)
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
-  gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
+  gsap.set(titleSplit.words.slice(6), { opacity: 0.05 });
   
   // Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
@@ -85,15 +87,23 @@ function initAboutSection() {
             gsap.set(titleSplit.words.slice(6), { opacity: 1 });
           }
         },
-        onLeaveBack: () => console.log('⬆️ Title ScrollTrigger: onLeaveBack'),
+        onLeaveBack: () => {
+          console.log('⬆️ Title ScrollTrigger: onLeaveBack');
+          // Ako je completed, zaustavi scrub i drži revealed
+          if (titleCompleted) {
+            gsap.set(titleSplit.words.slice(6), { opacity: 1 });
+          }
+        },
         onComplete: () => {
           console.log('✅ Title ScrollTrigger COMPLETED - ostajem revealed');
           titleCompleted = true;
+          // Zaustavi scrub nakon što je completed
+          gsap.set(titleSplit.words.slice(6), { opacity: 1 });
         }
       }
     });
     
-    // Animiraj riječi od 7. nadalje: 0.1 -> 1 (scrub animacija)
+    // Animiraj riječi od 7. nadalje: 0.05 -> 1 (scrub animacija)
     titleTl.to(titleSplit.words.slice(6), {
       opacity: 1,
       stagger: 0.015,
@@ -120,10 +130,18 @@ function initAboutSection() {
             gsap.set(scrollSplit.words, { opacity: 1 });
           }
         },
-        onLeaveBack: () => console.log('⬆️ Scroll ScrollTrigger: onLeaveBack'),
+        onLeaveBack: () => {
+          console.log('⬆️ Scroll ScrollTrigger: onLeaveBack');
+          // Ako je completed, zaustavi scrub i drži revealed
+          if (scrollCompleted) {
+            gsap.set(scrollSplit.words, { opacity: 1 });
+          }
+        },
         onComplete: () => {
           console.log('✅ Scroll ScrollTrigger COMPLETED - ostajem revealed');
           scrollCompleted = true;
+          // Zaustavi scrub nakon što je completed
+          gsap.set(scrollSplit.words, { opacity: 1 });
         }
       }
     });
