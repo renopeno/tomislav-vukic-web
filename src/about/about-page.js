@@ -1,5 +1,13 @@
 function initAbout() {
   document.addEventListener('DOMContentLoaded', function() {
+    // Provjeri jesmo li na ABOUT page-u PRIJE bilo čega drugog
+    const section = document.querySelector('.section.about-page');
+    
+    if (!section) {
+      // Tiho izađi - nismo na about page-u
+      return;
+    }
+    
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
@@ -18,7 +26,6 @@ function initAbout() {
     document.head.appendChild(style);
     
     // Dohvati elemente
-    const section = document.querySelector('.section.about-page');
     const image = document.querySelector('.about-page-mobile-img');
     const mainTitle = document.querySelector('.about-page-title');
     const mainParagraph = document.querySelector('.about-page-paragraph');
@@ -41,9 +48,6 @@ function initAbout() {
     
     // Dividers
     const dividers = document.querySelectorAll('.divider');
-    
-    // Provjeri postoje li elementi
-    if (!section) return;
     
     // Split instance za cleanup
     const splitInstances = [];
