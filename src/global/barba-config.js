@@ -110,7 +110,10 @@ function initPageSpecificFunctions(namespace) {
       console.log('  - Inicijalizacija animacije naslova kategorije');
       initCategoryTitleAnimation?.();
       console.log('  - Inicijalizacija Photo modala');
+      console.log('🔍 DEBUG: typeof window.initPhotoModal =', typeof window.initPhotoModal);
+      console.log('🔍 DEBUG: window.initPhotoModal =', window.initPhotoModal);
       initPhotoModal?.();
+      console.log('✅ initPhotoModal?.() pozvan');
       break;
     case 'about':
       console.log('👤 Učitavanje ABOUT komponenti:');
