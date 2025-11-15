@@ -2,7 +2,7 @@
 node_modules/
 
 # Build output
-dist/
+# dist/ <- Commented out jer jsDelivr CDN treba pristup buildu
 
 # Environment
 .env
