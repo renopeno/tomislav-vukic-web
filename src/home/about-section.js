@@ -1,24 +1,16 @@
 function initAboutSection() {
-  // PRIVREMENO ISKLJUČENO - testiranje Barba problema
-  console.log('⚠️ about-section.js PRIVREMENO ISKLJUČEN');
-  return;
-  
-  // PRECIZNA PROVJERA: Radi SAMO na HOME page-u
   const barbaContainer = document.querySelector('[data-barba-namespace="home"]');
   
   if (!barbaContainer) {
-    // Tiho izađi - nismo na home page-u
     return;
   }
-  
-  console.log('🎨 Inicijaliziram About Section text reveal (HOME page)');
   
   const aboutSection = document.querySelector('.section.about');
   const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
 
   if (!aboutScroll || !aboutSection || !homeAboutTitle) {
-    console.error('❌ About Section elementi nisu kompletni na HOME page-u');
+    console.error('❌ About Section elementi nisu kompletni');
     return;
   }
 
@@ -27,8 +19,6 @@ function initAboutSection() {
   // Split text u riječi
   const titleSplit = new SplitType(homeAboutTitle, { types: 'words' });
   const scrollSplit = new SplitType(aboutScroll, { types: 'words' });
-
-  console.log(`✅ Split: ${titleSplit.words.length} riječi u title, ${scrollSplit.words.length} u scroll`);
 
   // Postavi styling za masked reveal efekt
   titleSplit.words.forEach(word => {
@@ -105,8 +95,6 @@ function initAboutSection() {
       id: "about-scroll-reveal"
     }
   });
-  
-  console.log('✅ About Section text reveal postavljen');
 }
 
 window.initAboutSection = initAboutSection;
