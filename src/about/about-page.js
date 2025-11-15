@@ -48,6 +48,9 @@ function initAbout() {
     // Split instance za cleanup
     const splitInstances = [];
     
+    // Flag za praćenje je li title završio
+    let titleRevealed = false;
+    
     // Master timeline - BEZ ScrollTrigger (pokreće se odmah na load)
     const masterTimeline = gsap.timeline();
     
@@ -63,6 +66,7 @@ function initAbout() {
     }
     
     // 2. ABOUT TITLE - Line by line reveal (pred kraj fotke)
+    let titleEndTime = 0;
     if (mainTitle) {
       // Split title na linije
       const titleSplit = new SplitType(mainTitle, { 
@@ -88,12 +92,20 @@ function initAbout() {
             ease: "power2.out"
           }, titleStartTime + (index * 0.2)); // Stagger između linija
         });
+        
+        // Izračunaj kada zadnja linija završava
+        titleEndTime = titleStartTime + ((lines.length - 1) * 0.2) + 0.6;
+        
+        // Postavi flag kada title završi
+        masterTimeline.call(() => {
+          titleRevealed = true;
+        }, null, titleEndTime);
       }
     }
     
     // 3. SVE SEKCIJE - scroll triggered (uključujući About me)
     
-    // About me sekcija
+    // About me sekcija - MORA čekati da title završi
     if (dividers[0]) {
       gsap.set(dividers[0], { width: 0, opacity: 0 });
       if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
@@ -104,31 +116,47 @@ function initAbout() {
         start: "top 85%",
         once: true,
         onEnter: () => {
-          const tl = gsap.timeline();
-          
-          tl.to(dividers[0], {
-            opacity: 1,
-            width: '100%',
-            duration: 0.6,
-            ease: "power2.inOut"
-          }, 0);
-          
-          if (aboutMeTitle) {
-            tl.to(aboutMeTitle, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: "power2.out"
-            }, 0.3);
+          // Provjeri je li title završio
+          if (!titleRevealed) {
+            // Čekaj dok se title ne završi
+            const checkInterval = setInterval(() => {
+              if (titleRevealed) {
+                clearInterval(checkInterval);
+                revealFirstSection();
+              }
+            }, 50);
+          } else {
+            // Title je već završio, reveal odmah
+            revealFirstSection();
           }
           
-          if (aboutMeParagraph) {
-            tl.to(aboutMeParagraph, {
+          function revealFirstSection() {
+            const tl = gsap.timeline();
+            
+            tl.to(dividers[0], {
               opacity: 1,
-              y: 0,
+              width: '100%',
               duration: 0.6,
-              ease: "power2.out"
-            }, 0.5);
+              ease: "power2.inOut"
+            }, 0);
+            
+            if (aboutMeTitle) {
+              tl.to(aboutMeTitle, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "power2.out"
+              }, 0.3);
+            }
+            
+            if (aboutMeParagraph) {
+              tl.to(aboutMeParagraph, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "power2.out"
+              }, 0.5);
+            }
           }
         }
       });
