@@ -53,17 +53,17 @@ function initAbout() {
     // Split instance za cleanup
     const splitInstances = [];
     
-    // Kreiraj glavni timeline
-    const masterTimeline = gsap.timeline({ paused: true });
-    
-    // 1. SLIKA - Clip-path reveal
+    // 1. SLIKA - Clip-path reveal (odmah na load)
     if (image) {
       gsap.set(image, { clipPath: 'inset(0% 0% 100% 0%)' });
-      masterTimeline.to(image, {
+      
+      // Animiraj sliku odmah
+      gsap.to(image, {
         clipPath: 'inset(0% 0% 0% 0%)',
         duration: 1.0,
-        ease: "power3.inOut"
-      }, 0);
+        ease: "power3.inOut",
+        delay: 0.2
+      });
     }
     
     // 2. SCROLL REVEAL za glavni title - prvih nekoliko riječi vidljivo, ostalo 0.1
@@ -162,7 +162,15 @@ function initAbout() {
     }
     
     // Helper funkcija za scroll triggered sekcije
-    function createScrollDividerSequence(divider, title, content) {
+    let sectionRevealed = {
+      section0: false,
+      section1: false,
+      section2: false,
+      section3: false,
+      section4: false
+    };
+    
+    function createScrollDividerSequence(divider, title, content, sectionIndex, previousSectionIndex = null) {
       if (!divider) return;
       
       // Sakrij divider i content na početku
@@ -170,13 +178,27 @@ function initAbout() {
       if (title) gsap.set(title, { opacity: 0, y: 20 });
       if (content) gsap.set(content, { opacity: 0, y: 20 });
       
-      // Scroll trigger čim uđe u viewport
+      // Scroll trigger - malo mjesta u viewport
       ScrollTrigger.create({
         trigger: divider,
-        start: "top 95%",
+        start: "top 90%", // Malo u viewport
         once: true,
         onEnter: () => {
-          revealSection(divider, title, content, 0.2);
+          // Provjeri je li prethodna sekcija revealed (ako postoji)
+          if (previousSectionIndex !== null && !sectionRevealed[`section${previousSectionIndex}`]) {
+            // Čekaj dok se prethodna ne reveal-a
+            const checkInterval = setInterval(() => {
+              if (sectionRevealed[`section${previousSectionIndex}`]) {
+                clearInterval(checkInterval);
+                revealSection(divider, title, content, 0);
+                sectionRevealed[`section${sectionIndex}`] = true;
+              }
+            }, 100);
+          } else {
+            // Reveal odmah (nema prethodne ili je već revealed)
+            revealSection(divider, title, content, 0);
+            sectionRevealed[`section${sectionIndex}`] = true;
+          }
         }
       });
     }
@@ -190,6 +212,7 @@ function initAbout() {
       // Prva sekcija (About me) - odmah
       if (dividers[0]) {
         revealSection(dividers[0], aboutMeTitle, aboutMeParagraph, 0);
+        sectionRevealed.section0 = true;
       }
       
       // Druga sekcija (What I photograph) - sa delayom ako je u viewportu
@@ -197,51 +220,51 @@ function initAbout() {
         const secondSectionRect = dividers[1].getBoundingClientRect();
         if (secondSectionRect.top < window.innerHeight) {
           // U viewportu je, triggeruj sa delayem
-          revealSection(dividers[1], whatIPhotographTitle, whatIPhotographContent, 0.8);
+          revealSection(dividers[1], whatIPhotographTitle, whatIPhotographContent, 0.6);
+          setTimeout(() => {
+            sectionRevealed.section1 = true;
+          }, 600);
         } else {
           // Nije u viewportu, postavi scroll trigger
-          createScrollDividerSequence(dividers[1], whatIPhotographTitle, whatIPhotographContent);
+          createScrollDividerSequence(dividers[1], whatIPhotographTitle, whatIPhotographContent, 1, 0);
         }
       }
     }
     
-    // 3. OSTALE SEKCIJE - scroll triggered
-    // How I work
+    // 3. OSTALE SEKCIJE - scroll triggered sa dependency na prethodnu
+    // How I work (čeka What I photograph)
     if (dividers[2]) {
       createScrollDividerSequence(
         dividers[2], 
         howIWorkTitle, 
-        howIWorkParagraph
+        howIWorkParagraph,
+        2,
+        1
       );
     }
     
-    // Who I work with
+    // Who I work with (čeka How I work)
     if (dividers[3]) {
       createScrollDividerSequence(
         dividers[3], 
         whoIWorkWithTitle, 
-        whoIWorkWithContent
+        whoIWorkWithContent,
+        3,
+        2
       );
     }
     
-    // Footer divider + items
+    // Footer divider + items (čeka Who I work with)
     if (dividers[4]) {
       createScrollDividerSequence(
         dividers[4], 
         locationItem, 
-        availabilityItem
+        availabilityItem,
+        4,
+        3
       );
     }
     
-    // Pokreni animaciju kada sekcija uđe u viewport
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top 80%",
-      once: true,
-      onEnter: () => {
-        masterTimeline.play();
-      }
-    });
     
     // Sticky efekt za about section sa dodatnim spacingom
     ScrollTrigger.create({
@@ -261,8 +284,6 @@ function initAbout() {
         splitInstances.forEach(split => {
           if (split && split.revert) split.revert();
         });
-        // Clear timeline
-        if (masterTimeline) masterTimeline.kill();
         // Clear ScrollTriggers
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         // Clear style tag
