@@ -11,6 +11,9 @@ function initAboutSection() {
     return;
   }
   
+  // Registriraj ScrollTrigger plugin
+  gsap.registerPlugin(ScrollTrigger);
+  
   // SplitType za podjelu teksta na riječi
   const titleSplit = new SplitType(homeAboutTitle, { 
     types: 'words',
@@ -47,14 +50,18 @@ function initAboutSection() {
   // 3. Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
   
+  // Osvježi ScrollTrigger nakon što su riječi postavljene
+  ScrollTrigger.refresh();
+  
   // Scroll reveal animacija za home-about-title (riječi od 7. nadalje)
   const titleTl = gsap.timeline({
     scrollTrigger: {
-      trigger: homeAboutTitle,
+      trigger: aboutSection,
       start: "top 80%",
       end: "top 20%",
       scrub: 0.5,
-      invalidateOnRefresh: true
+      invalidateOnRefresh: true,
+      markers: true
     }
   });
   
@@ -68,11 +75,12 @@ function initAboutSection() {
   // Scroll reveal za about-scroll tekst (nakon završetka home-about-title)
   const scrollTl = gsap.timeline({
     scrollTrigger: {
-      trigger: homeAboutTitle,
+      trigger: aboutSection,
       start: "top 20%",
-      end: "top -20%",
+      end: "top -30%",
       scrub: 0.5,
-      invalidateOnRefresh: true
+      invalidateOnRefresh: true,
+      markers: true
     }
   });
   
@@ -81,6 +89,11 @@ function initAboutSection() {
     opacity: 1,
     stagger: 0.015,
     ease: "none"
+  });
+  
+  console.log('About section scroll reveal kreiran:', {
+    titleWords: titleSplit.words.length,
+    scrollWords: scrollSplit.words.length
   });
 }
 
