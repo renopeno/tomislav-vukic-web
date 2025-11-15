@@ -8,22 +8,19 @@ function initHighlights() {
 
   const totalWidth = highlightsWrapper.scrollWidth - highlightsSection.offsetWidth;
 
-  // Horizontal scroll animacija - BEZ PIN-a
+  // Horizontal scroll animacija - SA PIN-om i LAGGY scrub-om
   gsap.to(highlightsWrapper, {
     x: -totalWidth,
     ease: "none",
     scrollTrigger: {
       trigger: highlightsSection,
-      start: "top bottom",
-      end: "bottom top",
-      scrub: 1,
+      start: "top top",
+      end: `+=${totalWidth}`,
+      scrub: 3, // Veći broj = laggy-ji, manje opterećujuć
+      pin: true,
+      anticipatePin: 1,
       invalidateOnRefresh: true,
-      id: "highlights-horizontal",
-      onUpdate: (self) => {
-        if (self.direction === -1) {
-          console.log('🖼️ HIGHLIGHTS scrolling BACK, progress:', self.progress.toFixed(2));
-        }
-      }
+      id: "highlights-horizontal"
     },
   });
 
