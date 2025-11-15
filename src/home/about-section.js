@@ -1,8 +1,14 @@
 function initAboutSection() {
+  console.log('🎨 Inicijaliziram About Section text reveal');
+  
+  const aboutSection = document.querySelector('.section.about');
   const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
 
-  if (!homeAboutTitle || !aboutScroll) return;
+  if (!homeAboutTitle || !aboutScroll || !aboutSection) {
+    console.error('❌ About elementi nisu pronađeni');
+    return;
+  }
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -10,79 +16,85 @@ function initAboutSection() {
   const titleSplit = new SplitType(homeAboutTitle, { types: 'words' });
   const scrollSplit = new SplitType(aboutScroll, { types: 'words' });
 
-  // CSS za masked slide-up efekt
-  const style = document.createElement('style');
-  style.textContent = `
-    .word {
-      display: inline-block;
-      overflow: hidden;
-      vertical-align: top;
-    }
-    .word-inner {
-      display: inline-block;
-      opacity: 0.1;
-      transform: translateY(100%);
-    }
-  `;
-  document.head.appendChild(style);
+  console.log(`✅ Split: ${titleSplit.words.length} riječi u title, ${scrollSplit.words.length} u scroll`);
+
+  // Postavi styling za masked reveal efekt
+  titleSplit.words.forEach(word => {
+    gsap.set(word, { 
+      display: 'inline-block',
+      overflow: 'hidden',
+      verticalAlign: 'top'
+    });
+  });
+
+  scrollSplit.words.forEach(word => {
+    gsap.set(word, { 
+      display: 'inline-block',
+      overflow: 'hidden',
+      verticalAlign: 'top'
+    });
+  });
 
   // Wrap svaku riječ u inner span za slide-up efekt
   const wrapWords = (words) => {
     words.forEach(word => {
+      const text = word.textContent;
       const inner = document.createElement('span');
-      inner.className = 'word-inner';
-      inner.textContent = word.textContent;
+      inner.style.display = 'inline-block';
+      inner.textContent = text;
       word.textContent = '';
       word.appendChild(inner);
+      
+      // Inicijalno stanje - sakriveno ispod
+      gsap.set(inner, { 
+        y: '100%',
+        opacity: 0
+      });
     });
   };
 
   wrapWords(titleSplit.words);
   wrapWords(scrollSplit.words);
 
-  // Prvih 6 riječi već revealed
+  // Prvih 6 riječi odmah vidljivo
   titleSplit.words.slice(0, 6).forEach(word => {
-    const inner = word.querySelector('.word-inner');
-    gsap.set(inner, { opacity: 1, y: 0 });
+    const inner = word.querySelector('span');
+    gsap.set(inner, { y: 0, opacity: 1 });
   });
 
-  // Masked reveal za title - slide up from bottom (ONCE ONLY)
-  const titleTimeline = gsap.timeline({
+  // 🎬 TITLE REVEAL - masked slide up animacija
+  gsap.to(titleSplit.words.slice(6).map(w => w.querySelector('span')), {
+    y: 0,
+    opacity: 1,
+    duration: 0.6,
+    stagger: 0.015,
+    ease: "power2.out",
     scrollTrigger: {
-      trigger: homeAboutTitle,
-      start: "top 70%",
+      trigger: aboutSection,
+      start: "top 60%",
       toggleActions: "play none none none",
       once: true,
-      id: "about-title"
+      id: "about-title-reveal"
     }
   });
 
-  titleTimeline.to(titleSplit.words.slice(6).map(w => w.querySelector('.word-inner')), {
-    opacity: 1,
+  // 🎬 SCROLL TEXT REVEAL - masked slide up animacija
+  gsap.to(scrollSplit.words.map(w => w.querySelector('span')), {
     y: 0,
-    duration: 0.8,
-    stagger: 0.02,
-    ease: "power2.out"
-  });
-
-  // Masked reveal za scroll text - slide up from bottom (ONCE ONLY)
-  const scrollTimeline = gsap.timeline({
+    opacity: 1,
+    duration: 0.6,
+    stagger: 0.015,
+    ease: "power2.out",
     scrollTrigger: {
       trigger: aboutScroll,
-      start: "top 70%",
+      start: "top 80%",
       toggleActions: "play none none none",
       once: true,
-      id: "about-scroll"
+      id: "about-scroll-reveal"
     }
   });
-
-  scrollTimeline.to(scrollSplit.words.map(w => w.querySelector('.word-inner')), {
-    opacity: 1,
-    y: 0,
-    duration: 0.8,
-    stagger: 0.02,
-    ease: "power2.out"
-  });
+  
+  console.log('✅ About Section text reveal postavljen');
 }
 
 window.initAboutSection = initAboutSection;
