@@ -50,40 +50,54 @@ function initAboutSection() {
   // 3. Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
   
-  // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
-  const titleTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: homeAboutTitle,
-      start: "top 80%",
-      end: "bottom 30%",
-      scrub: 0.5,
-      invalidateOnRefresh: true
-    }
-  });
-  
-  // Animiraj riječi od 7. nadalje: 0.1 -> 1
-  titleTl.to(titleSplit.words.slice(6), {
-    opacity: 1,
-    stagger: 0.015,
-    ease: "power2.out"
-  });
-  
-  // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
-  const scrollTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: aboutScroll,
-      start: "top 80%",
-      end: "bottom 40%",
-      scrub: 0.5,
-      invalidateOnRefresh: true
-    }
-  });
-  
-  // Animiraj scroll tekst riječ po riječ
-  scrollTl.to(scrollSplit.words, {
-    opacity: 1,
-    stagger: 0.015,
-    ease: "power2.out"
+  // Pričekaj da se layout stabilizira, onda osvježi ScrollTrigger
+  requestAnimationFrame(() => {
+    ScrollTrigger.refresh();
+    
+    console.log('ScrollTrigger refresh nakon RAF');
+    console.log('homeAboutTitle pozicija:', homeAboutTitle.getBoundingClientRect());
+    
+    // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
+    const titleTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: homeAboutTitle,
+        start: "top 80%",
+        end: "bottom 30%",
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        markers: true,
+        id: "home-about-title"
+      }
+    });
+    
+    // Animiraj riječi od 7. nadalje: 0.1 -> 1
+    titleTl.to(titleSplit.words.slice(6), {
+      opacity: 1,
+      stagger: 0.015,
+      ease: "power2.out"
+    });
+    
+    // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
+    const scrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutScroll,
+        start: "top 80%",
+        end: "bottom 40%",
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        markers: true,
+        id: "about-scroll"
+      }
+    });
+    
+    // Animiraj scroll tekst riječ po riječ
+    scrollTl.to(scrollSplit.words, {
+      opacity: 1,
+      stagger: 0.015,
+      ease: "power2.out"
+    });
+    
+    console.log('ScrollTrigger animacije kreirane');
   });
 }
 
