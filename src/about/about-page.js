@@ -3,7 +3,7 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // CSS za reveal linije (očuva layout i sprječava overlap)
+    // CSS za animacije
     const style = document.createElement('style');
     style.textContent = `
       .about-page-title,
@@ -11,108 +11,117 @@ function initAbout() {
         position: relative;
         z-index: 1;
       }
+      
+      /* Typewriter stil za naslov */
+      .char {
+        display: inline-block;
+        opacity: 0;
+      }
+      
+      /* Stil za linije paragrafa */
       .reveal-line {
         display: block !important;
         overflow: visible;
         line-height: inherit;
         margin: 0;
         padding: 0;
+        opacity: 0;
       }
+      
       .reveal-line > div,
       .reveal-line > span {
         display: inline;
         white-space: normal;
       }
+      
+      /* Pocetno sakrij sliku */
+      .about-page-mobile-img {
+        opacity: 0;
+        filter: blur(20px);
+      }
     `;
     document.head.appendChild(style);
     
-    // Dohvati elemente koje želimo animirati
+    // Dohvati elemente
     const section = document.querySelector('.section.about-page');
     const title = document.querySelector('.about-page-title');
     const paragraph = document.querySelector('.about-page-paragraph');
-    const mobileImage = document.querySelector('.about-page-mobile-img');
+    const image = document.querySelector('.about-page-mobile-img');
     
-    // Provjeri postoje li elementi na stranici
-    if (!title && !paragraph) return;
+    // Provjeri postoje li elementi
+    if (!title && !paragraph && !image) return;
     
-    // Mobile image - jednostavna fade-in animacija
-    if (mobileImage) {
-      gsap.fromTo(
-        mobileImage,
-        { opacity: 0, scale: 0.95 },
-        { 
-          opacity: 1, 
-          scale: 1,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            toggleActions: "play none none none"
-          }
-        }
-      );
-    }
-    
-    // Split tekst na linije za line-by-line reveal
-    const textElements = [title, paragraph].filter(Boolean);
+    // Instanca za split text cleanup
     const splitInstances = [];
-    let previousEndTrigger = null;
     
-    textElements.forEach((element, elementIndex) => {
-      if (element) {
-        // Split na linije
-        const split = new SplitType(element, { 
-          types: 'lines',
-          lineClass: 'reveal-line'
-        });
-        splitInstances.push(split);
-        
-        if (split.lines && split.lines.length > 0) {
-          // Postavi svi redovi na opacity 0.1
-          gsap.set(split.lines, { opacity: 0.1 });
-          
-          // Prvi red odmah na opacity 1
-          gsap.set(split.lines[0], { opacity: 1 });
-          
-          // Scroll-triggered reveal za ostale linije
-          split.lines.forEach((line, lineIndex) => {
-            if (lineIndex === 0) return; // Skip prvi red (već vidljiv)
-            
-            // Svaka linija ima svoj ScrollTrigger
-            const trigger = elementIndex === 0 && lineIndex === 1 
-              ? section // Prvi element koristi section kao trigger
-              : split.lines[lineIndex - 1]; // Ostali koriste prethodnu liniju
-            
-            ScrollTrigger.create({
-              trigger: trigger,
-              start: elementIndex === 0 && lineIndex === 1 ? "top 70%" : "top 85%",
-              onEnter: () => {
-                gsap.to(line, {
-                  opacity: 1,
-                  duration: 0.4,
-                  ease: "power2.out"
-                });
-              },
-              once: true // Play only once, ne vraća se natrag
-            });
-          });
-          
-          // Zapamti zadnju liniju ovog elementa za chain
-          previousEndTrigger = split.lines[split.lines.length - 1];
-        }
+    // Kreiraj glavni timeline
+    const masterTimeline = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        console.log('About page animacija završena');
       }
     });
     
-    // Dodatna provjera za mobilne uređaje
-    const isMobile = window.innerWidth <= 767;
-    
-    if (isMobile) {
-      // Prilagodbe za mobilne uređaje
-      ScrollTrigger.getAll().forEach(trigger => {
-        trigger.start = "top 90%";
-      });
+    // 1. SLIKA - Blur to Clear + Fade In
+    if (image) {
+      masterTimeline.to(image, {
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 1.5,
+        ease: "power3.out"
+      }, 0);
     }
+    
+    // 2. TYPEWRITER EFEKT ZA NASLOV
+    if (title) {
+      // Split naslov na karaktere
+      const titleSplit = new SplitType(title, { 
+        types: 'chars',
+        tagName: 'span'
+      });
+      splitInstances.push(titleSplit);
+      
+      if (titleSplit.chars && titleSplit.chars.length > 0) {
+        // Typewriter animacija - svaki karakter se pojavljuje jedan za drugim
+        masterTimeline.to(titleSplit.chars, {
+          opacity: 1,
+          duration: 0.05,
+          stagger: 0.05, // 50ms između svakog slova
+          ease: "none"
+        }, "+=0.3"); // Počinje 0.3s nakon što slika završi
+      }
+    }
+    
+    // 3. PARAGRAF - Red po Red
+    if (paragraph) {
+      // Split paragraf na linije
+      const paragraphSplit = new SplitType(paragraph, { 
+        types: 'lines',
+        lineClass: 'reveal-line'
+      });
+      splitInstances.push(paragraphSplit);
+      
+      if (paragraphSplit.lines && paragraphSplit.lines.length > 0) {
+        // Animiraj svaku liniju sa staggeorm
+        masterTimeline.to(paragraphSplit.lines, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.15, // 150ms između svakog reda
+          ease: "power2.out"
+        }, "+=0.2"); // Počinje 0.2s nakon typewritera
+      }
+    }
+    
+    // Pokreni animaciju kada sekcija uđe u viewport
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top 80%",
+      once: true,
+      onEnter: () => {
+        masterTimeline.play();
+      }
+    });
     
     // Sticky efekt za about section
     ScrollTrigger.create({
@@ -132,6 +141,10 @@ function initAbout() {
         splitInstances.forEach(split => {
           if (split && split.revert) split.revert();
         });
+        // Clear timeline
+        if (masterTimeline) masterTimeline.kill();
+        // Clear ScrollTriggers
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         // Clear style tag
         if (style && style.parentNode) {
           style.parentNode.removeChild(style);
