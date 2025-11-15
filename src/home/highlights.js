@@ -8,7 +8,7 @@ function initHighlights() {
 
   const totalWidth = highlightsWrapper.scrollWidth - highlightsSection.offsetWidth;
 
-  // Horizontal scroll animacija - SA PIN-om i optimiziranim scrub-om
+  // Horizontal scroll animacija - SA PIN-om i brzim scrub-om za smooth osjećaj
   gsap.to(highlightsWrapper, {
     x: -totalWidth,
     ease: "none",
@@ -16,7 +16,7 @@ function initHighlights() {
       trigger: highlightsSection,
       start: "top top",
       end: `+=${totalWidth}`,
-      scrub: 3,
+      scrub: 1, // Brži scrub = manje "sticky" osjećaj, responzivnije
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
