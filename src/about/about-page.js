@@ -66,9 +66,13 @@ function initAbout() {
       start: "bottom bottom",
       endTrigger: ".footer",
       end: "bottom bottom",
-      pinSpacing: false,
+      pinSpacing: true, // Omogući spacing da ne dođe do preklapanja
       pin: true,
-      markers: false
+      markers: false,
+      onRefresh: (self) => {
+        // Osiguraj da se layout pravilno ažurira
+        self.pin.style.willChange = 'transform';
+      }
     });
   });
 }

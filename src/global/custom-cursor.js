@@ -89,8 +89,12 @@ export function initCustomCursor() {
     cursorX += (mouseX - cursorX) * speed;
     cursorY += (mouseY - cursorY) * speed;
     
-    cursor.style.left = `${cursorX}px`;
-    cursor.style.top = `${cursorY}px`;
+    // Provjera validnosti brojeva (sprječava NaN/Infinity/vrlo male brojeve)
+    const finalX = (Number.isFinite(cursorX) && Math.abs(cursorX) > 1e-10) ? cursorX : window.innerWidth / 2;
+    const finalY = (Number.isFinite(cursorY) && Math.abs(cursorY) > 1e-10) ? cursorY : window.innerHeight / 2;
+    
+    cursor.style.left = `${finalX}px`;
+    cursor.style.top = `${finalY}px`;
     
     requestAnimationFrame(animateCursor);
   };
@@ -125,11 +129,11 @@ export function initCustomCursor() {
     // Carousel hover - SAMO u vertikalnom range-u carousela (centar ekrana ±30%)
     if (isCanvas && !isDragging) {
       const viewportHeight = window.innerHeight;
-      const mouseY = e.clientY;
+      const currentMouseY = e.clientY; // Izbjegni shadowing outer scope mouseY
       const centerY = viewportHeight / 2;
       const allowedRange = viewportHeight * 0.3; // ±30% od centra
       
-      const isInCarouselArea = Math.abs(mouseY - centerY) < allowedRange;
+      const isInCarouselArea = Math.abs(currentMouseY - centerY) < allowedRange;
       
       if (isInCarouselArea) {
         if (!isHoveringCarousel) {
