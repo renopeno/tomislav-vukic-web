@@ -83,14 +83,16 @@ function initAbout() {
           words[i].classList.add('revealed');
         }
         
-        // Scroll reveal za ostatak riječi
+        // Scroll reveal za ostatak riječi - SAMO kad stvarno scrollaš do njih
         words.forEach((word, index) => {
           if (index < initialWordsCount) return; // Skip prve riječi
           
           ScrollTrigger.create({
             trigger: word,
-            start: "top 85%",
+            start: "top 60%",
             once: true,
+            // toggleActions sprječava auto-trigger ako je već u viewportu
+            toggleActions: "play none none none",
             onEnter: () => {
               gsap.to(word, {
                 opacity: 1,
