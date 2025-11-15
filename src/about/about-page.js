@@ -3,12 +3,17 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // Dodaj CSS za split linije (sakriva overflow tokom animacije)
+    // Dodaj CSS za split linije (očuva originalni layout)
     const style = document.createElement('style');
     style.textContent = `
-      .split-line {
-        overflow: hidden;
+      .about-page-title .split-line,
+      .about-page-paragraph .split-line {
         display: block;
+        overflow: visible;
+      }
+      .about-page-title .split-line > *,
+      .about-page-paragraph .split-line > * {
+        display: inline;
       }
     `;
     document.head.appendChild(style);
@@ -62,17 +67,14 @@ function initAbout() {
       if (element) {
         const split = new SplitType(element, { 
           types: 'lines',
-          lineClass: 'split-line'
+          lineClass: 'split-line',
+          tagName: 'span'
         });
         splitInstances.push(split);
         
         // Animiraj svaku liniju sa stagger efektom
-        gsap.fromTo(
+        gsap.to(
           split.lines,
-          {
-            opacity: 0,
-            y: 20
-          },
           {
             opacity: 1,
             y: 0,
