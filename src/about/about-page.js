@@ -83,7 +83,7 @@ function initAbout() {
         const lines = titleSplit.lines;
         
         // Početna pozicija (sve linije skrivene)
-        gsap.set(lines, { opacity: 0, y: 20 });
+        gsap.set(lines, { opacity: 0, y: 30 }); // Veći offset za bolju dinamiku
         
         // Počni reveal RANIJE (umjesto 1.0s -> 0.6s)
         const titleStartTime = 0.6; 
@@ -93,7 +93,7 @@ function initAbout() {
             opacity: 1,
             y: 0,
             duration: 0.5, // Malo brže (0.6 -> 0.5)
-            ease: "power2.out"
+            ease: "back.out(1.7)" // Elastičniji ease za dinamiku
           }, titleStartTime + (index * 0.15)); // Brži stagger (0.2 -> 0.15)
         });
         
