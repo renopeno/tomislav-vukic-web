@@ -1,15 +1,29 @@
 function initAboutSection() {
   // Dodajemo provjeru za sekciju i potrebne elemente
   const aboutSection = document.querySelector('.section.about');
-  if (!aboutSection) return;
+  if (!aboutSection) {
+    console.log('About section nije pronađena');
+    return;
+  }
   
   const aboutSideTitle = document.querySelector('.about-side-title');
   const aboutTitle = document.querySelector('.about-title');
   const aboutScroll = document.querySelector('.about-scroll');
+  const revealStart = document.querySelector('.about-reveal-start');
+  const revealEnd = document.querySelector('.about-reveal-end');
+  
+  console.log('About section elementi:', {
+    aboutSection,
+    aboutSideTitle,
+    aboutTitle,
+    aboutScroll,
+    revealStart,
+    revealEnd
+  });
   
   // Provjeri da li elementi postoje prije nego što nastaviš
   if (!aboutTitle || !aboutScroll) {
-    console.warn('About section elementi nisu pronađeni');
+    console.warn('About section glavni elementi nisu pronađeni');
     return;
   }
   
@@ -54,20 +68,28 @@ function initAboutSection() {
       scrollTrigger: {
         trigger: aboutSection,
         start: "top 80%",
-        toggleActions: "play none none none"
+        toggleActions: "play none none none",
+        markers: true,
+        id: "about-side-title"
       }
     });
   }
   
   // 2. Kreiraj scroll reveal timeline za glavni tekst
+  // Koristi revealStart/revealEnd ako postoje, inače fallback na aboutSection
+  const triggerElement = revealStart || aboutSection;
+  const endTriggerElement = revealEnd || aboutSection;
+  
   const titleTl = gsap.timeline({
     scrollTrigger: {
-      trigger: '.about-reveal-start',
-      endTrigger: '.about-reveal-end',
+      trigger: triggerElement,
+      endTrigger: endTriggerElement,
       start: "top 80%",
       end: "top 20%",
       scrub: 0.5,
-      invalidateOnRefresh: true
+      invalidateOnRefresh: true,
+      markers: true,
+      id: "about-title-reveal"
     }
   });
   
@@ -81,12 +103,14 @@ function initAboutSection() {
   // 3. Kreiraj timeline za scroll tekst (prikazuje se na kraju)
   const scrollTl = gsap.timeline({
     scrollTrigger: {
-        trigger: '.about-title',
-        endTrigger: '.about-reveal-end',
+        trigger: aboutTitle,
+        endTrigger: endTriggerElement,
         start: "center 60%",
         end: "bottom 40%",
         scrub: 0.5,
-        invalidateOnRefresh: true
+        invalidateOnRefresh: true,
+        markers: true,
+        id: "about-scroll-reveal"
     }
   });
   
@@ -96,6 +120,20 @@ function initAboutSection() {
     stagger: 0.015,
     ease: "none"
   });
+  
+  console.log('About section animacije kreirane');
+  
+  // FALLBACK: Ako nakon 2 sekunde tekst još nije vidljiv, prikaži ga
+  setTimeout(() => {
+    const isTextVisible = titleSplit.words.some(word => {
+      return window.getComputedStyle(word).opacity > 0;
+    });
+    
+    if (!isTextVisible) {
+      console.warn('Tekst nije vidljiv nakon 2s, primjenjujem fallback');
+      gsap.set([aboutSideTitle, titleSplit.words, scrollSplit.words], { opacity: 1 });
+    }
+  }, 2000);
 }
 
 // Izvezi funkciju globalno za Barba
