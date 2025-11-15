@@ -18,7 +18,12 @@ function initHighlights() {
       end: "bottom top",
       scrub: 1,
       invalidateOnRefresh: true,
-      id: "highlights-horizontal"
+      id: "highlights-horizontal",
+      onUpdate: (self) => {
+        if (self.direction === -1) {
+          console.log('🖼️ HIGHLIGHTS scrolling BACK, progress:', self.progress.toFixed(2));
+        }
+      }
     },
   });
 

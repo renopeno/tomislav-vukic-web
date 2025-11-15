@@ -1,6 +1,6 @@
 // Detaljni debug sustav za scroll probleme
 const ScrollDebugger = {
-  enabled: false, // Isključeno - problem pronađen!
+  enabled: true, // Uključeno - tražimo pravi uzrok!
   logs: [],
   lastScrollY: 0,
   lastTimestamp: 0,
