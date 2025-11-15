@@ -31,21 +31,20 @@ function initAbout() {
         element,
         { 
           opacity: 0, 
-          scale: 0.8, 
-          y: window.innerHeight / 5
+          y: 40 // Manji y offset da se ne preklapaju
         },
         { 
           opacity: 1, 
-          scale: 1, 
           y: 0,
-          duration: 1,
+          duration: 0.8,
           ease: "power3.out",
-          delay: index * 0.1, // Simulira stagger efekt
+          delay: index * 0.15, // Veći stagger za bolju separaciju
           scrollTrigger: {
             trigger: section,
             start: "top 80%",
             toggleActions: "play none none none"
-          }
+          },
+          clearProps: "transform" // Očisti transform nakon animacije
         }
       );
     });
@@ -60,18 +59,26 @@ function initAbout() {
       });
     }
     
-    // Sticky efekt za about section
+    // Sticky efekt za about section s fade out dok footer dolazi
     ScrollTrigger.create({
       trigger: section,
       start: "bottom bottom",
       endTrigger: ".footer",
       end: "bottom bottom",
-      pinSpacing: true, // Omogući spacing da ne dođe do preklapanja
+      pinSpacing: false, // Vrati false da footer prelazi preko
       pin: true,
       markers: false,
-      onRefresh: (self) => {
-        // Osiguraj da se layout pravilno ažurira
-        self.pin.style.willChange = 'transform';
+      anticipatePin: 1, // Sprječava layout shift
+      onUpdate: (self) => {
+        // Fade out about sadržaj dok footer dolazi (progress 0 = vidljivo, 1 = nevidljivo)
+        const opacity = 1 - self.progress;
+        if (section) {
+          section.style.opacity = opacity;
+        }
+      },
+      onRefresh: () => {
+        // Force proper layout calculation nakon refresh
+        ScrollTrigger.refresh();
       }
     });
   });
