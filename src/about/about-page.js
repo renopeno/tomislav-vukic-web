@@ -14,6 +14,11 @@ function initAbout() {
         display: block;
         opacity: 0;
       }
+      
+      .about-margin-footer {
+        height: 80vh;
+        min-height: 600px;
+      }
     `;
     document.head.appendChild(style);
     
