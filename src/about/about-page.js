@@ -80,22 +80,23 @@ function initAbout() {
         const words = titleSplit.words;
         
         // Sakrij sve riječi na početku
-        gsap.set(words, { autoAlpha: 0, y: 10 });
+        gsap.set(words, { autoAlpha: 0, y: 8 });
         
-        // Smooth reveal sa y translate i opacity - GSAP best practice
+        // Smooth reveal sa y translate i opacity
         masterTimeline.to(words, {
           autoAlpha: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.5,
           stagger: {
-            amount: 1.0, // Ukupno 1.0s za sve riječi
-            ease: "power2.out"
+            amount: 1.4, // Ukupno 1.4s za sve riječi - sporiji za smootheriji efekt
+            ease: "power2.inOut"
           },
           ease: "power2.out"
         }, 0.6);
         
-        // Title završava nakon 0.6 + 1.0 = 1.6s
-        titleEndTime = 1.6;
+        // Title završava nakon 0.6 + 1.4 = 2.0s
+        // Ali prvi divider počinje malo prije kraja
+        titleEndTime = 1.6; // Divider počinje 0.4s prije kraja title-a
       }
     }
     
