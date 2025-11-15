@@ -8,17 +8,15 @@ function initHighlights() {
 
   const totalWidth = highlightsWrapper.scrollWidth - highlightsSection.offsetWidth;
 
-  // Horizontal scroll animacija
+  // Horizontal scroll animacija - BEZ PIN-a
   gsap.to(highlightsWrapper, {
     x: -totalWidth,
     ease: "none",
     scrollTrigger: {
       trigger: highlightsSection,
-      start: "top top",
-      end: `+=${totalWidth}`,
+      start: "top bottom",
+      end: "bottom top",
       scrub: 1,
-      pin: true,
-      anticipatePin: 1,
       invalidateOnRefresh: true,
       id: "highlights-horizontal"
     },

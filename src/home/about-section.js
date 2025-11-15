@@ -46,36 +46,44 @@ function initAboutSection() {
     gsap.set(inner, { opacity: 1, y: 0 });
   });
 
-  // Masked reveal za title - slide up from bottom
-  gsap.to(titleSplit.words.slice(6).map(w => w.querySelector('.word-inner')), {
-    opacity: 1,
-    y: 0,
-    duration: 1,
-    stagger: 0.02,
-    ease: "power2.out",
+  // Masked reveal za title - slide up from bottom (BEZ SCRUB-a)
+  const titleTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: homeAboutTitle,
       start: "top 70%",
-      end: "bottom 40%",
-      scrub: 0.5,
+      end: "bottom 30%",
+      scrub: false,
+      toggleActions: "play none none reverse",
       id: "about-title"
     }
   });
 
-  // Masked reveal za scroll text - slide up from bottom
-  gsap.to(scrollSplit.words.map(w => w.querySelector('.word-inner')), {
+  titleTimeline.to(titleSplit.words.slice(6).map(w => w.querySelector('.word-inner')), {
     opacity: 1,
     y: 0,
-    duration: 1,
-    stagger: 0.02,
-    ease: "power2.out",
+    duration: 0.6,
+    stagger: 0.015,
+    ease: "power2.out"
+  });
+
+  // Masked reveal za scroll text - slide up from bottom (BEZ SCRUB-a)
+  const scrollTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutScroll,
       start: "top 70%",
-      end: "bottom 40%",
-      scrub: 0.5,
+      end: "bottom 30%",
+      scrub: false,
+      toggleActions: "play none none reverse",
       id: "about-scroll"
     }
+  });
+
+  scrollTimeline.to(scrollSplit.words.map(w => w.querySelector('.word-inner')), {
+    opacity: 1,
+    y: 0,
+    duration: 0.6,
+    stagger: 0.015,
+    ease: "power2.out"
   });
 }
 
