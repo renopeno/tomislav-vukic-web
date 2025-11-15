@@ -68,7 +68,7 @@ function initAbout() {
     
     // 2. ABOUT TITLE - Line by line reveal
     let titleEndTime = 0;
-    let titleStartTime = 0.8; // Kasnije (0.6 -> 0.8)
+    let titleStartTime = 0.6; // ✅ 0.2s ranije za brži reveal!
     let firstSectionStartTime = 0;
     
     if (mainTitle) {
