@@ -23,12 +23,6 @@ function initAbout() {
         opacity: 0;
       }
       
-      /* Stil za linije paragrafa */
-      .about-page-paragraph .line {
-        display: block;
-        opacity: 0;
-      }
-      
       /* Sakrij paragraf dok typewriter ne završi */
       .about-page-paragraph {
         opacity: 0;
@@ -37,6 +31,28 @@ function initAbout() {
       /* Pocetno sakrij sliku sa clip-path (od gore prema dolje) */
       .about-page-mobile-img {
         clip-path: inset(0% 0% 100% 0%);
+      }
+      
+      /* Typewriter cursor */
+      .typewriter-cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        background-color: var(--text-color, currentColor);
+        margin-left: 2px;
+        animation: blink 0.8s infinite;
+        vertical-align: text-bottom;
+      }
+      
+      @keyframes blink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+      }
+      
+      /* Stil za karaktere paragrafa */
+      .about-page-paragraph .char {
+        display: inline-block;
+        opacity: 0;
       }
     `;
     document.head.appendChild(style);
@@ -61,16 +77,17 @@ function initAbout() {
       }
     });
     
-    // 1. SLIKA - Clip-path reveal (od gore prema dolje)
+    // 1. SLIKA - Clip-path reveal (od gore prema dolje) - brži i jači easing
     if (image) {
       masterTimeline.to(image, {
         clipPath: 'inset(0% 0% 0% 0%)',
-        duration: 1.4,
-        ease: "power2.inOut"
+        duration: 1.0,
+        ease: "power3.inOut"
       }, 0);
     }
     
     // 2. TYPEWRITER EFEKT ZA NASLOV - počinje usred revealing slike
+    let typewriterEndTime = 0;
     if (title) {
       // Split naslov na riječi i karaktere (riječi ostaju zajedno)
       const titleSplit = new SplitType(title, { 
@@ -80,8 +97,12 @@ function initAbout() {
       splitInstances.push(titleSplit);
       
       if (titleSplit.chars && titleSplit.chars.length > 0) {
-        // Spremimo originalni tekst prije splita
         const chars = titleSplit.chars;
+        
+        // Kreiraj typewriter cursor
+        const cursor = document.createElement('span');
+        cursor.className = 'typewriter-cursor';
+        title.appendChild(cursor);
         
         // Typewriter animacija s manualnim staggerom za pauze
         let delay = 0;
@@ -93,7 +114,14 @@ function initAbout() {
             opacity: 1,
             duration: 0.08,
             ease: "power1.out"
-          }, 0.7 + delay); // Počinje nakon 0.7s (usred slike)
+          }, 0.5 + delay); // Počinje nakon 0.5s (usred slike)
+          
+          // Pomakni cursor iza trenutnog karaktera
+          masterTimeline.call(() => {
+            if (index < chars.length - 1) {
+              chars[index + 1].parentElement.insertBefore(cursor, chars[index + 1]);
+            }
+          }, null, 0.5 + delay + 0.04);
           
           // Dodaj delay za sljedeći karakter
           delay += 0.04; // Brza standardna brzina
@@ -103,81 +131,45 @@ function initAbout() {
             delay += 0.4; // Pauza nakon interpunkcije
           }
         });
+        
+        // Zapamti vrijeme kad typewriter završava
+        typewriterEndTime = 0.5 + delay;
+        
+        // Sakrij cursor na kraju
+        masterTimeline.to(cursor, {
+          opacity: 0,
+          duration: 0.2
+        }, typewriterEndTime);
       }
     }
     
-    // 3. PARAGRAF - Prikaži nakon typewritera
+    // 3. PARAGRAF - Prikaži character by character nakon typewritera
     let paragraphTimeline = null;
     if (paragraph) {
-      // Split paragraf na linije
+      // Split paragraf na karaktere
       const paragraphSplit = new SplitType(paragraph, { 
-        types: 'lines',
-        lineClass: 'line'
+        types: 'chars',
+        tagName: 'span'
       });
       splitInstances.push(paragraphSplit);
       
-      if (paragraphSplit.lines && paragraphSplit.lines.length > 0) {
-        const lines = paragraphSplit.lines;
+      if (paragraphSplit.chars && paragraphSplit.chars.length > 0) {
+        const chars = paragraphSplit.chars;
         
-        // Prvo prikaži cijeli paragraf (fade in)
+        // Prvo prikaži cijeli paragraf (fade in) taman kad završava typewriter
         masterTimeline.to(paragraph, {
           opacity: 1,
-          duration: 0.4,
+          duration: 0.3,
           ease: "power2.out"
-        }, "+=0.3");
+        }, typewriterEndTime);
         
-        // Prikaži prvi red
-        masterTimeline.to(lines[0], {
+        // Reveal karaktere jedan po jedan (brže nego typewriter)
+        masterTimeline.to(chars, {
           opacity: 1,
-          duration: 0.5,
-          ease: "power2.out"
-        }, "+=0.1");
-        
-        // Prikaži drugu polovicu (pola drugog reda)
-        if (lines.length > 1) {
-          masterTimeline.to(lines[1], {
-            opacity: 0.5, // Pola opacity za efekat "pola reda"
-            duration: 0.5,
-            ease: "power2.out"
-          }, "-=0.2"); // Overlapa sa prvim redom
-          
-          // Reveal cijeli drugi red na scroll
-          ScrollTrigger.create({
-            trigger: lines[0],
-            start: "top 80%",
-            onEnter: () => {
-              gsap.to(lines[1], {
-                opacity: 1,
-                duration: 0.5,
-                ease: "power2.out"
-              });
-            },
-            once: true,
-            markers: false
-          });
-        }
-        
-        // Ostale linije - scroll reveal red po red
-        if (lines.length > 2) {
-          for (let i = 2; i < lines.length; i++) {
-            const line = lines[i];
-            const prevLine = lines[i - 1];
-            
-            ScrollTrigger.create({
-              trigger: prevLine,
-              start: "top 80%",
-              onEnter: () => {
-                gsap.to(line, {
-                  opacity: 1,
-                  duration: 0.5,
-                  ease: "power2.out"
-                });
-              },
-              once: true,
-              markers: false
-            });
-          }
-        }
+          duration: 0.02,
+          stagger: 0.015, // 15ms između svakog karaktera
+          ease: "power1.out"
+        }, typewriterEndTime + 0.2); // Počinje 0.2s nakon što se paragraf pojavi
       }
     }
     
