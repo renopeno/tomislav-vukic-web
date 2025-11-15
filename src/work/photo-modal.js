@@ -428,19 +428,12 @@ function initPhotoModal() {
 }
 
 
+// Izvezi funkciju i postavi na window
 window.initPhotoModal = initPhotoModal;
 
-// Inicijaliziraj samo ako je ovo prvi load (prije nego Barba preuzme kontrolu)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
-      console.log('▶️ Prvi load - inicijaliziram photo modal');
-      initPhotoModal();
-    }
-  });
-} else {
-  if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
-    console.log('▶️ DOM već loaded - inicijaliziram photo modal odmah');
-    initPhotoModal();
-  }
-}
+// Izvezi kao named export da Vite ne tree-shake
+export { initPhotoModal };
+
+// Funkcija će biti pozvana SAMO kroz Barba hooks ili na prvi load
+// (Barba config poziva initPhotoModal() automatski)
+console.log('📦 photo-modal.js module loaded - funkcija spremna na window objektu');

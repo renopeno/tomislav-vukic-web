@@ -247,6 +247,24 @@ console.log("🚀 Pokrećem Barba.js inicijalizaciju");
 initBarba();
 console.log("✅ Barba.js konfiguracija kompletna");
 
+// 🎯 Inicijaliziraj trenutnu stranicu nakon što se Barba postavi
+// (Ovo pokriva prvi load - kada nema tranzicije)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentNamespace = document.querySelector('[data-barba="container"]')?.getAttribute('data-barba-namespace');
+    if (currentNamespace) {
+      console.log(`🏁 Prvi load - inicijaliziram ${currentNamespace} stranicu`);
+      initPageSpecificFunctions(currentNamespace);
+    }
+  });
+} else {
+  const currentNamespace = document.querySelector('[data-barba="container"]')?.getAttribute('data-barba-namespace');
+  if (currentNamespace) {
+    console.log(`🏁 Prvi load - inicijaliziram ${currentNamespace} stranicu`);
+    initPageSpecificFunctions(currentNamespace);
+  }
+}
+
 // // Inicijalizacija custom funkcija nakon Barba tranzicija
 // function initScripts() {
 //   console.log("Inicijaliziram custom JS funkcije...");

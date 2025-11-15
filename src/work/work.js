@@ -172,26 +172,13 @@ function initCategoryTitleAnimation() {
   });
 }
 
+// Izvezi funkcije i postavi na window
 window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
 
-// Inicijaliziraj samo ako je ovo prvi load (prije nego Barba preuzme kontrolu)
-console.log('📦 work.js loaded, document.readyState:', document.readyState);
-if (document.readyState === 'loading') {
-  console.log('⏳ Čekam DOMContentLoaded za work page...');
-  document.addEventListener('DOMContentLoaded', () => {
-    // Samo ako nema Barba wrappera ili je prvi load
-    if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
-      console.log('▶️ Prvi load work page-a, pozivam init funkcije');
-      initWork();
-      initCategoryTitleAnimation();
-    }
-  });
-} else {
-  // Samo ako nema Barba wrappera ili je prvi load
-  if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
-    console.log('▶️ DOM već loaded, pozivam initWork() i initCategoryTitleAnimation() odmah');
-    initWork();
-    initCategoryTitleAnimation();
-  }
-}
+// Izvezi kao named exports da Vite ne tree-shake
+export { initWork, initCategoryTitleAnimation };
+
+// Funkcije će biti pozvane SAMO kroz Barba hooks ili na prvi load
+// (Barba config poziva initWork() i initCategoryTitleAnimation() automatski)
+console.log('📦 work.js module loaded - funkcije spremne na window objektu');
