@@ -11,13 +11,15 @@ function initHighlights() {
   // Horizontal scroll animacija
   gsap.to(highlightsWrapper, {
     x: -totalWidth,
-    ease: "linear",
+    ease: "none",
     scrollTrigger: {
       trigger: highlightsSection,
       start: "top top",
       end: `+=${totalWidth}`,
-      scrub: true,
+      scrub: 1,
       pin: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
       id: "highlights-horizontal"
     },
   });

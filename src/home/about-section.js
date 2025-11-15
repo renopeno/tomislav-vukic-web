@@ -35,7 +35,8 @@ function initAboutSection() {
       trigger: homeAboutTitle,
       start: "top 70%",
       end: "bottom 40%",
-      scrub: 1
+      scrub: 0.5,
+      id: "about-title"
     }
   });
 
@@ -49,7 +50,8 @@ function initAboutSection() {
       trigger: aboutScroll,
       start: "top 70%",
       end: "bottom 40%",
-      scrub: 1
+      scrub: 0.5,
+      id: "about-scroll"
     }
   });
 }

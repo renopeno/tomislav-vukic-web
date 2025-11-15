@@ -1,16 +1,23 @@
 function initLenis() {
-  
   const lenis = new Lenis({
-    lerp: 0.08,
-    wheelMultiplier: 1.2,
+    lerp: 0.1,
+    wheelMultiplier: 1,
+    smoothWheel: true,
+    smoothTouch: false,
+    infinite: false
   });
 
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
+  // Globalna instance za pristup iz drugih fileova
+  window.lenis = lenis;
 
-  requestAnimationFrame(raf);
+  // Integracija sa GSAP ticker-om za bolje performanse
+  lenis.on('scroll', ScrollTrigger.update);
+  
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+  });
+  
+  gsap.ticker.lagSmoothing(0);
 }
 
 window.initLenis = initLenis;
