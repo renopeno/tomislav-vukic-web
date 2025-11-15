@@ -10,27 +10,49 @@ function initAboutSection() {
   const titleSplit = new SplitType(homeAboutTitle, { types: 'words' });
   const scrollSplit = new SplitType(aboutScroll, { types: 'words' });
 
-  // CSS za mask efekt
+  // CSS za masked slide-up efekt
   const style = document.createElement('style');
   style.textContent = `
     .word {
       display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+    }
+    .word-inner {
+      display: inline-block;
       opacity: 0.1;
+      transform: translateY(100%);
     }
   `;
   document.head.appendChild(style);
 
-  // Prvih 6 riječi vidljivo
+  // Wrap svaku riječ u inner span za slide-up efekt
+  const wrapWords = (words) => {
+    words.forEach(word => {
+      const inner = document.createElement('span');
+      inner.className = 'word-inner';
+      inner.textContent = word.textContent;
+      word.textContent = '';
+      word.appendChild(inner);
+    });
+  };
+
+  wrapWords(titleSplit.words);
+  wrapWords(scrollSplit.words);
+
+  // Prvih 6 riječi već revealed
   titleSplit.words.slice(0, 6).forEach(word => {
-    word.style.opacity = '1';
+    const inner = word.querySelector('.word-inner');
+    gsap.set(inner, { opacity: 1, y: 0 });
   });
 
-  // Masked reveal za title
-  gsap.to(titleSplit.words.slice(6), {
+  // Masked reveal za title - slide up from bottom
+  gsap.to(titleSplit.words.slice(6).map(w => w.querySelector('.word-inner')), {
     opacity: 1,
+    y: 0,
     duration: 1,
-    stagger: 0.03,
-    ease: "none",
+    stagger: 0.02,
+    ease: "power2.out",
     scrollTrigger: {
       trigger: homeAboutTitle,
       start: "top 70%",
@@ -40,12 +62,13 @@ function initAboutSection() {
     }
   });
 
-  // Masked reveal za scroll text
-  gsap.to(scrollSplit.words, {
+  // Masked reveal za scroll text - slide up from bottom
+  gsap.to(scrollSplit.words.map(w => w.querySelector('.word-inner')), {
     opacity: 1,
+    y: 0,
     duration: 1,
-    stagger: 0.03,
-    ease: "none",
+    stagger: 0.02,
+    ease: "power2.out",
     scrollTrigger: {
       trigger: aboutScroll,
       start: "top 70%",
