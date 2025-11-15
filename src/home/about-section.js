@@ -2,7 +2,6 @@ function initAboutSection() {
   const aboutSection = document.querySelector('.section.about');
   if (!aboutSection) return;
   
-  const homeAboutSmallTitle = document.querySelector('.home-about-small-title');
   const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
   
@@ -38,16 +37,11 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // 1. Mali naslov "Hi, I'm Tom" - UVIJEK VIDLJIV
-  if (homeAboutSmallTitle) {
-    gsap.set(homeAboutSmallTitle, { opacity: 1 });
-  }
-  
-  // 2. Home about title - prvih 6 riječi opacity 1, ostale 0.1
+  // Home about title - prvih 6 riječi opacity 1, ostale 0.1
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
   gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
   
-  // 3. Scroll tekst - početna opacity 0
+  // Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
   
   // Pričekaj da se layout stabilizira, onda osvježi ScrollTrigger
