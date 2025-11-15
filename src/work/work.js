@@ -14,14 +14,19 @@ async function initWork() {
   }
   
   try {
-    // DODAJ OVO NA POČETAK - postavi originalParent PRIJE mijenjanja DOM-a
+    const MAX_PHOTOS = 30;
+    const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
+    
+    // ✅ ODMAH sakrij sve fotke da spriječiš FOUC (Flash of Unstyled Content)
+    allPhotoContainers.forEach(container => {
+      container.style.opacity = '0';
+    });
+    
+    // Postavi originalParent PRIJE mijenjanja DOM-a
     const gridPhotos = document.querySelectorAll(".photo");
     gridPhotos.forEach(photo => {
       photo.originalParent = photo.parentElement;
     });
-    
-    const MAX_PHOTOS = 30;
-    const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
     
     // Prvih 6 fotki - eager loading s high priority, ostale lazy
     allPhotoContainers.forEach((container, index) => {
