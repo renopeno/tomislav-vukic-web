@@ -3,12 +3,25 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // CSS za reveal linije (očuva layout)
+    // CSS za reveal linije (očuva layout i sprječava overlap)
     const style = document.createElement('style');
     style.textContent = `
+      .about-page-title,
+      .about-page-paragraph {
+        position: relative;
+        z-index: 1;
+      }
       .reveal-line {
-        display: block;
-        transition: opacity 0.4s ease;
+        display: block !important;
+        overflow: visible;
+        line-height: inherit;
+        margin: 0;
+        padding: 0;
+      }
+      .reveal-line > div,
+      .reveal-line > span {
+        display: inline;
+        white-space: normal;
       }
     `;
     document.head.appendChild(style);
