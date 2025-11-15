@@ -3,32 +3,6 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // CSS za animacije
-    const style = document.createElement('style');
-    style.textContent = `
-      .about-page-title,
-      .about-page-paragraph {
-        position: relative;
-        z-index: 1;
-      }
-      
-      /* Sakrij paragraf dok typewriter ne završi */
-      .about-page-paragraph {
-        opacity: 0;
-      }
-      
-      /* Pocetno sakrij sliku sa clip-path (od gore prema dolje) */
-      .about-page-mobile-img {
-        clip-path: inset(0% 0% 100% 0%);
-      }
-      
-      /* Paragraf riječi wrap i opacity */
-      .about-page-paragraph .word {
-        opacity: 0.1;
-      }
-    `;
-    document.head.appendChild(style);
-    
     // Dohvati elemente
     const section = document.querySelector('.section.about-page');
     const title = document.querySelector('.about-page-title');
@@ -36,21 +10,17 @@ function initAbout() {
     const image = document.querySelector('.about-page-mobile-img');
     
     // Provjeri postoje li elementi
-    if (!title && !paragraph && !image) return;
-    
-    // Instanca za split text cleanup
-    const splitInstances = [];
+    if (!section) return;
     
     // Kreiraj glavni timeline
     const masterTimeline = gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        console.log('About page animacija završena');
-      }
+      paused: true
     });
     
-    // 1. SLIKA - Clip-path reveal (od gore prema dolje) - brži i jači easing
+    // 1. SLIKA - Clip-path reveal (od gore prema dolje)
     if (image) {
+      gsap.set(image, { clipPath: 'inset(0% 0% 100% 0%)' });
+      
       masterTimeline.to(image, {
         clipPath: 'inset(0% 0% 0% 0%)',
         duration: 1.0,
@@ -58,99 +28,26 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. TYPEWRITER EFEKT ZA NASLOV - počinje usred revealing slike (BEZ cursora)
-    let typewriterEndTime = 0;
+    // 2. ABOUT TITLE - Fade in (bez typewritera, samo fade)
     if (title) {
-      // Split naslov samo na karaktere
-      const titleSplit = new SplitType(title, { 
-        types: 'chars'
-      });
-      splitInstances.push(titleSplit);
+      gsap.set(title, { opacity: 0 });
       
-      if (titleSplit.chars && titleSplit.chars.length > 0) {
-        const chars = titleSplit.chars;
-        
-        // Dohvati originalni tekst da znamo gdje su zarezi i točke
-        const originalText = title.textContent;
-        
-        // Typewriter animacija s manualnim staggerom za pauze
-        let delay = 0;
-        chars.forEach((char, index) => {
-          const charText = originalText[index];
-          
-          // Animiraj svaki karakter
-          masterTimeline.to(char, {
-            opacity: 1,
-            duration: 0.1,
-            ease: "power2.out"
-          }, 0.5 + delay);
-          
-          // Dodaj delay za sljedeći karakter
-          delay += 0.05;
-          
-          // Ako je trenutni karakter zarez ili točka, dodaj ekstra pauzu
-          if (charText === ',' || charText === '.') {
-            delay += 0.4; // Pauza nakon interpunkcije
-          }
-        });
-        
-        // Zapamti vrijeme kad typewriter završava
-        typewriterEndTime = 0.5 + delay;
-      }
+      masterTimeline.to(title, {
+        opacity: 1,
+        duration: 1.5,
+        ease: "power2.out"
+      }, 0.6);
     }
     
-    // 3. PARAGRAF - Word by word reveal nakon typewritera
-    let paragraphTimeline = null;
+    // 3. PARAGRAF - Fade in sa malim delayom
     if (paragraph) {
-      // Split paragraf na riječi (riječi ostaju zajedno)
-      const paragraphSplit = new SplitType(paragraph, { 
-        types: 'words',
-        tagName: 'span'
-      });
-      splitInstances.push(paragraphSplit);
+      gsap.set(paragraph, { opacity: 0 });
       
-      if (paragraphSplit.words && paragraphSplit.words.length > 0) {
-        const words = paragraphSplit.words;
-        
-        // Prvo prikaži cijeli paragraf (fade in) ranije - odmah nakon što typewriter započne sa zadnjim redom
-        masterTimeline.to(paragraph, {
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out"
-        }, typewriterEndTime - 1.0); // Pojavljuje se 1s prije kraja typewritera
-        
-        // Prikaži prvu riječ odmah nakon fade-in
-        masterTimeline.to(words[0], {
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out"
-        }, typewriterEndTime - 0.8);
-        
-        // Ostale riječi - scroll reveal word by word
-        if (words.length > 1) {
-          // Grupiraj po ~ 3-4 riječi za smootheriji efekt
-          const wordsPerGroup = 3;
-          
-          for (let i = 1; i < words.length; i++) {
-            const word = words[i];
-            const prevWord = words[i - 1];
-            
-            ScrollTrigger.create({
-              trigger: prevWord,
-              start: "top 80%",
-              onEnter: () => {
-                gsap.to(word, {
-                  opacity: 1,
-                  duration: 0.35,
-                  ease: "power2.out"
-                });
-              },
-              once: true,
-              markers: false
-            });
-          }
-        }
-      }
+      masterTimeline.to(paragraph, {
+        opacity: 1,
+        duration: 1.2,
+        ease: "power2.out"
+      }, 1.8);
     }
     
     // Pokreni animaciju kada sekcija uđe u viewport
@@ -177,18 +74,10 @@ function initAbout() {
     // Cleanup za Barba.js transitions
     if (typeof barba !== 'undefined') {
       barba.hooks.beforeLeave(() => {
-        // Revert split text
-        splitInstances.forEach(split => {
-          if (split && split.revert) split.revert();
-        });
         // Clear timeline
         if (masterTimeline) masterTimeline.kill();
         // Clear ScrollTriggers
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        // Clear style tag
-        if (style && style.parentNode) {
-          style.parentNode.removeChild(style);
-        }
       });
     }
   });
