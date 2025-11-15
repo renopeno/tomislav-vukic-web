@@ -38,7 +38,7 @@ function initAbout() {
     const aboutMeParagraph = document.querySelector('#w-node-_38752304-f930-7aec-55b4-e5bb69d7261b-e0820647');
     const whatIPhotographContent = document.querySelector('#w-node-af8686f0-0eff-8a7c-0ed7-beca4d3b4ae5-e0820647');
     const howIWorkParagraph = document.querySelector('#w-node-f5866f73-1277-b3c6-9637-905ed2896c1d-e0820647');
-    const whoIWorkWithContent = document.querySelector('#w-node-_108f6310-e8be-638b-dc73-332ac7dd5576-e0820647');
+    const whoIWorkWithContent = document.querySelector('#w-node-_26bcf290-3970-d3ae-4c5a-8a87562b3b8f-e0820647'); // Ažuriran ID
     
     // Footer items
     const locationItem = document.querySelector('#w-node-_959dd736-48e6-8ca1-a499-ecdb1597fdfc-e0820647');
@@ -93,13 +93,13 @@ function initAbout() {
           masterTimeline.to(line, {
             opacity: 1,
             y: 0,
-            duration: 0.5,
+            duration: 0.4, // Smanjeno (0.5 -> 0.4)
             ease: "power2.out"
           }, titleStartTime + (index * 0.15));
         });
         
         // Izračunaj kada zadnja linija završava
-        titleEndTime = titleStartTime + ((lines.length - 1) * 0.15) + 0.5;
+        titleEndTime = titleStartTime + ((lines.length - 1) * 0.15) + 0.4; // Ažurirano
         
         // Izračunaj 70% title reveala - tu počinje prva sekcija (ranije: 90% -> 70%)
         const titleDuration = titleEndTime - titleStartTime;
