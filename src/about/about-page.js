@@ -19,6 +19,17 @@ function initAbout() {
         display: inline;
         white-space: normal;
       }
+      
+      /* Ghost text - 0.1 opacity za nereveal-ani content */
+      .about-page-paragraph-title,
+      .about-page-paragraph,
+      #w-node-af8686f0-0eff-8a7c-0ed7-beca4d3b4ae5-e0820647,
+      #w-node-f5866f73-1277-b3c6-9637-905ed2896c1d-e0820647,
+      #w-node-_108f6310-e8be-638b-dc73-332ac7dd5576-e0820647,
+      #w-node-_959dd736-48e6-8ca1-a499-ecdb1597fdfc-e0820647,
+      #w-node-_81d87156-36a4-f557-ac99-5a50eaa2aede-e0820647 {
+        opacity: 0.1;
+      }
     `;
     document.head.appendChild(style);
     
@@ -102,10 +113,10 @@ function initAbout() {
     function createDividerSequence(divider, title, content, startTime) {
       if (!divider) return startTime;
       
-      // Sakrij divider i content na početku
+      // Sakrij divider na početku (content je već 0.1 opacity)
       gsap.set(divider, { width: 0, opacity: 0 });
-      if (title) gsap.set(title, { opacity: 0, y: 20 });
-      if (content) gsap.set(content, { opacity: 0, y: 20 });
+      if (title) gsap.set(title, { y: 20 });
+      if (content) gsap.set(content, { y: 20 });
       
       // Divider animacija (fade in + width)
       masterTimeline.to(divider, {
@@ -115,7 +126,7 @@ function initAbout() {
         ease: "power2.inOut"
       }, startTime);
       
-      // Title fade in
+      // Title reveal (0.1 → 1 opacity)
       if (title) {
         masterTimeline.to(title, {
           opacity: 1,
@@ -125,7 +136,7 @@ function initAbout() {
         }, startTime + 0.3);
       }
       
-      // Content fade in
+      // Content reveal (0.1 → 1 opacity)
       if (content) {
         masterTimeline.to(content, {
           opacity: 1,
@@ -142,18 +153,18 @@ function initAbout() {
     function createScrollDividerSequence(divider, title, content) {
       if (!divider) return;
       
-      // Sakrij divider i content na početku
+      // Sakrij divider na početku (content je već 0.1 opacity)
       gsap.set(divider, { width: 0, opacity: 0 });
-      if (title) gsap.set(title, { opacity: 0, y: 20 });
-      if (content) gsap.set(content, { opacity: 0, y: 20 });
+      if (title) gsap.set(title, { y: 20 });
+      if (content) gsap.set(content, { y: 20 });
       
-      // Scroll trigger za divider
+      // Scroll trigger čim uđe u viewport
       ScrollTrigger.create({
         trigger: divider,
-        start: "top 85%",
+        start: "top 95%", // Triggeruje čim uđe u viewport
         once: true,
         onEnter: () => {
-          const tl = gsap.timeline();
+          const tl = gsap.timeline({ delay: 0.3 }); // 0.3s delay prije reveal-a
           
           // Divider
           tl.to(divider, {
@@ -163,7 +174,7 @@ function initAbout() {
             ease: "power2.inOut"
           }, 0);
           
-          // Title
+          // Title reveal (0.1 → 1 opacity)
           if (title) {
             tl.to(title, {
               opacity: 1,
@@ -173,7 +184,7 @@ function initAbout() {
             }, 0.3);
           }
           
-          // Content
+          // Content reveal (0.1 → 1 opacity)
           if (content) {
             tl.to(content, {
               opacity: 1,
