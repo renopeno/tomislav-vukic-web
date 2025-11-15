@@ -1,9 +1,23 @@
+// Globalne varijable za cleanup
+window.photoModalCleanup = null;
+
 function initPhotoModal() {
+    console.log('🖼️ Inicijaliziram Photo Modal');
+
+    // Ako već postoji prethodna instanca, očisti je prvo
+    if (window.photoModalCleanup) {
+        console.log('🧹 Čistim prethodnu Photo Modal instancu');
+        window.photoModalCleanup();
+        window.photoModalCleanup = null;
+    }
 
     const modal = document.querySelector(".modal-photo");
     
     // Dodajemo provjeru postojanja modal elementa
-    if (!modal) return;
+    if (!modal) {
+        console.log('⚠️ Modal element ne postoji, izlazim iz initPhotoModal');
+        return;
+    }
     
     const modalImageContainer = modal.querySelector(".modal-photo-container");
     const modalTitle = modal.querySelector(".modal-title");
@@ -18,6 +32,7 @@ function initPhotoModal() {
     let currentPhotoIndex = 0;
     let photoData = [];
     let activePhoto = null;
+    let photoClickHandlers = [];
 
     // Funkcija za tiho scrollanje do fotke u pozadini (dok je modal aktivan)
     function ensurePhotoInViewport(photo) {
@@ -44,11 +59,14 @@ function initPhotoModal() {
             placeholder: null // placeholder će se kreirati pri premještanju
         };
 
-        photo.addEventListener("click", () => {
+        const clickHandler = () => {
             currentPhotoIndex = actualIndex;
             activePhoto = photo;
             openModal(photoData[currentPhotoIndex]);
-        });
+        };
+        
+        photo.addEventListener("click", clickHandler);
+        photoClickHandlers.push({ element: photo, handler: clickHandler });
     });
 
     function openModal(photo) {
@@ -291,18 +309,20 @@ function initPhotoModal() {
         currentPhotoIndex = newIndex;
     }
 
-    document.addEventListener("keydown", (e) => {
+    const keydownHandler = (e) => {
         if (modal.classList.contains("active")) {
             if (e.key === "Escape") closeModal();
             if (e.key === "ArrowRight") showNextPhoto();
             if (e.key === "ArrowLeft") showPreviousPhoto();
         }
-    });
+    };
 
-    modal.addEventListener("click", (e) => {
+    const modalClickHandler = (e) => {
         if (e.target === modal) closeModal();
-    });
+    };
 
+    document.addEventListener("keydown", keydownHandler);
+    modal.addEventListener("click", modalClickHandler);
     closeButton.addEventListener("click", closeModal);
     prevButton.addEventListener("click", showPreviousPhoto);
     nextButton.addEventListener("click", showNextPhoto);
@@ -371,8 +391,56 @@ function initPhotoModal() {
             });
         }
     });
+
+    // Kreiraj cleanup funkciju
+    window.photoModalCleanup = () => {
+        console.log('🧹 Photo Modal cleanup');
+        
+        // Ukloni sve event listenere sa fotki
+        photoClickHandlers.forEach(({ element, handler }) => {
+            element.removeEventListener("click", handler);
+        });
+        
+        // Ukloni globalne event listenere
+        document.removeEventListener("keydown", keydownHandler);
+        modal.removeEventListener("click", modalClickHandler);
+        closeButton.removeEventListener("click", closeModal);
+        prevButton.removeEventListener("click", showPreviousPhoto);
+        nextButton.removeEventListener("click", showNextPhoto);
+        
+        // Uništi Hammer instancu
+        if (hammer) {
+            hammer.destroy();
+        }
+        
+        // Očisti modal ako je aktivan
+        if (modal.classList.contains("active")) {
+            modal.classList.remove("active");
+            modal.style.display = "none";
+            if (window.lenis) window.lenis.start();
+            document.body.style.overflow = '';
+        }
+        
+        console.log('✅ Photo Modal cleanup završen');
+    };
+    
+    console.log('✅ Photo Modal uspješno inicijaliziran');
 }
 
 
 window.initPhotoModal = initPhotoModal;
-initPhotoModal();
+
+// Inicijaliziraj samo ako je ovo prvi load (prije nego Barba preuzme kontrolu)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
+      console.log('▶️ Prvi load - inicijaliziram photo modal');
+      initPhotoModal();
+    }
+  });
+} else {
+  if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
+    console.log('▶️ DOM već loaded - inicijaliziram photo modal odmah');
+    initPhotoModal();
+  }
+}

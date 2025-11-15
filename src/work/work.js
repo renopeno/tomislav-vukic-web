@@ -31,6 +31,8 @@ function initWork() {
     const MAX_PHOTOS = 30;
     const allPhotoContainers = Array.from(document.querySelectorAll(".photo-container"));
     
+    console.log('🔍 Ukupno photo containers:', allPhotoContainers.length);
+    
     // Dodaj lazy loading atribute svim fotografijama
     allPhotoContainers.forEach(container => {
       const photo = container.querySelector(".photo");
@@ -50,17 +52,24 @@ function initWork() {
       container.style.transform = '';
     });
 
+    console.log('✅ Reset svih photo containers');
+
     // Ograniči broj prikazanih fotografija
     const photoContainers = allPhotoContainers.slice(0, MAX_PHOTOS);
     allPhotoContainers.slice(MAX_PHOTOS).forEach(container => {
       container.style.display = 'none';
     });
+    
+    console.log(`📸 Prikazujem prvih ${MAX_PHOTOS} fotki, sakrivam ${allPhotoContainers.length - MAX_PHOTOS}`);
 
 
     // Ako je nova stranica, promiješaj grid
     if (!window.shuffledPhotos || window.location.pathname !== window.lastPath) {
+      console.log('🔀 Nova stranica - shuffleam fotke!');
       window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
       window.lastPath = window.location.pathname;
+    } else {
+      console.log('♻️ Ista stranica - koristim postojeći shuffle');
     }
 
 
@@ -166,16 +175,23 @@ function initCategoryTitleAnimation() {
 window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
 
-// Inicijaliziraj odmah ili na DOMContentLoaded
+// Inicijaliziraj samo ako je ovo prvi load (prije nego Barba preuzme kontrolu)
 console.log('📦 work.js loaded, document.readyState:', document.readyState);
 if (document.readyState === 'loading') {
   console.log('⏳ Čekam DOMContentLoaded za work page...');
   document.addEventListener('DOMContentLoaded', () => {
-    initWork();
-    initCategoryTitleAnimation();
+    // Samo ako nema Barba wrappera ili je prvi load
+    if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
+      console.log('▶️ Prvi load work page-a, pozivam init funkcije');
+      initWork();
+      initCategoryTitleAnimation();
+    }
   });
 } else {
-  console.log('▶️ DOM već loaded, pozivam initWork() i initCategoryTitleAnimation() odmah');
-  initWork();
-  initCategoryTitleAnimation();
+  // Samo ako nema Barba wrappera ili je prvi load
+  if (!window.barba || document.querySelector('[data-barba-namespace="work"]')) {
+    console.log('▶️ DOM već loaded, pozivam initWork() i initCategoryTitleAnimation() odmah');
+    initWork();
+    initCategoryTitleAnimation();
+  }
 }

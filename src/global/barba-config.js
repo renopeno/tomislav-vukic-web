@@ -33,6 +33,12 @@ function updateNavigationWithHref() {
 function destroyPageSpecificFunctions(namespace) {
   console.log(`🧹 Započinjem čišćenje za namespace: ${namespace}`);
   
+  // Očisti Photo Modal ako napuštamo work page
+  if (namespace.startsWith('work') && window.photoModalCleanup) {
+    console.log('🖼️ Pozivam Photo Modal cleanup');
+    window.photoModalCleanup();
+  }
+  
   console.log('🔄 Uklanjam ScrollTrigger instance');
   ScrollTrigger.getAll().forEach((trigger) => {
     console.log(`  - Uklanjam trigger: ${trigger.vars.id || 'bez ID-a'}`);
@@ -158,11 +164,9 @@ function initBarba() {
           window.lenis.stop();
         }
         
-        // 🧹 Očisti sve ScrollTrigger instance prije napuštanja
-        console.log('🧹 Čišćenje ScrollTrigger instanci');
-        ScrollTrigger.getAll().forEach((trigger) => {
-          trigger.kill();
-        });
+        // 🧹 Očisti page-specific funkcije prije napuštanja
+        console.log('🧹 Čišćenje page-specific funkcija');
+        destroyPageSpecificFunctions(data.current.namespace);
         
         // 🌓 Primijeni dark mode i na izlasku da se spriječi flicker
         console.log('🌓 Održavam Dark Mode postavke tijekom izlazne tranzicije');
