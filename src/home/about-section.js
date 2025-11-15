@@ -13,12 +13,9 @@ function initAboutSection() {
   // Registriraj ScrollTrigger plugin
   gsap.registerPlugin(ScrollTrigger);
   
-  // Očisti SVE ScrollTrigger instance vezane za about sekciju
-  const existingTriggers = ScrollTrigger.getAll();
-  console.log('🧹 Čistim sve about section triggere, pronađeno:', existingTriggers.length);
-  existingTriggers.forEach(trigger => {
+  // Očisti postojeće ScrollTrigger instance za ovu sekciju
+  ScrollTrigger.getAll().forEach(trigger => {
     if (trigger.vars.id === 'home-about-title' || trigger.vars.id === 'about-scroll') {
-      console.log('  ❌ Uklanjam trigger:', trigger.vars.id);
       trigger.kill();
     }
   });
@@ -47,113 +44,70 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // Home about title - prvih 6 riječi opacity 1, ostale 0.05 (jasniji kontrast)
+  // Home about title - prvih 6 riječi opacity 1, ostale 0
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
-  gsap.set(titleSplit.words.slice(6), { opacity: 0.05 });
+  gsap.set(titleSplit.words.slice(6), { opacity: 0 });
   
   // Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
   
-  // Pričekaj da se layout stabilizira, onda osvježi ScrollTrigger
+  // Pričekaj da se layout stabilizira
   requestAnimationFrame(() => {
     ScrollTrigger.refresh();
     
-    console.log('📍 About section ScrollTrigger setup:', {
-      homeAboutTitle,
-      aboutScroll,
-      titleWords: titleSplit.words.length,
-      scrollWords: scrollSplit.words.length
-    });
+    // Prateći maksimalni progress - jednom revealed, ostaje revealed
+    let titleMaxProgress = 0;
+    let scrollMaxProgress = 0;
     
-    console.log('📊 Trenutno aktivnih ScrollTrigger instanci:', ScrollTrigger.getAll().length);
-    
-    // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
-    // scrub: riječ po riječ reveal dok scrollaš
-    let titleCompleted = false;
-    const titleTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: homeAboutTitle,
-        start: "top 80%",
-        end: "bottom 30%",
-        scrub: 0.5,
-        markers: true,
-        id: "home-about-title",
-        onEnter: () => console.log('✅ Title ScrollTrigger: onEnter'),
-        onLeave: () => console.log('🚪 Title ScrollTrigger: onLeave'),
-        onEnterBack: () => {
-          console.log('⬅️ Title ScrollTrigger: onEnterBack');
-          // Ako je već completed, postavi sve na opacity 1
-          if (titleCompleted) {
-            gsap.set(titleSplit.words.slice(6), { opacity: 1 });
-          }
-        },
-        onLeaveBack: () => {
-          console.log('⬆️ Title ScrollTrigger: onLeaveBack');
-          // Ako je completed, zaustavi scrub i drži revealed
-          if (titleCompleted) {
-            gsap.set(titleSplit.words.slice(6), { opacity: 1 });
-          }
-        },
-        onComplete: () => {
-          console.log('✅ Title ScrollTrigger COMPLETED - ostajem revealed');
-          titleCompleted = true;
-          // Zaustavi scrub nakon što je completed
-          gsap.set(titleSplit.words.slice(6), { opacity: 1 });
+    // Timeline za home-about-title - riječ po riječ reveal
+    ScrollTrigger.create({
+      trigger: homeAboutTitle,
+      start: "top 80%",
+      end: "bottom 30%",
+      id: "home-about-title",
+      onUpdate: (self) => {
+        // Prati maksimalni progress
+        if (self.progress > titleMaxProgress) {
+          titleMaxProgress = self.progress;
         }
+        
+        // Animiraj riječi na temelju maksimalnog progressa
+        const wordsToReveal = titleSplit.words.slice(6);
+        const totalWords = wordsToReveal.length;
+        
+        wordsToReveal.forEach((word, index) => {
+          const wordProgress = index / totalWords;
+          if (titleMaxProgress > wordProgress) {
+            gsap.to(word, { opacity: 1, duration: 0.3, overwrite: true });
+          }
+        });
       }
     });
     
-    // Animiraj riječi od 7. nadalje: 0.05 -> 1 (scrub animacija)
-    titleTl.to(titleSplit.words.slice(6), {
-      opacity: 1,
-      stagger: 0.015,
-      ease: "none"
-    });
-    
-    // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
-    // scrub: riječ po riječ reveal dok scrollaš
-    let scrollCompleted = false;
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: aboutScroll,
-        start: "top 80%",
-        end: "bottom 40%",
-        scrub: 0.5,
-        markers: true,
-        id: "about-scroll",
-        onEnter: () => console.log('✅ Scroll ScrollTrigger: onEnter'),
-        onLeave: () => console.log('🚪 Scroll ScrollTrigger: onLeave'),
-        onEnterBack: () => {
-          console.log('⬅️ Scroll ScrollTrigger: onEnterBack');
-          // Ako je već completed, postavi sve na opacity 1
-          if (scrollCompleted) {
-            gsap.set(scrollSplit.words, { opacity: 1 });
-          }
-        },
-        onLeaveBack: () => {
-          console.log('⬆️ Scroll ScrollTrigger: onLeaveBack');
-          // Ako je completed, zaustavi scrub i drži revealed
-          if (scrollCompleted) {
-            gsap.set(scrollSplit.words, { opacity: 1 });
-          }
-        },
-        onComplete: () => {
-          console.log('✅ Scroll ScrollTrigger COMPLETED - ostajem revealed');
-          scrollCompleted = true;
-          // Zaustavi scrub nakon što je completed
-          gsap.set(scrollSplit.words, { opacity: 1 });
+    // Timeline za about-scroll - riječ po riječ reveal
+    ScrollTrigger.create({
+      trigger: aboutScroll,
+      start: "top 80%",
+      end: "bottom 40%",
+      id: "about-scroll",
+      onUpdate: (self) => {
+        // Prati maksimalni progress
+        if (self.progress > scrollMaxProgress) {
+          scrollMaxProgress = self.progress;
         }
+        
+        // Animiraj riječi na temelju maksimalnog progressa
+        const wordsToReveal = scrollSplit.words;
+        const totalWords = wordsToReveal.length;
+        
+        wordsToReveal.forEach((word, index) => {
+          const wordProgress = index / totalWords;
+          if (scrollMaxProgress > wordProgress) {
+            gsap.to(word, { opacity: 1, duration: 0.3, overwrite: true });
+          }
+        });
       }
     });
-    
-    // Animiraj scroll tekst riječ po riječ (scrub animacija)
-    scrollTl.to(scrollSplit.words, {
-      opacity: 1,
-      stagger: 0.015,
-      ease: "none"
-    });
-    
-    console.log('🎯 ScrollTrigger animacije kreirane');
   });
 }
 
@@ -166,4 +120,3 @@ if (document.readyState === 'loading') {
 } else {
   initAboutSection();
 }
-
