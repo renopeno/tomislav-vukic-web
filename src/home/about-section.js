@@ -12,8 +12,8 @@ function initAboutSection() {
 
   // Početna opacity
   gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
-  gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
-  gsap.set(scrollSplit.words, { opacity: 0.1 });
+  gsap.set(titleSplit.words.slice(6), { opacity: 0 });
+  gsap.set(scrollSplit.words, { opacity: 0 });
 
   // Reveal na scroll - SAMO JEDNOM
   ScrollTrigger.create({
