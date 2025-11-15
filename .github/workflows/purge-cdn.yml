@@ -1,0 +1,18 @@
+name: Purge jsDelivr CDN
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dist/**'
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge jsDelivr CDN
+        run: |
+          curl -X POST "https://purge.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"
+          echo "✅ CDN cache purged successfully!"
+
