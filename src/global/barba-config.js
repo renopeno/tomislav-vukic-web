@@ -109,7 +109,11 @@ function initPageSpecificFunctions(namespace) {
     case 'about':
       console.log('👤 Učitavanje ABOUT komponenti:');
       console.log('  - Inicijalizacija About sekcije');
+      console.log('🔍 DEBUG: typeof initAbout =', typeof initAbout);
+      console.log('🔍 DEBUG: window.initAbout =', window.initAbout);
+      console.log('🔍 DEBUG: Pozivam initAbout?.()...');
       initAbout?.();
+      console.log('🔍 DEBUG: initAbout?.() završen');
       break;
     default:
       console.log(`⚠️ Nepoznati namespace: ${namespace}, ne inicijaliziram specifične funkcije`);
