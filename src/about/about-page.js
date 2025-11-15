@@ -70,9 +70,9 @@ function initAbout() {
       }, 0.2);
     }
     
-    // 2. ABOUT TITLE - Line by line reveal (ranije i brže)
+    // 2. ABOUT TITLE - Line by line reveal
     let titleEndTime = 0;
-    let titleStartTime = 0.6;
+    let titleStartTime = 0.8; // Kasnije (0.6 -> 0.8)
     let firstSectionStartTime = 0;
     let secondSectionStartTime = 0;
     
@@ -101,9 +101,9 @@ function initAbout() {
         // Izračunaj kada zadnja linija završava
         titleEndTime = titleStartTime + ((lines.length - 1) * 0.15) + 0.5;
         
-        // Izračunaj 90% title reveala - tu počinje prva sekcija
+        // Izračunaj 70% title reveala - tu počinje prva sekcija (ranije: 90% -> 70%)
         const titleDuration = titleEndTime - titleStartTime;
-        firstSectionStartTime = titleStartTime + (titleDuration * 0.9);
+        firstSectionStartTime = titleStartTime + (titleDuration * 0.7);
         
         // Postavi flag kada title završi
         masterTimeline.call(() => {
@@ -112,9 +112,9 @@ function initAbout() {
       }
     }
     
-    // 3. PRVA SEKCIJA - kreće na 90% title reveala
+    // 3. PRVA SEKCIJA - kreće na 70% title reveala
     
-    // About me sekcija - pokreće se dok title još traje (90%)
+    // About me sekcija - pokreće se dok title još traje (70%)
     if (dividers[0]) {
       gsap.set(dividers[0], { width: 0, opacity: 0 });
       if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
@@ -147,11 +147,11 @@ function initAbout() {
       
       // Izračunaj kad prva sekcija završava
       const firstSectionEndTime = firstSectionStartTime + 0.5 + 0.6;
-      // Izračunaj 90% prve sekcije - tu počinje druga sekcija
+      // Izračunaj 70% prve sekcije - tu počinje druga sekcija (ranije: 90% -> 70%)
       const firstSectionDuration = firstSectionEndTime - firstSectionStartTime;
-      secondSectionStartTime = firstSectionStartTime + (firstSectionDuration * 0.9);
+      secondSectionStartTime = firstSectionStartTime + (firstSectionDuration * 0.7);
       
-      // 4. DRUGA SEKCIJA - kreće na 90% prve sekcije (ako je u viewportu)
+      // 4. DRUGA SEKCIJA - kreće na 70% prve sekcije
       if (dividers[1]) {
         gsap.set(dividers[1], { width: 0, opacity: 0 });
         if (whatIPhotographTitle) gsap.set(whatIPhotographTitle, { opacity: 0, y: 20 });
