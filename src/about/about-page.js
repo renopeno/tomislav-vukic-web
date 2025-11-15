@@ -72,6 +72,10 @@ function initAbout() {
     
     // 2. ABOUT TITLE - Line by line reveal (ranije i brže)
     let titleEndTime = 0;
+    let titleStartTime = 0.6;
+    let firstSectionStartTime = 0;
+    let secondSectionStartTime = 0;
+    
     if (mainTitle) {
       // Split title na linije
       const titleSplit = new SplitType(mainTitle, { 
@@ -85,9 +89,6 @@ function initAbout() {
         // Početna pozicija (sve linije skrivene)
         gsap.set(lines, { opacity: 0, y: 20 });
         
-        // Počni reveal RANIJE (umjesto 1.0s -> 0.6s)
-        const titleStartTime = 0.6; 
-        
         lines.forEach((line, index) => {
           masterTimeline.to(line, {
             opacity: 1,
@@ -100,6 +101,10 @@ function initAbout() {
         // Izračunaj kada zadnja linija završava
         titleEndTime = titleStartTime + ((lines.length - 1) * 0.15) + 0.5;
         
+        // Izračunaj 90% title reveala - tu počinje prva sekcija
+        const titleDuration = titleEndTime - titleStartTime;
+        firstSectionStartTime = titleStartTime + (titleDuration * 0.9);
+        
         // Postavi flag kada title završi
         masterTimeline.call(() => {
           titleRevealed = true;
@@ -107,133 +112,80 @@ function initAbout() {
       }
     }
     
-    // 3. PRVA SEKCIJA - kreće na kraju title reveala
+    // 3. PRVA SEKCIJA - kreće na 90% title reveala
     
-    // About me sekcija - pokreće se na kraju titlea
+    // About me sekcija - pokreće se dok title još traje (90%)
     if (dividers[0]) {
       gsap.set(dividers[0], { width: 0, opacity: 0 });
       if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
       if (aboutMeParagraph) gsap.set(aboutMeParagraph, { opacity: 0, y: 20 });
       
-      // Dodaj u master timeline - kreće na kraju titlea
       masterTimeline.to(dividers[0], {
         opacity: 1,
         width: '100%',
-        duration: 0.4, // Brže (0.6 -> 0.4)
+        duration: 0.6,
         ease: "power2.inOut"
-      }, titleEndTime);
+      }, firstSectionStartTime);
       
       if (aboutMeTitle) {
         masterTimeline.to(aboutMeTitle, {
           opacity: 1,
           y: 0,
-          duration: 0.4, // Brže (0.6 -> 0.4)
+          duration: 0.6,
           ease: "power2.out"
-        }, titleEndTime + 0.2); // Manji delay (0.3 -> 0.2)
+        }, firstSectionStartTime + 0.3);
       }
       
       if (aboutMeParagraph) {
         masterTimeline.to(aboutMeParagraph, {
           opacity: 1,
           y: 0,
-          duration: 0.4, // Brže (0.6 -> 0.4)
+          duration: 0.6,
           ease: "power2.out"
-        }, titleEndTime + 0.3); // Manji delay (0.5 -> 0.3)
+        }, firstSectionStartTime + 0.5);
       }
       
       // Izračunaj kad prva sekcija završava
-      const firstSectionEndTime = titleEndTime + 0.3 + 0.4; // Ažurirano
+      const firstSectionEndTime = firstSectionStartTime + 0.5 + 0.6;
+      // Izračunaj 90% prve sekcije - tu počinje druga sekcija
+      const firstSectionDuration = firstSectionEndTime - firstSectionStartTime;
+      secondSectionStartTime = firstSectionStartTime + (firstSectionDuration * 0.9);
       
-      // Postavi flag kada prva sekcija završi
-      let firstSectionRevealed = false;
-      masterTimeline.call(() => {
-        firstSectionRevealed = true;
+      // 4. DRUGA SEKCIJA - kreće na 90% prve sekcije (ako je u viewportu)
+      if (dividers[1]) {
+        gsap.set(dividers[1], { width: 0, opacity: 0 });
+        if (whatIPhotographTitle) gsap.set(whatIPhotographTitle, { opacity: 0, y: 20 });
+        if (whatIPhotographContent) gsap.set(whatIPhotographContent, { opacity: 0, y: 20 });
         
-        // Provjeri je li druga sekcija u viewportu
-        if (dividers[1]) {
-          const secondSectionRect = dividers[1].getBoundingClientRect();
-          if (secondSectionRect.top < window.innerHeight) {
-            // Druga sekcija je u viewportu, pokreni je odmah
-            revealSecondSection();
-          }
-        }
-      }, null, firstSectionEndTime);
-      
-      function revealSecondSection() {
-        if (!dividers[1]) return;
-        
-        const tl = gsap.timeline();
-        
-        tl.to(dividers[1], {
+        // Dodaj u master timeline - kreće na 90% prve sekcije
+        masterTimeline.to(dividers[1], {
           opacity: 1,
           width: '100%',
-          duration: 0.4, // Brže
+          duration: 0.6,
           ease: "power2.inOut"
-        }, 0);
+        }, secondSectionStartTime);
         
         if (whatIPhotographTitle) {
-          tl.to(whatIPhotographTitle, {
+          masterTimeline.to(whatIPhotographTitle, {
             opacity: 1,
             y: 0,
-            duration: 0.4, // Brže
+            duration: 0.6,
             ease: "power2.out"
-          }, 0.2); // Manji delay
+          }, secondSectionStartTime + 0.3);
         }
         
         if (whatIPhotographContent) {
-          tl.to(whatIPhotographContent, {
+          masterTimeline.to(whatIPhotographContent, {
             opacity: 1,
             y: 0,
-            duration: 0.4, // Brže
+            duration: 0.6,
             ease: "power2.out"
-          }, 0.3); // Manji delay
+          }, secondSectionStartTime + 0.5);
         }
       }
     }
     
-    // 4. OSTALE SEKCIJE - scroll triggered
-    
-    // What I photograph sekcija - već se obradila iznad ako je u viewportu
-    // Ovdje samo dodaj ScrollTrigger ako nije bila u viewportu
-    if (dividers[1]) {
-      gsap.set(dividers[1], { width: 0, opacity: 0 });
-      if (whatIPhotographTitle) gsap.set(whatIPhotographTitle, { opacity: 0, y: 20 });
-      if (whatIPhotographContent) gsap.set(whatIPhotographContent, { opacity: 0, y: 20 });
-      
-      ScrollTrigger.create({
-        trigger: dividers[1],
-        start: "top 85%",
-        once: true,
-        onEnter: () => {
-          const tl = gsap.timeline();
-          
-          tl.to(dividers[1], {
-            opacity: 1,
-            width: '100%',
-            duration: 0.4,
-            ease: "power2.inOut"
-          }, 0);
-          
-          if (whatIPhotographTitle) {
-            tl.to(whatIPhotographTitle, {
-              opacity: 1,
-              y: 0,
-              duration: 0.4,
-              ease: "power2.out"
-            }, 0.2);
-          }
-          
-          if (whatIPhotographContent) {
-            tl.to(whatIPhotographContent, {
-              opacity: 1,
-              y: 0,
-              duration: 0.4,
-              ease: "power2.out"
-            }, 0.3);
-          }
-        }
-      });
-    }
+    // 5. OSTALE SEKCIJE - scroll triggered
     
     // How I work sekcija
     if (dividers[2]) {
@@ -251,7 +203,7 @@ function initAbout() {
           tl.to(dividers[2], {
             opacity: 1,
             width: '100%',
-            duration: 0.4,
+            duration: 0.6,
             ease: "power2.inOut"
           }, 0);
           
@@ -259,18 +211,18 @@ function initAbout() {
             tl.to(howIWorkTitle, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.2);
+            }, 0.3);
           }
           
           if (howIWorkParagraph) {
             tl.to(howIWorkParagraph, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.5);
           }
         }
       });
@@ -292,7 +244,7 @@ function initAbout() {
           tl.to(dividers[3], {
             opacity: 1,
             width: '100%',
-            duration: 0.4,
+            duration: 0.6,
             ease: "power2.inOut"
           }, 0);
           
@@ -300,18 +252,18 @@ function initAbout() {
             tl.to(whoIWorkWithTitle, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.2);
+            }, 0.3);
           }
           
           if (whoIWorkWithContent) {
             tl.to(whoIWorkWithContent, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.5);
           }
         }
       });
@@ -333,7 +285,7 @@ function initAbout() {
           tl.to(dividers[4], {
             opacity: 1,
             width: '100%',
-            duration: 0.4,
+            duration: 0.6,
             ease: "power2.inOut"
           }, 0);
           
@@ -341,18 +293,18 @@ function initAbout() {
             tl.to(locationItem, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.2);
+            }, 0.3);
           }
           
           if (availabilityItem) {
             tl.to(availabilityItem, {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.6,
               ease: "power2.out"
-            }, 0.3);
+            }, 0.5);
           }
         }
       });
