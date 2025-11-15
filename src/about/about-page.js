@@ -179,7 +179,7 @@ function initAbout() {
         
         ScrollTrigger.create({
           trigger: section.divider,
-          start: "top 85%",
+          start: "top 92%", // Ranije (85% -> 92%)
           once: true,
           onEnter: () => {
             const tl = gsap.timeline();
