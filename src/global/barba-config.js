@@ -31,6 +31,11 @@ function destroyPageSpecificFunctions(namespace) {
     window.photoModalCleanup();
   }
   
+  // Očisti work page observers
+  if (namespace.startsWith('work') && window.cleanupWorkPage) {
+    window.cleanupWorkPage();
+  }
+  
   // Ukloni ScrollTrigger instance
   ScrollTrigger.getAll().forEach((trigger) => {
     trigger.kill();
@@ -72,6 +77,7 @@ function initPageSpecificFunctions(namespace) {
     case 'work-architecture':
       window.initWork?.();
       window.initCategoryTitleAnimation?.();
+      window.initWorkCategoriesReveal?.();
       window.initPhotoModal?.();
       break;
     case 'about':

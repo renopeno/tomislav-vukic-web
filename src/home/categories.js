@@ -95,4 +95,17 @@ function initCategories() {
 }
 
 window.initCategories = initCategories;
-initCategories();
+
+// Inicijaliziraj odmah samo ako smo na HOME pageu
+// Na work pageu će se pozvati iz initWorkCategoriesReveal()
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('[data-barba-namespace="home"]')) {
+      initCategories();
+    }
+  });
+} else {
+  if (document.querySelector('[data-barba-namespace="home"]')) {
+    initCategories();
+  }
+}

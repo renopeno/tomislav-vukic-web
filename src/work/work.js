@@ -139,19 +139,39 @@ async function initWork() {
       window.isSettingUpGrid = false;
     }
     
-    // Tranzicija za ulazak fotki u view
-    gsap.fromTo(
-      window.shuffledPhotos,
-      { opacity: 0, scale: 0.8, y: window.innerHeight / 5 },
-      { 
-        opacity: 1, 
-        scale: 1, 
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.1
-      }
-    );
+    // ✅ LAZY LOAD: Fotke se pojavljuju kako scrollaš pomoću Intersection Observer
+    const observerOptions = {
+      root: null,
+      rootMargin: '100px', // Započni animaciju 100px prije nego fotka uđe u viewport
+      threshold: 0.1
+    };
+    
+    const photoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Animiraj fotku kad uđe u viewport
+          gsap.to(entry.target, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out"
+          });
+          
+          // Prestani promatrati nakon reveal-a
+          photoObserver.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Postavi početno stanje i počni promatrati sve fotke
+    window.shuffledPhotos.forEach(container => {
+      gsap.set(container, { opacity: 0, scale: 0.9, y: 50 });
+      photoObserver.observe(container);
+    });
+    
+    // Spremi observer za cleanup
+    window.workPhotoObserver = photoObserver;
   } finally {
     isWorkInitializing = false;
   }
@@ -178,6 +198,61 @@ function initCategoryTitleAnimation() {
   });
 }
 
+// Scroll reveal za kategorije sekciju na work pageu
+function initWorkCategoriesReveal() {
+  const categoriesSection = document.querySelector('.section.categories');
+  
+  if (!categoriesSection) return;
+  
+  // Sakrij kategorije na početku
+  gsap.set(categoriesSection, { opacity: 0, y: 60 });
+  
+  // Reveal kad dođeš do kraja grida
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        gsap.to(categoriesSection, {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out"
+        });
+        
+        // Inicijaliziraj hover efekte nakon reveal-a
+        if (window.initCategories) {
+          window.initCategories();
+        }
+        
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    rootMargin: '-100px', // Reveal kad je 100px iznad kraja grida
+    threshold: 0.1
+  });
+  
+  revealObserver.observe(categoriesSection);
+  
+  // Spremi za cleanup
+  window.workCategoriesObserver = revealObserver;
+}
+
+// Cleanup funkcija za Barba.js tranzicije
+function cleanupWorkPage() {
+  // Disconnect observers
+  if (window.workPhotoObserver) {
+    window.workPhotoObserver.disconnect();
+    window.workPhotoObserver = null;
+  }
+  
+  if (window.workCategoriesObserver) {
+    window.workCategoriesObserver.disconnect();
+    window.workCategoriesObserver = null;
+  }
+}
+
 // Postavi funkcije na window
 window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
+window.initWorkCategoriesReveal = initWorkCategoriesReveal;
+window.cleanupWorkPage = cleanupWorkPage;
