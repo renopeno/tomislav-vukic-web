@@ -66,11 +66,11 @@ function initAbout() {
       masterTimeline.to(image, {
         clipPath: 'inset(0% 0% 0% 0%)',
         duration: 1.2,
-        ease: "power3.inOut"
+        ease: "expo.inOut" // Jači, dinamičniji ease
       }, 0.2);
     }
     
-    // 2. ABOUT TITLE - Line by line reveal (pred kraj fotke)
+    // 2. ABOUT TITLE - Line by line reveal (ranije i brže)
     let titleEndTime = 0;
     if (mainTitle) {
       // Split title na linije
@@ -85,21 +85,20 @@ function initAbout() {
         // Početna pozicija (sve linije skrivene)
         gsap.set(lines, { opacity: 0, y: 20 });
         
-        // Počni reveal linija pred kraj fotke (oko 70% trajanja fotke = 0.84s)
-        // Fotka počinje na 0.2s i traje 1.2s, znači 70% je na 1.04s od početka
-        const titleStartTime = 1.0; // Počne malo pred kraj fotke
+        // Počni reveal RANIJE (umjesto 1.0s -> 0.6s)
+        const titleStartTime = 0.6; 
         
         lines.forEach((line, index) => {
           masterTimeline.to(line, {
             opacity: 1,
             y: 0,
-            duration: 0.6,
+            duration: 0.5, // Malo brže (0.6 -> 0.5)
             ease: "power2.out"
-          }, titleStartTime + (index * 0.2)); // Stagger između linija
+          }, titleStartTime + (index * 0.15)); // Brži stagger (0.2 -> 0.15)
         });
         
         // Izračunaj kada zadnja linija završava
-        titleEndTime = titleStartTime + ((lines.length - 1) * 0.2) + 0.6;
+        titleEndTime = titleStartTime + ((lines.length - 1) * 0.15) + 0.5;
         
         // Postavi flag kada title završi
         masterTimeline.call(() => {
@@ -108,66 +107,94 @@ function initAbout() {
       }
     }
     
-    // 3. SVE SEKCIJE - scroll triggered (uključujući About me)
+    // 3. PRVA SEKCIJA - kreće na kraju title reveala
     
-    // About me sekcija - MORA čekati da title završi
+    // About me sekcija - pokreće se na kraju titlea
     if (dividers[0]) {
       gsap.set(dividers[0], { width: 0, opacity: 0 });
       if (aboutMeTitle) gsap.set(aboutMeTitle, { opacity: 0, y: 20 });
       if (aboutMeParagraph) gsap.set(aboutMeParagraph, { opacity: 0, y: 20 });
       
-      ScrollTrigger.create({
-        trigger: dividers[0],
-        start: "top 85%",
-        once: true,
-        onEnter: () => {
-          // Provjeri je li title završio
-          if (!titleRevealed) {
-            // Čekaj dok se title ne završi
-            const checkInterval = setInterval(() => {
-              if (titleRevealed) {
-                clearInterval(checkInterval);
-                revealFirstSection();
-              }
-            }, 50);
-          } else {
-            // Title je već završio, reveal odmah
-            revealFirstSection();
-          }
-          
-          function revealFirstSection() {
-            const tl = gsap.timeline();
-            
-            tl.to(dividers[0], {
-              opacity: 1,
-              width: '100%',
-              duration: 0.6,
-              ease: "power2.inOut"
-            }, 0);
-            
-            if (aboutMeTitle) {
-              tl.to(aboutMeTitle, {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: "power2.out"
-              }, 0.3);
-            }
-            
-            if (aboutMeParagraph) {
-              tl.to(aboutMeParagraph, {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: "power2.out"
-              }, 0.5);
-            }
+      // Dodaj u master timeline - kreće na kraju titlea
+      masterTimeline.to(dividers[0], {
+        opacity: 1,
+        width: '100%',
+        duration: 0.6,
+        ease: "power2.inOut"
+      }, titleEndTime);
+      
+      if (aboutMeTitle) {
+        masterTimeline.to(aboutMeTitle, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out"
+        }, titleEndTime + 0.3);
+      }
+      
+      if (aboutMeParagraph) {
+        masterTimeline.to(aboutMeParagraph, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out"
+        }, titleEndTime + 0.5);
+      }
+      
+      // Izračunaj kad prva sekcija završava
+      const firstSectionEndTime = titleEndTime + 0.5 + 0.6;
+      
+      // Postavi flag kada prva sekcija završi
+      let firstSectionRevealed = false;
+      masterTimeline.call(() => {
+        firstSectionRevealed = true;
+        
+        // Provjeri je li druga sekcija u viewportu
+        if (dividers[1]) {
+          const secondSectionRect = dividers[1].getBoundingClientRect();
+          if (secondSectionRect.top < window.innerHeight) {
+            // Druga sekcija je u viewportu, pokreni je odmah
+            revealSecondSection();
           }
         }
-      });
+      }, null, firstSectionEndTime);
+      
+      function revealSecondSection() {
+        if (!dividers[1]) return;
+        
+        const tl = gsap.timeline();
+        
+        tl.to(dividers[1], {
+          opacity: 1,
+          width: '100%',
+          duration: 0.6,
+          ease: "power2.inOut"
+        }, 0);
+        
+        if (whatIPhotographTitle) {
+          tl.to(whatIPhotographTitle, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out"
+          }, 0.3);
+        }
+        
+        if (whatIPhotographContent) {
+          tl.to(whatIPhotographContent, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out"
+          }, 0.5);
+        }
+      }
     }
     
-    // What I photograph sekcija
+    // 4. OSTALE SEKCIJE - scroll triggered
+    
+    // What I photograph sekcija - već se obradila iznad ako je u viewportu
+    // Ovdje samo dodaj ScrollTrigger ako nije bila u viewportu
     if (dividers[1]) {
       gsap.set(dividers[1], { width: 0, opacity: 0 });
       if (whatIPhotographTitle) gsap.set(whatIPhotographTitle, { opacity: 0, y: 20 });
@@ -330,18 +357,6 @@ function initAbout() {
         }
       });
     }
-    
-    
-    // Sticky efekt za about section sa dodatnim spacingom
-    ScrollTrigger.create({
-      trigger: section,
-      start: "bottom bottom",
-      endTrigger: ".footer",
-      end: "top bottom-=200", // Dodaj 200px spacing prije footera
-      pinSpacing: false,
-      pin: true,
-      markers: false
-    });
     
     // Cleanup za Barba.js transitions
     if (typeof barba !== 'undefined') {
