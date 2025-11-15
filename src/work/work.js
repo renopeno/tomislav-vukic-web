@@ -33,11 +33,18 @@ function initWork() {
     
     console.log('🔍 Ukupno photo containers:', allPhotoContainers.length);
     
-    // Dodaj lazy loading atribute svim fotografijama
-    allPhotoContainers.forEach(container => {
+    // Prvih 6 fotki - eager loading s high priority, ostale lazy
+    allPhotoContainers.forEach((container, index) => {
       const photo = container.querySelector(".photo");
       if (photo) {
-        photo.setAttribute("loading", "lazy");
+        if (index < 6) {
+          // Prvih 6 - učitaj odmah
+          photo.setAttribute("loading", "eager");
+          photo.setAttribute("fetchpriority", "high");
+        } else {
+          // Ostale - lazy load
+          photo.setAttribute("loading", "lazy");
+        }
         photo.setAttribute("decoding", "async");
       }
     });
