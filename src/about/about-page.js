@@ -20,13 +20,18 @@ function initAbout() {
       
       .about-page-title .char {
         display: inline-block;
-        opacity: 0.1;
+        opacity: 0;
       }
       
       /* Stil za linije paragrafa */
       .about-page-paragraph .line {
         display: block;
-        opacity: 0.1;
+        opacity: 0;
+      }
+      
+      /* Sakrij paragraf dok typewriter ne završi */
+      .about-page-paragraph {
+        opacity: 0;
       }
       
       /* Pocetno sakrij sliku sa clip-path (od gore prema dolje) */
@@ -86,8 +91,8 @@ function initAbout() {
           // Animiraj svaki karakter
           masterTimeline.to(char, {
             opacity: 1,
-            duration: 0.05,
-            ease: "none"
+            duration: 0.08,
+            ease: "power1.out"
           }, 0.7 + delay); // Počinje nakon 0.7s (usred slike)
           
           // Dodaj delay za sljedeći karakter
@@ -101,7 +106,7 @@ function initAbout() {
       }
     }
     
-    // 3. PARAGRAF - Prikaži prvu liniju nakon typewritera, ostalo scroll reveal
+    // 3. PARAGRAF - Prikaži nakon typewritera
     let paragraphTimeline = null;
     if (paragraph) {
       // Split paragraf na linije
@@ -114,16 +119,47 @@ function initAbout() {
       if (paragraphSplit.lines && paragraphSplit.lines.length > 0) {
         const lines = paragraphSplit.lines;
         
-        // Dodaj prvu liniju u master timeline (nakon typewritera)
-        masterTimeline.to(lines[0], {
+        // Prvo prikaži cijeli paragraf (fade in)
+        masterTimeline.to(paragraph, {
           opacity: 1,
-          duration: 0.6,
+          duration: 0.4,
           ease: "power2.out"
         }, "+=0.3");
         
-        // Ostale linije - scroll reveal red po red
+        // Prikaži prvi red
+        masterTimeline.to(lines[0], {
+          opacity: 1,
+          duration: 0.5,
+          ease: "power2.out"
+        }, "+=0.1");
+        
+        // Prikaži drugu polovicu (pola drugog reda)
         if (lines.length > 1) {
-          for (let i = 1; i < lines.length; i++) {
+          masterTimeline.to(lines[1], {
+            opacity: 0.5, // Pola opacity za efekat "pola reda"
+            duration: 0.5,
+            ease: "power2.out"
+          }, "-=0.2"); // Overlapa sa prvim redom
+          
+          // Reveal cijeli drugi red na scroll
+          ScrollTrigger.create({
+            trigger: lines[0],
+            start: "top 80%",
+            onEnter: () => {
+              gsap.to(lines[1], {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power2.out"
+              });
+            },
+            once: true,
+            markers: false
+          });
+        }
+        
+        // Ostale linije - scroll reveal red po red
+        if (lines.length > 2) {
+          for (let i = 2; i < lines.length; i++) {
             const line = lines[i];
             const prevLine = lines[i - 1];
             
