@@ -12,17 +12,6 @@ function initAbout() {
         z-index: 1;
       }
       
-      /* Typewriter stil za naslov - inline karakteri */
-      .about-page-title {
-        display: block;
-        white-space: normal;
-      }
-      
-      .about-page-title > * {
-        display: inline;
-        white-space: normal;
-      }
-      
       /* Sakrij paragraf dok typewriter ne završi */
       .about-page-paragraph {
         opacity: 0;
@@ -33,41 +22,7 @@ function initAbout() {
         clip-path: inset(0% 0% 100% 0%);
       }
       
-      /* Typewriter cursor */
-      .typewriter-cursor {
-        display: inline;
-        width: 0;
-        position: relative;
-      }
-      
-      .typewriter-cursor::after {
-        content: '';
-        display: inline-block;
-        width: 3px;
-        height: 1em;
-        background-color: var(--text-color, currentColor);
-        margin-left: 2px;
-        margin-right: 2px;
-        vertical-align: text-bottom;
-        opacity: 0;
-      }
-      
-      .typewriter-cursor.active::after {
-        animation: blink 0.7s steps(1, end) infinite;
-        opacity: 1;
-      }
-      
-      @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-      }
-      
       /* Paragraf riječi wrap i opacity */
-      .about-page-paragraph > * {
-        display: inline;
-        white-space: normal;
-      }
-      
       .about-page-paragraph .word {
         opacity: 0.1;
       }
@@ -103,10 +58,10 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. TYPEWRITER EFEKT ZA NASLOV - počinje usred revealing slike
+    // 2. TYPEWRITER EFEKT ZA NASLOV - počinje usred revealing slike (BEZ cursora)
     let typewriterEndTime = 0;
     if (title) {
-      // Split naslov samo na karaktere (inline pristup)
+      // Split naslov samo na karaktere
       const titleSplit = new SplitType(title, { 
         types: 'chars'
       });
@@ -115,61 +70,32 @@ function initAbout() {
       if (titleSplit.chars && titleSplit.chars.length > 0) {
         const chars = titleSplit.chars;
         
-        // Postavi sve karaktere na opacity 0
-        gsap.set(chars, { opacity: 0 });
-        
-        // Kreiraj typewriter cursor
-        const cursor = document.createElement('span');
-        cursor.className = 'typewriter-cursor';
-        
-        // Postavi cursor prije prvog karaktera (u njegovog parent-a)
-        chars[0].parentNode.insertBefore(cursor, chars[0]);
+        // Dohvati originalni tekst da znamo gdje su zarezi i točke
+        const originalText = title.textContent;
         
         // Typewriter animacija s manualnim staggerom za pauze
         let delay = 0;
         chars.forEach((char, index) => {
-          const charText = char.textContent;
+          const charText = originalText[index];
           
-          // Prikaži cursor skupa sa prvim karakterom
-          if (index === 0) {
-            masterTimeline.call(() => {
-              cursor.classList.add('active');
-            }, null, 0.5 + delay);
-          }
-          
-          // Animiraj svaki karakter (sporije i smootherije)
+          // Animiraj svaki karakter
           masterTimeline.to(char, {
             opacity: 1,
-            duration: 0.12,
+            duration: 0.1,
             ease: "power2.out"
           }, 0.5 + delay);
           
-          // Pomakni cursor ODMAH nakon što karakter postane vidljiv
-          if (index < chars.length - 1) {
-            masterTimeline.call(() => {
-              const nextChar = chars[index + 1];
-              if (nextChar && nextChar.parentNode) {
-                nextChar.parentNode.insertBefore(cursor, nextChar);
-              }
-            }, null, 0.5 + delay + 0.12);
-          }
-          
-          // Dodaj delay za sljedeći karakter (sporije)
-          delay += 0.06;
+          // Dodaj delay za sljedeći karakter
+          delay += 0.05;
           
           // Ako je trenutni karakter zarez ili točka, dodaj ekstra pauzu
           if (charText === ',' || charText === '.') {
-            delay += 0.5; // Duža pauza nakon interpunkcije
+            delay += 0.4; // Pauza nakon interpunkcije
           }
         });
         
         // Zapamti vrijeme kad typewriter završava
         typewriterEndTime = 0.5 + delay;
-        
-        // Sakrij cursor prije nego što se prikaže zadnji karakter
-        masterTimeline.call(() => {
-          cursor.classList.remove('active');
-        }, null, typewriterEndTime - 0.15);
       }
     }
     
