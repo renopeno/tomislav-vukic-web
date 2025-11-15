@@ -102,7 +102,7 @@ function initAbout() {
         
         // Izračunaj 70% title reveala - tu počinje prva sekcija (ranije: 90% -> 70%)
         const titleDuration = titleEndTime - titleStartTime;
-        firstSectionStartTime = titleStartTime + (titleDuration * 0.7);
+        firstSectionStartTime = titleStartTime + (titleDuration * 0.7) - 0.15; // 0.15s ranije
         
         // Postavi flag kada title završi
         masterTimeline.call(() => {
