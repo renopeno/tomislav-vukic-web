@@ -48,13 +48,26 @@ function initAboutSection() {
   requestAnimationFrame(() => {
     ScrollTrigger.refresh();
     
+    console.log('📍 About section ScrollTrigger setup:', {
+      homeAboutTitle,
+      aboutScroll,
+      titleWords: titleSplit.words.length,
+      scrollWords: scrollSplit.words.length
+    });
+    
     // Kreiraj timeline za home-about-title (scroll reveal od riječi 7 nadalje)
     // toggleActions: "play none none none" - animacija se odvija samo pri ulasku, ne vraća unatrag
     const titleTl = gsap.timeline({
       scrollTrigger: {
         trigger: homeAboutTitle,
         start: "top 80%",
-        toggleActions: "play none none none"
+        toggleActions: "play none none none",
+        markers: true,
+        id: "home-about-title",
+        onEnter: () => console.log('✅ Title ScrollTrigger: onEnter'),
+        onLeave: () => console.log('🚪 Title ScrollTrigger: onLeave'),
+        onEnterBack: () => console.log('⬅️ Title ScrollTrigger: onEnterBack'),
+        onLeaveBack: () => console.log('⬆️ Title ScrollTrigger: onLeaveBack')
       }
     });
     
@@ -63,7 +76,9 @@ function initAboutSection() {
       opacity: 1,
       stagger: 0.015,
       duration: 1.5,
-      ease: "power2.out"
+      ease: "power2.out",
+      onStart: () => console.log('🎬 Title animacija započela'),
+      onComplete: () => console.log('✅ Title animacija završena')
     });
     
     // Kreiraj timeline za about-scroll (nakon završetka title reviewa)
@@ -72,7 +87,13 @@ function initAboutSection() {
       scrollTrigger: {
         trigger: aboutScroll,
         start: "top 80%",
-        toggleActions: "play none none none"
+        toggleActions: "play none none none",
+        markers: true,
+        id: "about-scroll",
+        onEnter: () => console.log('✅ Scroll ScrollTrigger: onEnter'),
+        onLeave: () => console.log('🚪 Scroll ScrollTrigger: onLeave'),
+        onEnterBack: () => console.log('⬅️ Scroll ScrollTrigger: onEnterBack'),
+        onLeaveBack: () => console.log('⬆️ Scroll ScrollTrigger: onLeaveBack')
       }
     });
     
@@ -81,8 +102,12 @@ function initAboutSection() {
       opacity: 1,
       stagger: 0.015,
       duration: 1,
-      ease: "power2.out"
+      ease: "power2.out",
+      onStart: () => console.log('🎬 Scroll animacija započela'),
+      onComplete: () => console.log('✅ Scroll animacija završena')
     });
+    
+    console.log('🎯 ScrollTrigger animacije kreirane');
   });
 }
 
