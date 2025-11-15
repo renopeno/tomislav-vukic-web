@@ -40,6 +40,9 @@ function initAboutSection() {
   gsap.set(titleSplit.words, { opacity: 0 });
   gsap.set(scrollSplit.words, { opacity: 0 });
   
+  // Osvježi ScrollTrigger nakon SplitType operacije
+  ScrollTrigger.refresh();
+  
   // Kreiraj timeline za naslov
   const titleTl = gsap.timeline({
     scrollTrigger: {
@@ -47,7 +50,8 @@ function initAboutSection() {
       endTrigger: '.about-reveal-end',
       start: "top 100%",
       end: "top 20%",
-      scrub: 0.5
+      scrub: 0.5,
+      invalidateOnRefresh: true
     }
   });
   
@@ -66,7 +70,8 @@ function initAboutSection() {
         start: "center 70%",
         end: "top 40%",
         scrub: 0.5,
-        markers: false
+        markers: false,
+        invalidateOnRefresh: true
     }
   });
   
@@ -80,4 +85,11 @@ function initAboutSection() {
 
 // Izvezi funkciju globalno za Barba
 window.initAboutSection = initAboutSection;
+
+// Pokreni funkciju na prvom učitavanju stranice
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAboutSection);
+} else {
+  initAboutSection();
+}
 

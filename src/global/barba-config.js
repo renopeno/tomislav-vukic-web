@@ -161,6 +161,12 @@ function initBarba() {
         console.log(`🚪 LEAVE: Napuštam stranicu ${data.current.namespace}`);
         console.log(`  - URL: ${data.current.url.path}`);
         
+        // 🧹 Očisti sve ScrollTrigger instance prije napuštanja
+        console.log('🧹 Čišćenje ScrollTrigger instanci');
+        ScrollTrigger.getAll().forEach((trigger) => {
+          trigger.kill();
+        });
+        
         // 🌓 Primijeni dark mode i na izlasku da se spriječi flicker
         console.log('🌓 Održavam Dark Mode postavke tijekom izlazne tranzicije');
         if (localStorage.getItem("dark-mode") === "enabled") {
@@ -210,6 +216,12 @@ function initBarba() {
         initPageSpecificFunctions(data.next.namespace);
         console.log(`  - Ažuriram status navigacije`);
         updateNavigationWithHref();
+        
+        // 🔄 Osvježi ScrollTrigger nakon što su sve funkcije inicijalizirane
+        console.log('🔄 Osvježavam ScrollTrigger pozicije');
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 100);
       }
     }],
     views: [
