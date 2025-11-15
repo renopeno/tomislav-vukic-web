@@ -3,12 +3,21 @@ function initAbout() {
     // Inicijalizacija GSAP
     gsap.registerPlugin(ScrollTrigger);
     
-    // CSS za word wrapping i smooth reveal
+    // CSS za pravilnu strukturu i smooth reveal
     const style = document.createElement('style');
     style.textContent = `
+      .about-page-title {
+        overflow: visible;
+      }
+      
+      .about-page-title .line {
+        display: block;
+        overflow: visible;
+      }
+      
       .about-page-title .word {
         display: inline;
-        opacity: 0;
+        white-space: normal;
       }
     `;
     document.head.appendChild(style);
@@ -57,31 +66,36 @@ function initAbout() {
       }, 0);
     }
     
-    // 2. WORD BY WORD REVEAL za glavni title
+    // 2. WORD BY WORD REVEAL za glavni title - pravilna struktura
     let titleEndTime = 0;
     if (mainTitle) {
-      // Split title na riječi
+      // Split title na lines i words - održava prirodan layout
       const titleSplit = new SplitType(mainTitle, { 
-        types: 'words'
+        types: 'lines,words',
+        lineClass: 'line'
       });
       splitInstances.push(titleSplit);
       
       if (titleSplit.words && titleSplit.words.length > 0) {
         const words = titleSplit.words;
         
-        // Smooth stagger animacija - brža i fluidnija
+        // Sakrij sve riječi na početku
+        gsap.set(words, { autoAlpha: 0, y: 10 });
+        
+        // Smooth reveal sa y translate i opacity - GSAP best practice
         masterTimeline.to(words, {
-          opacity: 1,
-          duration: 0.4,
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.6,
           stagger: {
-            amount: 1.2, // Total 1.2s za sve riječi
-            ease: "power1.out"
+            amount: 1.0, // Ukupno 1.0s za sve riječi
+            ease: "power2.out"
           },
           ease: "power2.out"
         }, 0.6);
         
-        // Title završava nakon 0.6 + 1.2 + 0.4 = ~2.2s
-        titleEndTime = 2.2;
+        // Title završava nakon 0.6 + 1.0 = 1.6s
+        titleEndTime = 1.6;
       }
     }
     
