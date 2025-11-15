@@ -133,6 +133,11 @@ function initPhotoModal() {
 
     function closeModal() {
         if (!activePhoto) return;
+        
+        // ✅ UBIJ SVE AKTIVNE ANIMACIJE ODMAH (ako zatvaraš prije nego se otvorio)
+        gsap.killTweensOf([modal, modalTitle, modalExif, closeButton, prevButton, nextButton]);
+        gsap.killTweensOf('.photo, .navigation, .navbar, .work-categories-wrapper, .category-title');
+        
         if (window.lenis) window.lenis.start();
         document.body.style.overflow = '';
     
