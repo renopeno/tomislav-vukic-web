@@ -114,24 +114,35 @@ Webflow.push(function() {
 <!-- Three.js r159 (zadnja globalna verzija bez deprecation warninga) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 
-<!-- Production -->
-<!-- <script type="module" src="https://tomislav-vukic-web-team-renopeno.vercel.app/index.js"></script> -->
-
-<!-- Local Development -->
-<script type="module" src="http://127.0.0.1:5500/src/index.js"></script>
+<!-- Custom JavaScript (jsDelivr CDN sa GitHuba) -->
+<script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
 ```
 
 ---
 
-## 🔄 Development vs Production
+## 🚀 Deploy Process (jsDelivr CDN)
 
-### Development (Lokalno testiranje):
-- Uncomment: **Local Development** script
-- Comment: **Production** script
+### Kad napraviš izmjene u kodu:
 
-### Production (Live site):
-- Comment: **Local Development** script
-- Uncomment: **Production** script
+1. **Build projekt:**
+   ```bash
+   npm run build
+   ```
+
+2. **Commit i push na GitHub:**
+   ```bash
+   git add -f dist/index.js
+   git commit -m "Build: Update"
+   git push origin main
+   ```
+
+3. **jsDelivr automatski povlači sa GitHuba** (može trebati 1-2 min cache refresh)
+
+4. **Force refresh u browseru** ako ne vidiš izmjene odmah:
+   - Mac: `Cmd + Shift + R`
+   - Windows/Linux: `Ctrl + Shift + R`
+
+**Nema potrebe za Vercelom!** jsDelivr je besplatan i bez limita.
 
 ---
 

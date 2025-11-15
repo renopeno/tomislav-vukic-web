@@ -1,12 +1,25 @@
 let isWorkInitializing = false;
 
 function initWork() {
-  if (isWorkInitializing) return; // Sprečava višestruko pokretanje
+  console.log('🔍 initWork() POZVAN!');
+  
+  if (isWorkInitializing) {
+    console.log('⚠️ initWork() već se izvršava, preskačem');
+    return;
+  }
   isWorkInitializing = true;
   
   // Provjera da znamo da smo na pageu koji ima grid
   const photoContainers = document.querySelectorAll('.photo-container');
-  if (!photoContainers.length) return;
+  console.log('🔍 Pronađeno photo containers:', photoContainers.length);
+  
+  if (!photoContainers.length) {
+    console.log('⚠️ Nema photo containers - nije work page, izlazim');
+    isWorkInitializing = false;
+    return;
+  }
+  
+  console.log('✅ Inicijaliziram Work page grid!');
   
   try {
     // DODAJ OVO NA POČETAK - postavi originalParent PRIJE mijenjanja DOM-a
@@ -151,7 +164,18 @@ function initCategoryTitleAnimation() {
 }
 
 window.initWork = initWork;
-initWork();
-
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
-initCategoryTitleAnimation();
+
+// Inicijaliziraj odmah ili na DOMContentLoaded
+console.log('📦 work.js loaded, document.readyState:', document.readyState);
+if (document.readyState === 'loading') {
+  console.log('⏳ Čekam DOMContentLoaded za work page...');
+  document.addEventListener('DOMContentLoaded', () => {
+    initWork();
+    initCategoryTitleAnimation();
+  });
+} else {
+  console.log('▶️ DOM već loaded, pozivam initWork() i initCategoryTitleAnimation() odmah');
+  initWork();
+  initCategoryTitleAnimation();
+}
