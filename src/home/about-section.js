@@ -1,44 +1,28 @@
 function initAboutSection() {
-  // Dodajemo provjeru za sekciju i potrebne elemente
   const aboutSection = document.querySelector('.section.about');
-  if (!aboutSection) {
-    console.log('About section nije pronađena');
-    return;
-  }
+  if (!aboutSection) return;
   
   const aboutSideTitle = document.querySelector('.about-side-title');
-  const aboutTitle = document.querySelector('.about-title');
+  const homeAboutTitle = document.querySelector('.home-about-title');
   const aboutScroll = document.querySelector('.about-scroll');
-  const revealStart = document.querySelector('.about-reveal-start');
-  const revealEnd = document.querySelector('.about-reveal-end');
   
-  console.log('About section elementi:', {
-    aboutSection,
-    aboutSideTitle,
-    aboutTitle,
-    aboutScroll,
-    revealStart,
-    revealEnd
-  });
-  
-  // Provjeri da li elementi postoje prije nego što nastaviš
-  if (!aboutTitle || !aboutScroll) {
-    console.warn('About section glavni elementi nisu pronađeni');
+  if (!homeAboutTitle || !aboutScroll) {
+    console.warn('About section elementi nisu pronađeni');
     return;
   }
   
-  // Koristi SplitType za podjelu teksta na riječi, s tagName: 'span' opcijom
-  const titleSplit = new SplitType(aboutTitle, { 
+  // SplitType za podjelu teksta na riječi
+  const titleSplit = new SplitType(homeAboutTitle, { 
     types: 'words',
-    tagName: 'span'  // Koristi span umjesto div
+    tagName: 'span'
   });
   
   const scrollSplit = new SplitType(aboutScroll, { 
     types: 'words',
-    tagName: 'span'  // Koristi span umjesto div
+    tagName: 'span'
   });
   
-  // Dodaj CSS koji postavlja riječi kao inline elemente (samo ako još nije dodan)
+  // CSS za inline prikaz riječi
   if (!document.getElementById('about-section-styles')) {
     const style = document.createElement('style');
     style.id = 'about-section-styles';
@@ -51,89 +35,53 @@ function initAboutSection() {
     document.head.appendChild(style);
   }
   
-  // Postavi početnu vidljivost elemenata na 0
+  // 1. About me naslov - UVIJEK VIDLJIV
   if (aboutSideTitle) {
-    gsap.set(aboutSideTitle, { opacity: 0, y: 20 });
+    gsap.set(aboutSideTitle, { opacity: 1 });
   }
-  gsap.set(titleSplit.words, { opacity: 0 });
+  
+  // 2. Home about title - prvih 6 riječi opacity 1, ostale 0.1
+  gsap.set(titleSplit.words.slice(0, 6), { opacity: 1 });
+  gsap.set(titleSplit.words.slice(6), { opacity: 0.1 });
+  
+  // 3. Scroll tekst - početna opacity 0
   gsap.set(scrollSplit.words, { opacity: 0 });
   
-  // 1. Animiraj "About me" naslov kad sekcija uđe u viewport na 20%
-  if (aboutSideTitle) {
-    gsap.to(aboutSideTitle, {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: aboutSection,
-        start: "top 80%",
-        toggleActions: "play none none none",
-        markers: true,
-        id: "about-side-title"
-      }
-    });
-  }
-  
-  // 2. Kreiraj scroll reveal timeline za glavni tekst
-  // Koristi revealStart/revealEnd ako postoje, inače fallback na aboutSection
-  const triggerElement = revealStart || aboutSection;
-  const endTriggerElement = revealEnd || aboutSection;
-  
+  // Scroll reveal animacija za home-about-title (riječi od 7. nadalje)
   const titleTl = gsap.timeline({
     scrollTrigger: {
-      trigger: triggerElement,
-      endTrigger: endTriggerElement,
+      trigger: homeAboutTitle,
       start: "top 80%",
       end: "top 20%",
       scrub: 0.5,
-      invalidateOnRefresh: true,
-      markers: true,
-      id: "about-title-reveal"
+      invalidateOnRefresh: true
     }
   });
   
-  // Animiraj glavni tekst riječ po riječ
-  titleTl.to(titleSplit.words, {
+  // Animiraj riječi od 7. nadalje: 0.1 -> 1
+  titleTl.to(titleSplit.words.slice(6), {
     opacity: 1,
     stagger: 0.015,
     ease: "none"
   });
   
-  // 3. Kreiraj timeline za scroll tekst (prikazuje se na kraju)
+  // Scroll reveal za about-scroll tekst (nakon završetka home-about-title)
   const scrollTl = gsap.timeline({
     scrollTrigger: {
-        trigger: aboutTitle,
-        endTrigger: endTriggerElement,
-        start: "center 60%",
-        end: "bottom 40%",
-        scrub: 0.5,
-        invalidateOnRefresh: true,
-        markers: true,
-        id: "about-scroll-reveal"
+      trigger: homeAboutTitle,
+      start: "top 20%",
+      end: "top -20%",
+      scrub: 0.5,
+      invalidateOnRefresh: true
     }
   });
   
-  // Animiraj scroll tekst
+  // Animiraj scroll tekst riječ po riječ
   scrollTl.to(scrollSplit.words, {
     opacity: 1,
     stagger: 0.015,
     ease: "none"
   });
-  
-  console.log('About section animacije kreirane');
-  
-  // FALLBACK: Ako nakon 2 sekunde tekst još nije vidljiv, prikaži ga
-  setTimeout(() => {
-    const isTextVisible = titleSplit.words.some(word => {
-      return window.getComputedStyle(word).opacity > 0;
-    });
-    
-    if (!isTextVisible) {
-      console.warn('Tekst nije vidljiv nakon 2s, primjenjujem fallback');
-      gsap.set([aboutSideTitle, titleSplit.words, scrollSplit.words], { opacity: 1 });
-    }
-  }, 2000);
 }
 
 // Izvezi funkciju globalno za Barba
