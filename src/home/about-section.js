@@ -13,6 +13,14 @@ function initAboutSection() {
   // Registriraj ScrollTrigger plugin
   gsap.registerPlugin(ScrollTrigger);
   
+  // Očisti postojeće ScrollTrigger instance za ovu sekciju
+  ScrollTrigger.getAll().forEach(trigger => {
+    if (trigger.vars.id === 'home-about-title' || trigger.vars.id === 'about-scroll') {
+      console.log('🧹 Čistim stari trigger:', trigger.vars.id);
+      trigger.kill();
+    }
+  });
+  
   // SplitType za podjelu teksta na riječi
   const titleSplit = new SplitType(homeAboutTitle, { 
     types: 'words',
