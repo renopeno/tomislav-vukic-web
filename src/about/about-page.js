@@ -25,28 +25,52 @@ function initAbout() {
     // Elementi koje animiramo
     const elements = [mobileImage, title, paragraph].filter(Boolean);
     
+    // Provjeri da li je section odmah vidljiv pri učitavanju
+    const rect = section.getBoundingClientRect();
+    const isInView = rect.top < window.innerHeight * 0.8;
+    
     // Koristi fromTo animaciju koja je konzistentna s grid.js
     elements.forEach((element, index) => {
-      gsap.fromTo(
-        element,
-        { 
-          opacity: 0, 
-          y: 40 // Manji y offset da se ne preklapaju
-        },
-        { 
-          opacity: 1, 
-          y: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          delay: index * 0.15, // Veći stagger za bolju separaciju
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            toggleActions: "play none none none"
+      if (isInView) {
+        // Odmah animiraj bez ScrollTrigger ako je već vidljivo
+        gsap.fromTo(
+          element,
+          { 
+            opacity: 0, 
+            y: 40
           },
-          clearProps: "transform" // Očisti transform nakon animacije
-        }
-      );
+          { 
+            opacity: 1, 
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            delay: 0.2 + (index * 0.15), // Mali početni delay + stagger
+            clearProps: "transform"
+          }
+        );
+      } else {
+        // Koristi ScrollTrigger za kasnije
+        gsap.fromTo(
+          element,
+          { 
+            opacity: 0, 
+            y: 40
+          },
+          { 
+            opacity: 1, 
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            delay: index * 0.15,
+            scrollTrigger: {
+              trigger: section,
+              start: "top 80%",
+              toggleActions: "play none none none"
+            },
+            clearProps: "transform"
+          }
+        );
+      }
     });
     
     // Dodatna provjera za mobilne uređaje
