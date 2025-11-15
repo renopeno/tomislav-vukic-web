@@ -256,3 +256,28 @@ window.initWork = initWork;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
 window.initWorkCategoriesReveal = initWorkCategoriesReveal;
 window.cleanupWorkPage = cleanupWorkPage;
+
+// ✅ FALLBACK: Ako smo direktno na work pageu (refresh), pokreni odmah
+// Ovo rješava race condition gdje barba-config poziva initWork prije nego je postavljen
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const isWorkPage = document.querySelector('[data-barba-namespace^="work"]');
+    if (isWorkPage && document.querySelectorAll('.photo-container').length > 0) {
+      // Pozovi samo ako već nije pokrenut (od strane Barba.js)
+      if (!isWorkInitializing) {
+        initWork();
+        initCategoryTitleAnimation();
+        initWorkCategoriesReveal();
+      }
+    }
+  });
+} else {
+  const isWorkPage = document.querySelector('[data-barba-namespace^="work"]');
+  if (isWorkPage && document.querySelectorAll('.photo-container').length > 0) {
+    if (!isWorkInitializing) {
+      initWork();
+      initCategoryTitleAnimation();
+      initWorkCategoriesReveal();
+    }
+  }
+}
