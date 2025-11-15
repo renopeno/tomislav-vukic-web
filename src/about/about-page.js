@@ -122,8 +122,8 @@ function initAbout() {
         const cursor = document.createElement('span');
         cursor.className = 'typewriter-cursor';
         
-        // Postavi cursor prije prvog karaktera
-        title.insertBefore(cursor, chars[0]);
+        // Postavi cursor prije prvog karaktera (u njegovog parent-a)
+        chars[0].parentNode.insertBefore(cursor, chars[0]);
         
         // Typewriter animacija s manualnim staggerom za pauze
         let delay = 0;
@@ -147,7 +147,10 @@ function initAbout() {
           // Pomakni cursor ODMAH nakon što karakter postane vidljiv
           if (index < chars.length - 1) {
             masterTimeline.call(() => {
-              title.insertBefore(cursor, chars[index + 1]);
+              const nextChar = chars[index + 1];
+              if (nextChar && nextChar.parentNode) {
+                nextChar.parentNode.insertBefore(cursor, nextChar);
+              }
             }, null, 0.5 + delay + 0.12);
           }
           
