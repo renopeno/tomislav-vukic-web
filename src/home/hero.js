@@ -202,7 +202,7 @@ function initHero() {
   // Parametri carousela
   const radius = 280; // MANJI radijus = uži carousel
   const planeWidth = 165; // VEĆE za manje slika (bilo 140, sad 8 slika umjesto 10)
-  const planeHeight = 185; // Proporcionalno veće (bilo 160)
+  const planeHeight = 220; // Povećano za 3:4 aspect ratio (bilo 185)
   const angleStep = (2 * Math.PI) / totalImages;
   
   let loadedCount = 0;
