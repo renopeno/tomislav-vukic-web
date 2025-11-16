@@ -139,12 +139,21 @@ function initBarba() {
           document.body.classList.remove("ui-dark-mode");
         }
         
-        // Sakrij category title ODMAH da spriječi flash
+        // Sakrij category title i work-categories-wrapper ODMAH da spriječi flash
+        // SAMO ako postoji category title (category stranice)
         const categoryTitle = data.next.container.querySelector?.('.category-title');
         if (categoryTitle) {
           categoryTitle.style.opacity = '0';
           categoryTitle.style.visibility = 'hidden';
+          
+          // Sakrij categories wrapper SAMO ako postoji category title
+          const categoriesWrapper = data.next.container.querySelector?.('.work-categories-wrapper');
+          if (categoriesWrapper) {
+            categoriesWrapper.style.opacity = '0';
+            categoriesWrapper.style.visibility = 'hidden';
+          }
         }
+        // Ako nema category title (work page), wrapper ostaje vidljiv
         
         // Postavi scroll na vrh
         if (window.lenis) {

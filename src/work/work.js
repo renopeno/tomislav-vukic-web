@@ -1,13 +1,23 @@
 let isWorkInitializing = false;
 
-// Sakrij category title ODMAH kada se stranica učita da spriječi flash
+// Sakrij category title i work-categories-wrapper ODMAH kada se stranica učita da spriječi flash
+// SAMO ako postoji category title (category stranice)
 function hideCategoryTitleImmediately() {
   const categoryTitle = document.querySelector('.category-title');
+  
   if (categoryTitle) {
     // Koristimo inline style da osiguramo da se primijeni odmah, prije bilo kakvog renderinga
     categoryTitle.style.opacity = '0';
     categoryTitle.style.visibility = 'hidden'; // Dodatna zaštita
+    
+    // Sakrij categories wrapper SAMO ako postoji category title
+    const categoriesWrapper = document.querySelector('.work-categories-wrapper');
+    if (categoriesWrapper) {
+      categoriesWrapper.style.opacity = '0';
+      categoriesWrapper.style.visibility = 'hidden';
+    }
   }
+  // Ako nema category title (work page), wrapper ostaje vidljiv
 }
 
 // Pozovi odmah kada se DOM učita
@@ -222,12 +232,20 @@ async function initWork() {
 }
 
 // Reveal animacija za category title (karakter-po-karakter masked reveal)
+let isCategoryTitleRevealInitialized = false;
+
 function initCategoryTitleReveal() {
   const categoryTitle = document.querySelector('.category-title');
   
   if (!categoryTitle) {
     return; // Nije category stranica
   }
+  
+  // Spriječi duplo učitavanje
+  if (isCategoryTitleRevealInitialized) {
+    return;
+  }
+  isCategoryTitleRevealInitialized = true;
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -262,6 +280,12 @@ function initCategoryTitleReveal() {
     });
   });
 
+  // Sakrij work-categories-wrapper dok se title ne animira
+  const categoriesWrapper = document.querySelector('.work-categories-wrapper');
+  if (categoriesWrapper) {
+    gsap.set(categoriesWrapper, { opacity: 0, visibility: 'hidden' });
+  }
+
   // 🎬 CATEGORY TITLE REVEAL - delayed animacija koja se pokreće nakon grid setup-a
   // Delay odgovara grid reveal animaciji (0.3s delay + stagger)
   gsap.to(categoryTitle, { 
@@ -269,7 +293,11 @@ function initCategoryTitleReveal() {
     visibility: 'visible',
     duration: 0 
   }); // Prikaži container odmah
-  gsap.to(titleSplit.chars.map(c => c.querySelector('span')), {
+  
+  // Timeline za title animaciju
+  const titleTimeline = gsap.timeline();
+  
+  titleTimeline.to(titleSplit.chars.map(c => c.querySelector('span')), {
     y: 0,
     opacity: 1,
     duration: 0.8,
@@ -277,6 +305,49 @@ function initCategoryTitleReveal() {
     ease: "power2.out",
     delay: 0.3 // Odgovara delay-u grid reveal animacije
   });
+  
+  // Animiraj wrapper i njegove iteme paralelno sa gridom i naslovom
+  // Kreni 0.1s nakon što krene grid/title animacija (0.3s delay + 0.1s = 0.4s)
+  if (categoriesWrapper) {
+    // Pronađi sve .category-link elemente unutar wrappera (to su stvarni itemi)
+    const categoryLinks = Array.from(categoriesWrapper.querySelectorAll('.category-link'));
+    
+    if (categoryLinks.length > 0) {
+      // Sakrij sve linkove na početku
+      categoryLinks.forEach(link => {
+        gsap.set(link, { opacity: 0, y: 20 });
+      });
+      
+      // Prikaži wrapper odmah (ali linkovi će se animirati jedan po jedan)
+      titleTimeline.to(categoriesWrapper, {
+        opacity: 1,
+        visibility: 'visible',
+        duration: 0
+      }, 0.4); // 0.3s (grid delay) + 0.1s = 0.4s
+      
+      // Animiraj linkove jedan po jedan s laganim delayem - paralelno sa gridom i naslovom
+      // Koristimo fromTo za bolju kontrolu i osiguravamo da se animiraju jedan po jedan
+      titleTimeline.fromTo(categoryLinks, 
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1, // 100ms između svakog linka za očitiju animaciju
+          ease: "power2.out"
+        }, 
+        0.4 // Kreni 0.1s nakon grid/title animacije (0.3s + 0.1s)
+      );
+    } else {
+      // Ako nema linkova, samo prikaži wrapper
+      titleTimeline.to(categoriesWrapper, {
+        opacity: 1,
+        visibility: 'visible',
+        duration: 0.6,
+        ease: "power2.out"
+      }, 0.4);
+    }
+  }
 }
 
 // Dodaj ovo u initWork()  ili kao zasebnu funkciju koja se poziva nakon initWork()
@@ -351,6 +422,9 @@ function cleanupWorkPage() {
     window.workCategoriesObserver.disconnect();
     window.workCategoriesObserver = null;
   }
+  
+  // Reset flag za category title reveal da se može ponovno inicijalizirati
+  isCategoryTitleRevealInitialized = false;
 }
 
 // Postavi funkcije na window
