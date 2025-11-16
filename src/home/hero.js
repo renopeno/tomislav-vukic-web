@@ -146,11 +146,29 @@ function initHero() {
   const curvedFragmentShader = `
     uniform sampler2D uTexture;
     uniform float uOpacity;
+    uniform vec2 uImageAspect;  // (width/height, 1.0)
+    uniform vec2 uPlaneAspect;  // (width/height, 1.0)
     varying vec2 vUv;
     varying float vBendAmount;
 
     void main() {
-      vec4 texColor = texture2D(uTexture, vUv);
+      // Background cover: scale to cover, maintain aspect ratio, crop center
+      float imageAspect = uImageAspect.x;
+      float planeAspect = uPlaneAspect.x;
+      
+      vec2 uv = vUv;
+      
+      if (imageAspect > planeAspect) {
+        // Image is wider - crop left/right, zoom X
+        float scale = imageAspect / planeAspect;
+        uv.x = (uv.x - 0.5) / scale + 0.5;
+      } else {
+        // Image is taller - crop top/bottom, zoom Y
+        float scale = planeAspect / imageAspect;
+        uv.y = (uv.y - 0.5) / scale + 0.5;
+      }
+      
+      vec4 texColor = texture2D(uTexture, uv);
       
       // Shadow na rubovima za naglašavanje benda
       float edgeShadow = 1.0 - smoothstep(0.5, 1.0, abs(vUv.x - 0.5) * 2.0) * 0.25;
@@ -196,6 +214,15 @@ function initHero() {
     textureLoader.load(
       img.src,
       (texture) => {
+        // Get image dimensions for background cover crop
+        // Use texture.image if available, otherwise fallback to img element
+        const imageWidth = texture.image ? texture.image.width : img.naturalWidth || img.width;
+        const imageHeight = texture.image ? texture.image.height : img.naturalHeight || img.height;
+        
+        // Calculate aspect ratios for background cover
+        const imageAspect = imageWidth / imageHeight;
+        const planeAspect = planeWidth / planeHeight;
+        
         // PlaneGeometry s MNOGO segmenata za smooth curve
         const geometry = new THREE.PlaneGeometry(
           planeWidth, 
@@ -204,12 +231,14 @@ function initHero() {
           1   // height segments
         );
 
-        // Curved shader material
+        // Curved shader material with aspect ratio uniforms for background cover
         const material = new THREE.ShaderMaterial({
           uniforms: {
             uTexture: { value: texture },
             uBend: { value: 0.0015 }, // Malo jači bend za manji radius
-            uOpacity: { value: 0 } // Startuje nevidljivo (reveal animacija)
+            uOpacity: { value: 0 }, // Startuje nevidljivo (reveal animacija)
+            uImageAspect: { value: new THREE.Vector2(imageAspect, 1.0) },
+            uPlaneAspect: { value: new THREE.Vector2(planeAspect, 1.0) }
           },
           vertexShader: curvedVertexShader,
           fragmentShader: curvedFragmentShader,
