@@ -139,39 +139,94 @@ async function initWork() {
       window.isSettingUpGrid = false;
     }
     
-    // ✅ LAZY LOAD: Fotke se pojavljuju kako scrollaš pomoću Intersection Observer
-    const observerOptions = {
-      root: null,
-      rootMargin: '100px', // Započni animaciju 100px prije nego fotka uđe u viewport
-      threshold: 0.1
-    };
+    // ✅ Detektiraj touch device (Safari bug postoji samo na touch devices)
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
-    const photoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Animiraj fotku kad uđe u viewport
-          gsap.to(entry.target, {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out"
-          });
-          
-          // Prestani promatrati nakon reveal-a
-          photoObserver.unobserve(entry.target);
+    // ✅ HYBRID: Prvih 5 fotki instant reveal, ostale lazy load
+    const firstPhotosCount = 5;
+    const firstPhotos = window.shuffledPhotos.slice(0, firstPhotosCount);
+    const lazyPhotos = window.shuffledPhotos.slice(firstPhotosCount);
+    
+    // 1️⃣ PRVIH 5 FOTKI - Instant reveal s GSAP animacijom
+    if (isTouchDevice) {
+      // MOBITEL/TABLET: Bez y:50 (Safari bug fix)
+      gsap.fromTo(firstPhotos, 
+        { opacity: 0, scale: 0.9 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.1
         }
+      );
+    } else {
+      // DESKTOP: Sa y:50 slide-up effect
+      gsap.fromTo(firstPhotos, 
+        { opacity: 0, scale: 0.9, y: 50 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.1
+        }
+      );
+    }
+    
+    // 2️⃣ OSTALE FOTKE - Lazy load s Intersection Observer
+    if (lazyPhotos.length > 0) {
+      const observerOptions = {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1
+      };
+      
+      const photoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Animiraj fotku kad uđe u viewport
+            if (isTouchDevice) {
+              // MOBITEL/TABLET: Bez y (Safari fix)
+              gsap.to(entry.target, {
+                opacity: 1,
+                scale: 1,
+                duration: 0.8,
+                ease: "power3.out"
+              });
+            } else {
+              // DESKTOP: Sa y:0 slide-up effect
+              gsap.to(entry.target, {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out"
+              });
+            }
+            
+            // Prestani promatrati nakon reveal-a
+            photoObserver.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+      
+      // Postavi početno stanje i počni promatrati lazy fotke
+      lazyPhotos.forEach(container => {
+        if (isTouchDevice) {
+          // MOBITEL/TABLET: Bez y:50
+          gsap.set(container, { opacity: 0, scale: 0.9 });
+        } else {
+          // DESKTOP: Sa y:50
+          gsap.set(container, { opacity: 0, scale: 0.9, y: 50 });
+        }
+        photoObserver.observe(container);
       });
-    }, observerOptions);
-    
-    // Postavi početno stanje i počni promatrati sve fotke
-    window.shuffledPhotos.forEach(container => {
-      gsap.set(container, { opacity: 0, scale: 0.9, y: 50 });
-      photoObserver.observe(container);
-    });
-    
-    // Spremi observer za cleanup
-    window.workPhotoObserver = photoObserver;
+      
+      // Spremi observer za cleanup
+      window.workPhotoObserver = photoObserver;
+    }
   } finally {
     isWorkInitializing = false;
   }
