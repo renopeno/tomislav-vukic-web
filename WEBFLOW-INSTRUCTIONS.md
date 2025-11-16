@@ -1,5 +1,30 @@
 # 🌐 Webflow Setup - Kratke Upute
 
+## ⚡ QUICK REFERENCE
+
+### Za Localhost Testiranje:
+```bash
+npm run local
+```
+**Script tag za Webflow Footer:**
+```html
+<script type="module" src="http://localhost:5500/src/index.js"></script>
+```
+
+### Za Production Deploy:
+```bash
+npm run build
+git add .
+git commit -m "Update"
+git push origin main
+```
+**Script tag za Webflow Footer:**
+```html
+<script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+```
+
+---
+
 ## 📍 Project Settings → Custom Code
 
 ### HEAD CODE
@@ -48,6 +73,11 @@ body {
 
 /* Barba container - sprječava flicker */
 [data-barba="container"] {
+  opacity: 0;
+}
+
+/* Work galerija - spriječi flicker prije nego JS preuzme kontrolu */
+.photo-container {
   opacity: 0;
 }
 
@@ -114,9 +144,56 @@ Webflow.push(function() {
 <!-- Three.js r159 (zadnja globalna verzija bez deprecation warninga) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
 
-<!-- Custom JavaScript (jsDelivr CDN sa GitHuba) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Custom JavaScript Bundle -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
 <script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+
+<!-- LOCAL TESTING (zakomentiraj production, odkomentiraj ovo) -->
+<!-- <script type="module" src="http://localhost:5500/src/index.js"></script> -->
 ```
+
+---
+
+## 🧪 LOCAL TESTING Workflow
+
+### Prije pusha na production - UVIJEK testiraj lokalno!
+
+1. **Pokreni lokalni dev server:**
+   ```bash
+   npm run local
+   ```
+   Server će se pokrenuti na: `http://localhost:5500`
+
+2. **U Webflow Footer Code - zakomentiraj production, odkomentiraj localhost:**
+   ```html
+   <!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
+   <!-- <script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script> -->
+   
+   <!-- LOCAL TESTING -->
+   <script type="module" src="http://localhost:5500/src/index.js"></script>
+   ```
+
+3. **Testiraj sve izmjene u Webflow Preview:**
+   - Otvori Webflow Preview
+   - Provjeri sve interakcije
+   - Provjeri Console (F12) za greške
+
+4. **Kad sve radi - Build za production:**
+   ```bash
+   npm run build
+   ```
+
+5. **U Webflow Footer Code - vrati na production:**
+   ```html
+   <!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
+   <script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+   
+   <!-- LOCAL TESTING (zakomentiraj ovo) -->
+   <!-- <script type="module" src="http://localhost:5500/src/index.js"></script> -->
+   ```
 
 ---
 
@@ -131,8 +208,8 @@ Webflow.push(function() {
 
 2. **Commit i push na GitHub:**
    ```bash
-   git add -f dist/index.js
-   git commit -m "Build: Update"
+   git add .
+   git commit -m "Update: Opis izmjena"
    git push origin main
    ```
 

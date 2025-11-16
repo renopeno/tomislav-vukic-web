@@ -139,72 +139,44 @@ async function initWork() {
       window.isSettingUpGrid = false;
     }
     
-    // ✅ Detektiraj touch device (Safari bug postoji samo na touch devices)
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    // ✅ HYBRID: Prvih 5 fotki instant reveal, ostale lazy load
+    // ✅ HYBRID: Prvih 5 fotki delayed reveal, ostale lazy load
     const firstPhotosCount = 5;
     const firstPhotos = window.shuffledPhotos.slice(0, firstPhotosCount);
     const lazyPhotos = window.shuffledPhotos.slice(firstPhotosCount);
     
-    // 1️⃣ PRVIH 5 FOTKI - Instant reveal s GSAP animacijom
-    if (isTouchDevice) {
-      // MOBITEL/TABLET: Bez y:50 (Safari bug fix)
-      gsap.fromTo(firstPhotos, 
-        { opacity: 0, scale: 0.9 },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          duration: 0.8,
-          ease: "power3.out",
-          stagger: 0.1
-        }
-      );
-    } else {
-      // DESKTOP: Sa y:50 slide-up effect
-      gsap.fromTo(firstPhotos, 
-        { opacity: 0, scale: 0.9, y: 50 },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          y: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          stagger: 0.1
-        }
-      );
-    }
+    // 1️⃣ PRVIH 5 FOTKI - Delayed reveal s GSAP animacijom (y:50 za sve)
+    gsap.fromTo(firstPhotos, 
+      { opacity: 0, scale: 0.9, y: 50 },
+      { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.12,
+        delay: 0.3 // Početni delay
+      }
+    );
     
     // 2️⃣ OSTALE FOTKE - Lazy load s Intersection Observer
     if (lazyPhotos.length > 0) {
       const observerOptions = {
         root: null,
-        rootMargin: '100px',
-        threshold: 0.1
+        rootMargin: '0px', // Smanjeno sa 100px da se kasnije triggera
+        threshold: 0.2 // Povećano threshold - mora biti 20% vidljivo
       };
       
       const photoObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Animiraj fotku kad uđe u viewport
-            if (isTouchDevice) {
-              // MOBITEL/TABLET: Bez y (Safari fix)
-              gsap.to(entry.target, {
-                opacity: 1,
-                scale: 1,
-                duration: 0.8,
-                ease: "power3.out"
-              });
-            } else {
-              // DESKTOP: Sa y:0 slide-up effect
-              gsap.to(entry.target, {
-                opacity: 1,
-                scale: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out"
-              });
-            }
+            // Animiraj fotku kad uđe u viewport (y:50 za sve)
+            gsap.to(entry.target, {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out"
+            });
             
             // Prestani promatrati nakon reveal-a
             photoObserver.unobserve(entry.target);
@@ -212,15 +184,9 @@ async function initWork() {
         });
       }, observerOptions);
       
-      // Postavi početno stanje i počni promatrati lazy fotke
+      // Postavi početno stanje i počni promatrati lazy fotke (y:50 za sve)
       lazyPhotos.forEach(container => {
-        if (isTouchDevice) {
-          // MOBITEL/TABLET: Bez y:50
-          gsap.set(container, { opacity: 0, scale: 0.9 });
-        } else {
-          // DESKTOP: Sa y:50
-          gsap.set(container, { opacity: 0, scale: 0.9, y: 50 });
-        }
+        gsap.set(container, { opacity: 0, scale: 0.9, y: 50 });
         photoObserver.observe(container);
       });
       

@@ -276,37 +276,11 @@ function initHero() {
   function startAnimation() {
     const mainTimeline = gsap.timeline();
 
-    // 1. Animiraj tekst
-    mainTimeline.to(
-      characters,
-      {
-      y: 0,
-      opacity: 1,
-      duration: 0.3,
-        stagger: 0.03,
-      ease: "power3.out"
-      },
-      0
-    );
-
-    // 2. Animiraj footer
-    mainTimeline.to(
-      heroFooters,
-      {
-      y: 0,
-      opacity: 1,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: "power3.out"
-      },
-      0.2
-    );
-
-    // Fotke fade-in + carousel lagano rotira
+    // 1. CAROUSEL - prvi što se učitava
     startContinuousRotation(0.008);
     
     planeMeshes.forEach((mesh, index) => {
-      const startTime = 0.2 + index * 0.15;
+      const startTime = 0.2 + index * 0.15; // Carousel kreće odmah sa 0.2s delayom
       
       // Fade-in (opacity)
       mainTimeline.to(
@@ -326,15 +300,45 @@ function initHero() {
           x: 1,
           y: 1,
           z: 1,
-          duration: 0.6, // JOŠ BRŽE (bilo 0.8)
+          duration: 0.6,
           ease: "back.out(1.2)",
         },
         startTime
       );
     });
 
-    // 4. SMOOTH USPORAVANJE + ROTATING EFEKT (ranije počinje usporavanje!)
-    const revealEndTime = 0.2 + (planeMeshes.length - 1) * 0.15 + 0.6; // Reveal traje ~1.5s!
+    // Izračunaj kad carousel bude skoro gotov (70% završen)
+    const carouselRevealEnd = 0.2 + (planeMeshes.length - 1) * 0.15 + 0.6;
+    const textStartTime = carouselRevealEnd - 1.2; // Tekstovi kreću RANIJE - 1.2s prije kraja carousela
+
+    // 2. TEKST - dolazi pred kraj carousela (sporije i smooth-ije)
+    mainTimeline.to(
+      characters,
+      {
+      y: 0,
+      opacity: 1,
+      duration: 0.6, // Sporija animacija (bilo 0.3)
+        stagger: 0.04, // Malo više stagge za smooth efekt
+      ease: "power2.inOut" // Smooth ease in out
+      },
+      textStartTime
+    );
+
+    // 3. FOOTER - dolazi malo nakon teksta
+    mainTimeline.to(
+      heroFooters,
+      {
+      y: 0,
+      opacity: 1,
+      duration: 0.6, // Sporija animacija (bilo 0.4)
+      stagger: 0.12,
+      ease: "power2.inOut" // Smooth ease in out
+      },
+      textStartTime + 0.3
+    );
+
+    // 4. SMOOTH USPORAVANJE + ROTATING EFEKT
+    const revealEndTime = carouselRevealEnd;
     
     // Kreiraj dummy objekt da GSAP može animirati broj (targetRotationSpeed)
     const speedController = { value: 0.008 }; // Početna umjerena brzina
