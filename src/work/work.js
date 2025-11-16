@@ -1,5 +1,22 @@
 let isWorkInitializing = false;
 
+// Sakrij category title ODMAH kada se stranica učita da spriječi flash
+function hideCategoryTitleImmediately() {
+  const categoryTitle = document.querySelector('.category-title');
+  if (categoryTitle) {
+    // Koristimo inline style da osiguramo da se primijeni odmah, prije bilo kakvog renderinga
+    categoryTitle.style.opacity = '0';
+    categoryTitle.style.visibility = 'hidden'; // Dodatna zaštita
+  }
+}
+
+// Pozovi odmah kada se DOM učita
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', hideCategoryTitleImmediately);
+} else {
+  hideCategoryTitleImmediately();
+}
+
 async function initWork() {
   if (isWorkInitializing) {
     return;
@@ -196,6 +213,70 @@ async function initWork() {
   } finally {
     isWorkInitializing = false;
   }
+  
+  // Pokreni category title reveal nakon što se grid postavi
+  // Koristimo mali delay da osiguramo da se grid potpuno postavi
+  setTimeout(() => {
+    initCategoryTitleReveal();
+  }, 100);
+}
+
+// Reveal animacija za category title (karakter-po-karakter masked reveal)
+function initCategoryTitleReveal() {
+  const categoryTitle = document.querySelector('.category-title');
+  
+  if (!categoryTitle) {
+    return; // Nije category stranica
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Osiguraj da je title sakriven (možda je već sakriven inline style-om)
+  gsap.set(categoryTitle, { opacity: 0, visibility: 'hidden' });
+
+  // Split text u karaktere (slova) za slovo-po-slovo reveal
+  const titleSplit = new SplitType(categoryTitle, { types: 'chars' });
+
+  // Postavi styling za masked reveal efekt
+  titleSplit.chars.forEach(char => {
+    gsap.set(char, { 
+      display: 'inline-block',
+      overflow: 'hidden',
+      verticalAlign: 'top'
+    });
+  });
+
+  // Wrap svaki karakter u inner span za slide-up efekt
+  titleSplit.chars.forEach(char => {
+    const text = char.textContent;
+    const inner = document.createElement('span');
+    inner.style.display = 'inline-block';
+    inner.textContent = text;
+    char.textContent = '';
+    char.appendChild(inner);
+    
+    // Inicijalno stanje - sakriveno ispod
+    gsap.set(inner, { 
+      y: '100%',
+      opacity: 0
+    });
+  });
+
+  // 🎬 CATEGORY TITLE REVEAL - delayed animacija koja se pokreće nakon grid setup-a
+  // Delay odgovara grid reveal animaciji (0.3s delay + stagger)
+  gsap.to(categoryTitle, { 
+    opacity: 1, 
+    visibility: 'visible',
+    duration: 0 
+  }); // Prikaži container odmah
+  gsap.to(titleSplit.chars.map(c => c.querySelector('span')), {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    stagger: 0.03, // Povećano sa 0.015 na 0.03 (30ms između karaktera) za očitiju animaciju
+    ease: "power2.out",
+    delay: 0.3 // Odgovara delay-u grid reveal animacije
+  });
 }
 
 // Dodaj ovo u initWork()  ili kao zasebnu funkciju koja se poziva nakon initWork()
@@ -274,6 +355,7 @@ function cleanupWorkPage() {
 
 // Postavi funkcije na window
 window.initWork = initWork;
+window.initCategoryTitleReveal = initCategoryTitleReveal;
 window.initCategoryTitleAnimation = initCategoryTitleAnimation;
 window.initWorkCategoriesReveal = initWorkCategoriesReveal;
 window.cleanupWorkPage = cleanupWorkPage;
@@ -286,6 +368,7 @@ function initWorkPageOnRefresh() {
     // Pozovi samo ako već nije pokrenut (od strane Barba.js)
     if (!isWorkInitializing) {
       initWork();
+      initCategoryTitleReveal(); // Reveal animacija za category title
       initCategoryTitleAnimation();
       initWorkCategoriesReveal();
       

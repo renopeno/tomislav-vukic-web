@@ -139,6 +139,13 @@ function initBarba() {
           document.body.classList.remove("ui-dark-mode");
         }
         
+        // Sakrij category title ODMAH da spriječi flash
+        const categoryTitle = data.next.container.querySelector?.('.category-title');
+        if (categoryTitle) {
+          categoryTitle.style.opacity = '0';
+          categoryTitle.style.visibility = 'hidden';
+        }
+        
         // Postavi scroll na vrh
         if (window.lenis) {
           window.lenis.scrollTo(0, { immediate: true, force: true });
