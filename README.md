@@ -9,10 +9,10 @@ Custom JavaScript za Webflow website sa Barba.js tranzicijama i dark mode funkci
 ### Development (Lokalno)
 
 ```bash
-npm run dev
+npm run local
 ```
 
-Server radi na: `http://127.0.0.1:5500`
+Server radi na: `http://localhost:5500`
 
 ### Production Build
 
@@ -22,11 +22,12 @@ npm run build
 
 Output: `dist/index.js`
 
-### Deploy
+### Deploy na Vercel
 
 ```bash
+npm run build
 git add .
-git commit -m "Update"
+git commit -m "Update: opis izmjena"
 git push origin main
 ```
 
@@ -64,14 +65,14 @@ src/
 
 ### Footer Code
 
-**Development:**
+**Local Development:**
 ```html
-<script type="module" src="http://127.0.0.1:5500/src/index.js"></script>
+<script type="module" src="http://localhost:5500/src/index.js"></script>
 ```
 
-**Production:**
+**Production (Vercel):**
 ```html
-<script type="module" src="https://tomislav-vukic-web-team-renopeno.vercel.app/index.js"></script>
+<script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script>
 ```
 
 Detaljnije upute: **`WEBFLOW-INSTRUCTIONS.md`**
@@ -120,7 +121,7 @@ initNovaFunkcija?.();
 ## 🔧 Korisne Naredbe
 
 ```bash
-npm run dev      # Pokreni dev server (port 5500)
+npm run local    # Pokreni lokalni dev server (localhost:5500)
 npm run build    # Build za production (dist/index.js)
 npm run preview  # Preview production builda
 ```

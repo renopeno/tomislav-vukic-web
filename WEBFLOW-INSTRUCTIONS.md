@@ -2,7 +2,7 @@
 
 ## ⚡ QUICK REFERENCE
 
-### Za Localhost Testiranje:
+### Za Localhost Development:
 ```bash
 npm run local
 ```
@@ -11,16 +11,18 @@ npm run local
 <script type="module" src="http://localhost:5500/src/index.js"></script>
 ```
 
-### Za Production Deploy:
+### Za Production Deploy (Vercel):
 ```bash
 npm run build
 git add .
-git commit -m "Update"
+git commit -m "Update: opis izmjena"
 git push origin main
 ```
-**Script tag za Webflow Footer:**
+**Vercel automatski deploya!**
+
+**Script tag za Webflow Footer (Production):**
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+<script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script>
 ```
 
 ---
@@ -148,16 +150,16 @@ Webflow.push(function() {
 <!-- Custom JavaScript Bundle -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 
-<!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
-<script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+<!-- PRODUCTION (Vercel) -->
+<script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script>
 
-<!-- LOCAL TESTING (zakomentiraj production, odkomentiraj ovo) -->
+<!-- LOCAL DEVELOPMENT (zakomentiraj production, odkomentiraj ovo) -->
 <!-- <script type="module" src="http://localhost:5500/src/index.js"></script> -->
 ```
 
 ---
 
-## 🧪 LOCAL TESTING Workflow
+## 🧪 LOCAL DEVELOPMENT Workflow
 
 ### Prije pusha na production - UVIJEK testiraj lokalno!
 
@@ -169,10 +171,10 @@ Webflow.push(function() {
 
 2. **U Webflow Footer Code - zakomentiraj production, odkomentiraj localhost:**
    ```html
-   <!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
-   <!-- <script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script> -->
+   <!-- PRODUCTION (Vercel) -->
+   <!-- <script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script> -->
    
-   <!-- LOCAL TESTING -->
+   <!-- LOCAL DEVELOPMENT -->
    <script type="module" src="http://localhost:5500/src/index.js"></script>
    ```
 
@@ -188,16 +190,16 @@ Webflow.push(function() {
 
 5. **U Webflow Footer Code - vrati na production:**
    ```html
-   <!-- PRODUCTION (jsDelivr CDN sa GitHuba) -->
-   <script type="module" src="https://cdn.jsdelivr.net/gh/renopeno/tomislav-vukic-web@main/dist/index.js"></script>
+   <!-- PRODUCTION (Vercel) -->
+   <script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script>
    
-   <!-- LOCAL TESTING (zakomentiraj ovo) -->
+   <!-- LOCAL DEVELOPMENT (zakomentiraj ovo) -->
    <!-- <script type="module" src="http://localhost:5500/src/index.js"></script> -->
    ```
 
 ---
 
-## 🚀 Deploy Process (jsDelivr CDN)
+## 🚀 Deploy Process (Vercel)
 
 ### Kad napraviš izmjene u kodu:
 
@@ -213,13 +215,13 @@ Webflow.push(function() {
    git push origin main
    ```
 
-3. **jsDelivr automatski povlači sa GitHuba** (može trebati 1-2 min cache refresh)
+3. **Vercel automatski deploya** (1-2 min)
+   - Svaki push na `main` branch automatski triggera deployment
+   - Provjeri status na: https://vercel.com/dashboard
 
 4. **Force refresh u browseru** ako ne vidiš izmjene odmah:
    - Mac: `Cmd + Shift + R`
    - Windows/Linux: `Ctrl + Shift + R`
-
-**Nema potrebe za Vercelom!** jsDelivr je besplatan i bez limita.
 
 ---
 

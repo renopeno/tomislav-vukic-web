@@ -54,10 +54,11 @@ vercel --prod
 ### 1. Lokalni Development
 
 ```bash
-# Napravi izmjene u src/
-npm run dev
+# Pokreni lokalni dev server
+npm run local
 
-# Testiraj na: http://127.0.0.1:5500/test-server.html
+# Server će biti na: http://localhost:5500
+# Testiraj u Webflow Preview sa localhost script tagom
 ```
 
 ### 2. Build (Opciono - da provjeriš radi li)
@@ -76,16 +77,24 @@ git push origin main
 # Vercel automatski deploya (1-2 min)
 ```
 
-### 4. Update Webflow
+### 4. Update Webflow Footer Code
 
-U Webflow Footer Code **zamijenite comment**:
-
+**PRODUCTION (Vercel):**
 ```html
-<!-- Production -->
-<script type="module" src="https://VAŠ-URL.vercel.app/index.js"></script>
+<!-- PRODUCTION (Vercel) -->
+<script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script>
 
-<!-- Local -->
-<!-- <script type="module" src="http://127.0.0.1:5500/src/index.js"></script> -->
+<!-- LOCAL DEVELOPMENT (zakomentiraj ovo) -->
+<!-- <script type="module" src="http://localhost:5500/src/index.js"></script> -->
+```
+
+**LOCAL DEVELOPMENT:**
+```html
+<!-- PRODUCTION (Vercel) -->
+<!-- <script type="module" src="https://VAŠ-VERCEL-URL.vercel.app/index.js"></script> -->
+
+<!-- LOCAL DEVELOPMENT -->
+<script type="module" src="http://localhost:5500/src/index.js"></script>
 ```
 
 ---
