@@ -225,156 +225,111 @@ Webflow.push(function() {
 
 ---
 
-## 🎬 Home Page - Hero Animacije
+## 🎬 Home Page - Hero Sekcija
 
-### Redoslijed Animacija
+### Setup & Ponašanje
 
-Hero sekcija koristi **3D Carousel** (Three.js) sa preciznim timing-om:
+Hero sekcija koristi **3D Carousel** sa Three.js i preciziranim redoslijedom animacija.
 
-#### 1. **Carousel (prvo što se učitava)**
-- **Delay:** 0.2s
-- **Fotke fade-in:** stagger 0.15s između svake fotke
-- **Efekt:** opacity 0→1, scale 0.7→1
-- **Duration:** 0.6s per fotka
-- **Ease:** back.out(1.2) za scale (bounce efekt)
+#### **Redoslijed Učitavanja:**
 
-#### 2. **Tekst (dolazi pred kraj carousela)**
-- **Timing:** Počinje ~0.8s prije kraja carousel animacije
-- **Duration:** 0.6s (sporija animacija)
-- **Stagger:** 0.04s između slova
-- **Ease:** power2.inOut (smooth in/out)
-- **Efekt:** y:200→0, opacity 0→1
+1. **Carousel fotografije** - učitavaju se prve
+2. **Tekst** - pojavljuje se pred kraj carousel animacije
+3. **Footer elementi** - dolaze nakon teksta
 
-#### 3. **Footer (dolazi nakon teksta)**
-- **Timing:** 0.2s nakon što tekst počne
-- **Duration:** 0.6s
-- **Stagger:** 0.12s između elemenata
-- **Ease:** power2.inOut
-- **Efekt:** y:20→0, opacity 0→1
+**Logika:** Carousel ima prioritet jer je glavni vizualni element. Tekst i footer layeraju se preko dok se carousel još animira za smooth "layered reveal" efekt.
 
-#### 4. **Carousel Behavior**
+#### **Carousel Interakcija:**
 
-**Auto-rotation:**
-- **Base speed:** 0.001 (vrlo sporo)
-- **Scroll-driven:** Ubrzava se prema scroll brzini
-- **Max speed:** 0.015
+- **Auto-rotation:** Lagana kontinuirana rotacija
+- **Scroll-driven:** Carousel ubrzava rotaciju prema brzini scrolla
+- **Drag:** Desktop ima mouse drag, mobile nema (ne blokira scroll)
+- **Inertia:** Smooth deceleration nakon puštanja
+- **Floating:** Lagano "breathing" ljuljanje za organic feel
 
-**Drag interakcija:**
-- **Desktop:** Mouse drag enabled
-- **Mobile:** Drag disabled (normalan scroll)
-- **Inertia:** 3s smooth deceleration nakon puštanja
-- **Sensitivity:** 0.0009 (70% sporije nego default)
+#### **Optimizacije:**
 
-**Floating efekt:**
-- Lagano ljuljanje po X i Z osi
-- Duration: 4-5.5s
-- Ease: sine.inOut (breathing efekt)
+- Intersection Observer pauzira rendering kad nije u viewportu
+- GSAP Ticker sinkroniziran sa Lenis smooth scrollom
+- Responsive camera positioning za mobile
 
-#### 5. **Optimizacije**
-
-- **Intersection Observer:** Pauzira rendering kad nije u viewportu
-- **GSAP Ticker:** Sinkronizirano sa Lenis smooth scrollom
-- **Responsive:** Camera position adjusted za mobile
+**Detalji o timing-ima i vrijednostima:** `src/home/hero.js`
 
 ---
 
-## 📸 Work Page - Grid & Animacije
+## 📸 Work Page - Grid Galerija
 
-### Ponašanje Galerije
+### Setup & Ponašanje
 
-Work page galerija koristi **JavaScript generated grid** umjesto Webflow layouta:
+Work page galerija koristi **JavaScript generated grid** umjesto Webflow layouta.
 
-#### 1. **Flicker Prevention**
+#### **Webflow Setup:**
+
+- Galerija u Webflowu može biti u bilo kojem layoutu (flex, grid, collection list)
+- Svaki photo container treba imati klasu `.photo-container`
+- Svaka slika treba imati klasu `.photo`
+- **Bitno:** `.photo-container` mora imati `opacity: 0` (CSS u HEAD CODE ili Webflow stilovi)
+
 ```css
-/* U HEAD CODE - sakrij fotke dok JS ne preuzme kontrolu */
+/* U HEAD CODE - spriječi flicker prije nego JS preuzme kontrolu */
 .photo-container {
   opacity: 0;
 }
 ```
-- Webflow prikazuje galeriju u flexbox layoutu
-- JS odmah postavlja `opacity: 0` na sve `.photo-container` elemente
-- Čeka da slike budu učitane
-- Generira grid i animira reveal
 
-#### 2. **Grid Konfiguracija**
+#### **Kako Funkcionira:**
 
-```javascript
-// Desktop (> 992px)
-columns: 12
-left side: [2, 3]
-right side: [8, 9]
-horizontal span: 3
-vertical span: 2
+1. **Webflow prikazuje galeriju** u svom originalnom layoutu
+2. **JS odmah sakrije sve fotke** (`opacity: 0`)
+3. **Čeka da se slike učitaju** (da zna aspect ratio)
+4. **Generira randomiziran grid** sa specifičnim pravilima za pozicioniranje
+5. **Animira reveal** sa GSAP-om
 
-// Tablet (768px - 992px)
-columns: 8
-left side: [2, 3]
-right side: [5, 6]
+#### **Grid Logika:**
 
-// Mobile (< 768px)
-columns: 1
-```
+- **Responsive:** Različite grid konfiguracije za desktop/tablet/mobile
+- **Random positioning:** Fotke se pozicioniraju nasumično u definirane grid zone (lijevo/desno)
+- **Aspect ratio aware:** Horizontalne vs vertikalne fotke dobivaju različite span-ove
+- **Shuffle:** Svaki page load prikazuje fotke u različitom redoslijedu
 
-#### 3. **Animacije**
+#### **Animacije:**
 
-**Prve 5 fotki (instant reveal):**
-- **Delay:** 0.3s (da se vidi animacija)
-- **Duration:** 0.8s
-- **Ease:** power3.out
-- **Stagger:** 0.12s između fotki
-- **Efekt:** opacity 0→1, scale 0.9→1, y:50→0
+- **Prve fotke:** Instant reveal sa delayom (da korisnik vidi animaciju)
+- **Ostale fotke:** Lazy load sa Intersection Observer (animiraju se kad uđu u viewport)
+- **Efekti:** fade + scale + slide up (y:50) za smooth reveal
 
-**Ostale fotke (lazy load sa Intersection Observer):**
-- **rootMargin:** 0px (triggera kad fotka uđe u viewport)
-- **threshold:** 0.2 (mora biti 20% vidljiva)
-- **Bez delay-a** - animacija kreće odmah
-- **Duration:** 0.8s
-- **Ease:** power3.out
-- **Efekt:** isti kao prve fotke (opacity, scale, y:50)
+#### **Optimizacije:**
 
-#### 4. **Shuffle & Limit**
+- **Limit broja fotki** za performanse (CMS može imati više od potrebe)
+- **Eager loading** za prve fotke, lazy za ostale
+- **Intersection Observer** za efikasno lazy loading
+- **Cleanup:** Disconnect observers na page leave (Barba.js)
 
-- **Max fotki:** 30 (performanse)
-- **Random shuffle:** Svaki page load različit redoslijed
-- **Eager loading:** Prvih 6 fotki (loading="eager" + fetchpriority="high")
-- **Lazy loading:** Ostale fotke (loading="lazy")
-
-#### 5. **Webflow Setup**
-
-**U Webflowu:**
-- `.photo-container` mora imati **opacity: 0%** (ili u HEAD CODE)
-- Galerija može biti u bilo kojem layoutu (flex, grid) - JS će preuzeti kontrolu
-- Svaka fotka mora imati klasu `.photo`
-
-**Cleanup na page leave:**
-- Disconnect Intersection Observer
-- Dispose GSAP animacija
-- Dispose Three.js resources (ako ih ima)
+**Detalji o grid pravilima i timing-ima:** `src/work/work.js`
 
 ---
 
-## 🔧 Troubleshooting Animacija
+## 🔧 Troubleshooting
 
-### Hero Animacije
+### Hero Sekcija
 
-**Problem: Carousel se učitava prekasno**
-- Povećaj delay za carousel animacije (trenutno 0.2s)
-- `src/home/hero.js` → `startTime = 0.2 + index * 0.15`
+**Problem: Carousel se učitava prekasno/prerano**
+- Adjust `startTime` delay za carousel fotke u `src/home/hero.js`
 
-**Problem: Tekst se učitava prerano**
-- Smanji `textStartTime` offset (trenutno `-1.2s`)
-- `src/home/hero.js` → `const textStartTime = carouselRevealEnd - 1.2`
+**Problem: Tekst se učitava prekasno/prerano**
+- Adjust `textStartTime` offset u `src/home/hero.js`
+- To kontrolira kada tekst počinje u odnosu na carousel reveal
 
 **Problem: Animacije su prespore/prebrze**
-- Adjust duration: `duration: 0.6` (trenutno)
-- Adjust stagger: `stagger: 0.04` za tekst, `0.12` za footer
+- Adjust `duration` i `stagger` vrijednosti u `src/home/hero.js`
 
-**Problem: Carousel se ne vrti/lagga**
-- Provjeri Console za greške
+**Problem: Carousel se ne vrti ili lagga**
+- Provjeri Console (F12) za greške
 - Provjeri da Three.js CDN radi
 - Provjeri da `.hero-images-container` postoji u DOM-u
+- Provjeri da Webflow CMS ima slike u hero sekciji
 
-### Work Grid Animacije
+### Work Page Grid
 
 **Problem: Fotke se vide prije nego JS preuzme kontrolu (flicker)**
 ```css
@@ -384,22 +339,21 @@ columns: 1
 }
 ```
 
-**Problem: Fotke se učitavaju prekasno pri scrollu**
-- Smanji `threshold` (trenutno 0.2)
-- Povećaj `rootMargin` (trenutno 0px)
-- `src/work/work.js` → observerOptions
+**Problem: Fotke se učitavaju prekasno/prerano pri scrollu**
+- Adjust Intersection Observer `threshold` i `rootMargin` u `src/work/work.js`
+- Veći threshold = fotka mora biti više vidljiva prije nego se animira
+- Pozitivan rootMargin = triggera ranije (prije nego uđe u viewport)
 
-**Problem: Fotke se učitavaju prerano pri scrollu**
-- Povećaj `threshold` (0.2 → 0.3)
-- Smanji `rootMargin` (0px → -50px)
+**Problem: Prvih fotki ima prekratak delay**
+- Adjust `delay` vrijednost za prvih X fotki u `src/work/work.js`
 
-**Problem: Prvih 5 fotki ima delay koji je prekratak**
-- Povećaj delay (trenutno 0.3s)
-- `src/work/work.js` → `delay: 0.3`
+**Problem: Animacije nisu smooth**
+- Adjust `ease` i `duration` parametara u GSAP animacijama
+- Check `src/work/work.js` za sve animation properties
 
-**Problem: Animacija y:50 nije glatka**
-- Promijeni ease (trenutno `power3.out`)
-- Promijeni duration (trenutno 0.8s)
+**Problem: Grid ne radi na mobile/tablet**
+- Provjeri responsive breakpoints u `getCurrentConfig()` funkciji
+- Provjeri da grid konfiguracije postoje za sve breakpointe
 
 ---
 
