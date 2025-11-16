@@ -24,6 +24,6 @@
   "homepage": "https://github.com/renopeno/tomislav-vukic-web#readme",
   "description": "",
   "devDependencies": {
-    "vite": "^6.2.1"
+    "vite": "^6.4.1"
   }
 }
