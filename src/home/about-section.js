@@ -16,11 +16,30 @@ function initAboutSection() {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Split text u karaktere (slova) za slovo-po-slovo reveal
-  const titleSplit = new SplitType(homeAboutTitle, { types: 'chars' });
-  const scrollSplit = new SplitType(aboutScroll, { types: 'chars' });
+  // Split text prvo na riječi, pa na karaktere - sprječava lomljenje riječi
+  const titleSplit = new SplitType(homeAboutTitle, { types: 'words,chars' });
+  const scrollSplit = new SplitType(aboutScroll, { types: 'words,chars' });
 
-  // Postavi styling za masked reveal efekt
+  // Postavi styling za riječi - svaka riječ je inline-block da se ne lomi
+  if (titleSplit.words) {
+    titleSplit.words.forEach(word => {
+      gsap.set(word, { 
+        display: 'inline-block',
+        whiteSpace: 'nowrap'
+      });
+    });
+  }
+
+  if (scrollSplit.words) {
+    scrollSplit.words.forEach(word => {
+      gsap.set(word, { 
+        display: 'inline-block',
+        whiteSpace: 'nowrap'
+      });
+    });
+  }
+
+  // Postavi styling za masked reveal efekt na karakterima
   titleSplit.chars.forEach(char => {
     gsap.set(char, { 
       display: 'inline-block',
