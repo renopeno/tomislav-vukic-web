@@ -55,22 +55,6 @@ async function initWork() {
       photo.originalParent = photo.parentElement;
     });
     
-    // Prvih 6 fotki - eager loading s high priority, ostale lazy
-    allPhotoContainers.forEach((container, index) => {
-      const photo = container.querySelector(".photo");
-      if (photo) {
-        if (index < 6) {
-          // Prvih 6 - učitaj odmah
-          photo.setAttribute("loading", "eager");
-          photo.setAttribute("fetchpriority", "high");
-        } else {
-          // Ostale - lazy load
-          photo.setAttribute("loading", "lazy");
-        }
-        photo.setAttribute("decoding", "async");
-      }
-    });
-    
     // Resetiraj sve postavke
     allPhotoContainers.forEach(container => {
       container.style.display = '';
@@ -87,10 +71,28 @@ async function initWork() {
       container.style.display = 'none';
     });
 
+    // ✅ RANDOMIZIRAJ PRIJE postavljanja eager loading!
     // UVIJEK uzmi NOVE elemente iz DOM-a, nemoj cachirati stare reference
     // Barba.js zamijeni cijeli container pri navigaciji, stare reference postanu mrtve!
     window.shuffledPhotos = photoContainers.sort(() => Math.random() - 0.5);
     window.lastPath = window.location.pathname;
+    
+    // ✅ SADA postavi eager loading na prvih 5 RANDOMIZIRANIH slika
+    const FIRST_PHOTOS_COUNT = 5;
+    window.shuffledPhotos.forEach((container, index) => {
+      const photo = container.querySelector(".photo");
+      if (photo) {
+        if (index < FIRST_PHOTOS_COUNT) {
+          // Prvih 5 RANDOMIZIRANIH - učitaj odmah
+          photo.setAttribute("loading", "eager");
+          photo.setAttribute("fetchpriority", "high");
+        } else {
+          // Ostale - lazy load
+          photo.setAttribute("loading", "lazy");
+        }
+        photo.setAttribute("decoding", "async");
+      }
+    });
 
 
     // Grid konfiguracija po uređajima
@@ -107,7 +109,7 @@ async function initWork() {
       return gridConfig.desktop;
     }
 
-    function setupGrid() {
+    function setupGrid(usePlaceholderHeights = false) {
       const config = getCurrentConfig();
       let isLeft = true;
       let currentRow = 1;
@@ -116,8 +118,27 @@ async function initWork() {
 
       window.shuffledPhotos.forEach((container, index) => {
         const photo = container.querySelector(".photo");
-        const isHorizontal = photo.naturalWidth > photo.naturalHeight;
-        const colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
+        
+        // ✅ Ako slika još nije učitana, koristi placeholder aspect ratio
+        let isHorizontal = false;
+        let colSpan = config.verticalSpan;
+        
+        if (photo.naturalWidth > 0 && photo.naturalHeight > 0) {
+          // Slika je učitana - koristi stvarni aspect ratio
+          isHorizontal = photo.naturalWidth > photo.naturalHeight;
+          colSpan = isHorizontal ? config.horizontalSpan : config.verticalSpan;
+        } else if (usePlaceholderHeights) {
+          // Slika još nije učitana - koristi placeholder
+          // Na mobitelu sve su jedna ispod druge, na desktopu koristimo prosječni aspect ratio
+          if (config.columns === 1) {
+            // Mobile - sve su vertikalne (1 kolona)
+            colSpan = config.verticalSpan;
+          } else {
+            // Desktop/Tablet - koristi prosječni aspect ratio (pretpostavljamo 4:3)
+            // Možemo koristiti placeholder visinu ili čekati da se učitaju
+            colSpan = config.verticalSpan; // Default na vertikalno
+          }
+        }
 
         let startCol;
         if (config.columns === 1) {
@@ -140,15 +161,34 @@ async function initWork() {
         container.style.gridColumnStart = startCol;
         container.style.gridColumnEnd = startCol + colSpan;
         container.style.gridRowStart = currentRow;
+        
+        // ✅ Na mobitelu, postavi minimalnu visinu placeholder-a dok se slika ne učita
+        if (config.columns === 1 && usePlaceholderHeights && photo.naturalHeight === 0) {
+          // Postavi aspect ratio placeholder (pretpostavljamo 4:3 za vertikalne, 16:9 za horizontalne)
+          const containerWidth = container.offsetWidth || window.innerWidth;
+          const placeholderHeight = containerWidth * 1.33; // 4:3 aspect ratio
+          container.style.minHeight = `${placeholderHeight}px`;
+        }
 
         isLeft = !isLeft;
         currentRow++;
       });
     }
 
-    // Čekaj da sve slike budu učitane prije postavljanja grida
-    const allImages = window.shuffledPhotos.map(c => c.querySelector('.photo'));
-    const imageLoadPromises = allImages.map(img => {
+    // ✅ POSTAVI GRID ODMAH s placeholder visinama (osobito važno na mobitelu!)
+    // Ovo osigurava da grid ima visinu čak i dok se slike učitavaju
+    if (!window.isSettingUpGrid) {
+      window.isSettingUpGrid = true;
+      setupGrid(true); // Postavi grid s placeholder visinama
+      window.isSettingUpGrid = false;
+    }
+    
+    // ✅ Čekaj samo prvih 5 slika za početni reveal (ne sve!)
+    const firstPhotosCount = 5;
+    const firstPhotos = window.shuffledPhotos.slice(0, firstPhotosCount);
+    const firstImages = firstPhotos.map(c => c.querySelector('.photo'));
+    
+    const firstImagePromises = firstImages.map(img => {
       if (img.complete && img.naturalWidth > 0) {
         return Promise.resolve();
       }
@@ -158,17 +198,27 @@ async function initWork() {
       });
     });
 
-    await Promise.all(imageLoadPromises);
+    // Čekaj samo prvih 5 slika
+    await Promise.all(firstImagePromises);
     
+    // ✅ Ažuriraj grid nakon što se prvih 5 slika učitaju (da se korigiraju aspect ratio-i)
     if (!window.isSettingUpGrid) {
       window.isSettingUpGrid = true;
-      setupGrid();
+      setupGrid(false); // Ažuriraj grid sa stvarnim aspect ratio-ima
       window.isSettingUpGrid = false;
     }
     
+    // ✅ Ukloni placeholder min-height nakon što se slike učitaju
+    if (getCurrentConfig().columns === 1) {
+      firstPhotos.forEach(container => {
+        const photo = container.querySelector(".photo");
+        if (photo && photo.naturalHeight > 0) {
+          container.style.minHeight = '';
+        }
+      });
+    }
+    
     // ✅ HYBRID: Prvih 5 fotki delayed reveal, ostale lazy load
-    const firstPhotosCount = 5;
-    const firstPhotos = window.shuffledPhotos.slice(0, firstPhotosCount);
     const lazyPhotos = window.shuffledPhotos.slice(firstPhotosCount);
     
     // 1️⃣ PRVIH 5 FOTKI - Delayed reveal s GSAP animacijom (y:50 za sve)
