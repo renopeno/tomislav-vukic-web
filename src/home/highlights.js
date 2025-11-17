@@ -39,6 +39,7 @@ function initHighlights() {
     duration: 0.6,
     ease: "power1.inOut",
     stagger: 0.2,
+    delay: 0.1,
     scrollTrigger: {
       trigger: '.highlights-wrapper',
       start: isMobile ? "top 80%" : "top 80%",
