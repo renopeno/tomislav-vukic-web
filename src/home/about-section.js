@@ -80,43 +80,43 @@ function initAboutSection() {
   // Provjera za mobile
   const isMobile = window.innerWidth <= 767;
 
-  // Izračunaj trajanje title animacije
-  const titleChars = titleSplit.chars.map(c => c.querySelector('span'));
-  const titleDuration = 1; // duration
-  const titleStagger = 0.015;
-  const titleTotalTime = titleDuration + ((titleChars.length - 1) * titleStagger);
-  
-  // Scroll text animacija počinje 0.1s prije nego title završi
-  const scrollTextStartTime = titleTotalTime - 0.1;
-
-  // 🎬 MASTER TIMELINE - scroll-driven animacija koja kontrolira obje animacije
-  const masterTimeline = gsap.timeline({
+  // 🎬 TITLE REVEAL - scroll-driven masked slide up animacija s elastic efektom
+  const titleTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutSection,
       start: isMobile ? "top 60%" : "top 85%",
       end: "top 15%",
       scrub: 1,
-      id: "about-section-reveal"
+      id: "about-title-reveal"
     }
   });
 
-  // TITLE REVEAL - scroll-driven masked slide up animacija
-  masterTimeline.to(titleChars, {
-    y: 0,
-    opacity: 1,
-    duration: titleDuration,
-    stagger: titleStagger,
-    ease: "power2.out"
-  }, 0); // Počinje na 0
-
-  // SCROLL TEXT REVEAL - počinje 0.1s prije nego title završi
-  masterTimeline.to(scrollSplit.chars.map(c => c.querySelector('span')), {
+  titleTimeline.to(titleSplit.chars.map(c => c.querySelector('span')), {
     y: 0,
     opacity: 1,
     duration: 1,
     stagger: 0.015,
     ease: "power2.out"
-  }, scrollTextStartTime);
+  });
+
+  // 🎬 SCROLL TEXT REVEAL - počinje kad element uđe ~5% u viewport
+  const scrollTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: aboutScroll,
+      start: "top 95%", // Animacija počinje kad je vrh elementa na 95% viewport-a (uđe 5% u viewport)
+      end: "top 25%",
+      scrub: 1,
+      id: "about-scroll-reveal"
+    }
+  });
+
+  scrollTimeline.to(scrollSplit.chars.map(c => c.querySelector('span')), {
+    y: 0,
+    opacity: 1,
+    duration: 1,
+    stagger: 0.015,
+    ease: "power2.out"
+  });
 }
 
 window.initAboutSection = initAboutSection;
