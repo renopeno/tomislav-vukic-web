@@ -16,36 +16,36 @@ function initAboutSection() {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Split text u riječi
-  const titleSplit = new SplitType(homeAboutTitle, { types: 'words' });
-  const scrollSplit = new SplitType(aboutScroll, { types: 'words' });
+  // Split text u karaktere (slova) za slovo-po-slovo reveal
+  const titleSplit = new SplitType(homeAboutTitle, { types: 'chars' });
+  const scrollSplit = new SplitType(aboutScroll, { types: 'chars' });
 
   // Postavi styling za masked reveal efekt
-  titleSplit.words.forEach(word => {
-    gsap.set(word, { 
+  titleSplit.chars.forEach(char => {
+    gsap.set(char, { 
       display: 'inline-block',
       overflow: 'hidden',
       verticalAlign: 'top'
     });
   });
 
-  scrollSplit.words.forEach(word => {
-    gsap.set(word, { 
+  scrollSplit.chars.forEach(char => {
+    gsap.set(char, { 
       display: 'inline-block',
       overflow: 'hidden',
       verticalAlign: 'top'
     });
   });
 
-  // Wrap svaku riječ u inner span za slide-up efekt
-  const wrapWords = (words) => {
-    words.forEach(word => {
-      const text = word.textContent;
+  // Wrap svaki karakter u inner span za slide-up efekt
+  const wrapChars = (chars) => {
+    chars.forEach(char => {
+      const text = char.textContent;
       const inner = document.createElement('span');
       inner.style.display = 'inline-block';
       inner.textContent = text;
-      word.textContent = '';
-      word.appendChild(inner);
+      char.textContent = '';
+      char.appendChild(inner);
       
       // Inicijalno stanje - sakriveno ispod
       gsap.set(inner, { 
@@ -55,45 +55,48 @@ function initAboutSection() {
     });
   };
 
-  wrapWords(titleSplit.words);
-  wrapWords(scrollSplit.words);
+  wrapChars(titleSplit.chars);
+  wrapChars(scrollSplit.chars);
 
-  // Prvih 6 riječi odmah vidljivo
-  titleSplit.words.slice(0, 6).forEach(word => {
-    const inner = word.querySelector('span');
-    gsap.set(inner, { y: 0, opacity: 1 });
-  });
+  // Provjera za mobile
+  const isMobile = window.innerWidth <= 767;
 
-  // 🎬 TITLE REVEAL - masked slide up animacija
-  gsap.to(titleSplit.words.slice(6).map(w => w.querySelector('span')), {
-    y: 0,
-    opacity: 1,
-    duration: 0.6,
-    stagger: 0.015,
-    ease: "power2.out",
+  // 🎬 TITLE REVEAL - scroll-driven masked slide up animacija s elastic efektom
+  const titleTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutSection,
-      start: "top 60%",
-      toggleActions: "play none none none",
-      once: true,
+      start: isMobile ? "top 60%" : "top 85%",
+      end: "top 15%",
+      scrub: 1,
       id: "about-title-reveal"
     }
   });
 
-  // 🎬 SCROLL TEXT REVEAL - masked slide up animacija
-  gsap.to(scrollSplit.words.map(w => w.querySelector('span')), {
+  titleTimeline.to(titleSplit.chars.map(c => c.querySelector('span')), {
     y: 0,
     opacity: 1,
-    duration: 0.6,
+    duration: 1,
     stagger: 0.015,
-    ease: "power2.out",
+    ease: "power2.out"
+  });
+
+  // 🎬 SCROLL TEXT REVEAL - scroll-driven masked slide up animacija
+  const scrollTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutScroll,
-      start: "top 80%",
-      toggleActions: "play none none none",
-      once: true,
+      start: isMobile ? "top 70%" : "top 95%",
+      end: "top 25%",
+      scrub: 1,
       id: "about-scroll-reveal"
     }
+  });
+
+  scrollTimeline.to(scrollSplit.chars.map(c => c.querySelector('span')), {
+    y: 0,
+    opacity: 1,
+    duration: 1,
+    stagger: 0.015,
+    ease: "power2.out"
   });
 }
 
