@@ -102,9 +102,9 @@ function initAboutSection() {
   // 🎬 SCROLL TEXT REVEAL - scroll-driven masked slide up animacija
   const scrollTimeline = gsap.timeline({
     scrollTrigger: {
-      trigger: aboutScroll,
-      start: isMobile ? "top 30%" : "top 95%",
-      end: "top 25%",
+      trigger: aboutSection,
+      start: isMobile ? "top 80%" : "top 90%",
+      end: isMobile ? "top 20%" : "top 25%",
       scrub: 1,
       id: "about-scroll-reveal"
     }
