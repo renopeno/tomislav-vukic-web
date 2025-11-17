@@ -80,43 +80,43 @@ function initAboutSection() {
   // Provjera za mobile
   const isMobile = window.innerWidth <= 767;
 
-  // 🎬 TITLE REVEAL - scroll-driven masked slide up animacija s elastic efektom
-  const titleTimeline = gsap.timeline({
+  // Izračunaj trajanje title animacije
+  const titleChars = titleSplit.chars.map(c => c.querySelector('span'));
+  const titleDuration = 1; // duration
+  const titleStagger = 0.015;
+  const titleTotalTime = titleDuration + ((titleChars.length - 1) * titleStagger);
+  
+  // Scroll text animacija počinje 0.1s prije nego title završi
+  const scrollTextStartTime = titleTotalTime - 0.1;
+
+  // 🎬 MASTER TIMELINE - scroll-driven animacija koja kontrolira obje animacije
+  const masterTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutSection,
       start: isMobile ? "top 60%" : "top 85%",
       end: "top 15%",
       scrub: 1,
-      id: "about-title-reveal"
+      id: "about-section-reveal"
     }
   });
 
-  titleTimeline.to(titleSplit.chars.map(c => c.querySelector('span')), {
+  // TITLE REVEAL - scroll-driven masked slide up animacija
+  masterTimeline.to(titleChars, {
+    y: 0,
+    opacity: 1,
+    duration: titleDuration,
+    stagger: titleStagger,
+    ease: "power2.out"
+  }, 0); // Počinje na 0
+
+  // SCROLL TEXT REVEAL - počinje 0.1s prije nego title završi
+  masterTimeline.to(scrollSplit.chars.map(c => c.querySelector('span')), {
     y: 0,
     opacity: 1,
     duration: 1,
     stagger: 0.015,
     ease: "power2.out"
-  });
-
-  // 🎬 SCROLL TEXT REVEAL - scroll-driven masked slide up animacija
-  const scrollTimeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: aboutSection,
-      start: isMobile ? "top 80%" : "top 90%",
-      end: isMobile ? "top 20%" : "top 25%",
-      scrub: 1,
-      id: "about-scroll-reveal"
-    }
-  });
-
-  scrollTimeline.to(scrollSplit.chars.map(c => c.querySelector('span')), {
-    y: 0,
-    opacity: 1,
-    duration: 1,
-    stagger: 0.015,
-    ease: "power2.out"
-  });
+  }, scrollTextStartTime);
 }
 
 window.initAboutSection = initAboutSection;
