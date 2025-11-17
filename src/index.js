@@ -14,6 +14,7 @@ initCustomCursor();
 // Home page skripte
 import './home/hero.js';
 import './home/about-section.js';
+import './home/about-carousel.js';
 import './home/highlights.js';
 import './home/categories.js';
 
