@@ -103,7 +103,7 @@ function initAboutSection() {
   const scrollTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: aboutScroll,
-      start: isMobile ? "top 50%" : "top 95%",
+      start: isMobile ? "top 30%" : "top 95%",
       end: "top 25%",
       scrub: 1,
       id: "about-scroll-reveal"
