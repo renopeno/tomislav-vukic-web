@@ -66,7 +66,6 @@ function initPageSpecificFunctions(namespace) {
     case 'home':
       window.initHero?.();
       window.initAboutSection?.();
-      window.initAboutCarousel?.();
       window.initHighlights?.();
       window.initCategories?.();
       break;
